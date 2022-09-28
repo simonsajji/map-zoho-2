@@ -8,3 +8,30 @@ html, body {
   .map {
     height:100%;
   }
+
+  .c-gr{
+    color:grey;
+  }
+
+  .dot{
+    color: rgb(146, 146, 146);
+    font-weight: 400;
+  }
+
+  .flex-1{
+    flex:1 !important;
+  }
+  .flex-2{
+    flex:2 !important;
+  }
+
+  .w-90{
+    width: 90%!important;
+  }
+  .w-95{
+    width: 95% !important;
+  }
+
+  .w-100{
+    width: 100%!important;
+  }
