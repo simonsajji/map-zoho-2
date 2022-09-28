@@ -11,7 +11,7 @@
                    
                     <div class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5"> 
                         <div *ngIf="i==0" class="d-flex align-center">
-                            <i  class="fa fa-home f-s-18 m-r-10 flex-1"></i> 
+                            <i  class="fa fa-home f-s-22 m-r-10 flex-1"></i> 
                             <div [style.width]="'calc(100% - ' + 18 + 'px)'" >{{leg?.start_address}}</div> 
                         </div> 
                         <div *ngIf="i!=0" class="d-flex ">
@@ -22,10 +22,10 @@
                     </div>
                     
                     <div  class="p-r-10 f-w-400 d-flex j-space align-center flex-wrap c-gr w-90 p-t-5"> {{leg?.start_address}}</div>
-                    <div class="f-s-12 f-w-400 m-b-5 m-t-10 sub-head d-flex align-center p-t-5 p-b-5 w-100 flex-1"><hr [style.width]="'calc(40% - ' + (sr.clientWidth) + 'px)'"  class="hor-line  m-r-0 m-l-0"> <div class="d-flex " #sr><i class="fa fa-car f-w-500 f-s-14 p-r-5 p-l-5"></i> {{leg?.duration?.text}} <div class="p-r-5 p-l-5">&middot;</div>  <div class="c-gr p-r-5">{{leg?.distance?.text}}</div> </div>  <hr [style.width]="'calc(65% - ' + (sr.clientWidth) + 'px)'"  class="hor-line  m-l-0  m-r-0"></div>
-                    <div *ngIf="i==shortestRte?.legs?.length-1" class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5"> 
+                    <div class="f-s-12 f-w-400 m-b-5 m-t-10 sub-head d-flex align-center p-t-5 p-b-5 w-100 flex-1"><hr [style.width]="'calc(40% - ' + (sr.clientWidth) + 'px)'"  class="hor-line  m-r-0 m-l-0"> <div class="d-flex " #sr><i class="fa fa-car f-w-500 f-s-16 p-r-5 p-l-10"></i> {{leg?.duration?.text}} <div class="p-r-5 p-l-5">&middot;</div>  <div class="c-gr p-r-5">{{leg?.distance?.text}}</div> </div>  <hr [style.width]="'calc(65% - ' + (sr.clientWidth) + 'px)'"  class="hor-line  m-l-0  m-r-0"></div>
+                    <div *ngIf="i==shortestRte?.legs?.length-1" class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5 p-10 p-l-0"> 
                         <div  class="d-flex align-center">
-                            <i  class="fa fa-home f-s-18 m-r-10 flex-1"></i> 
+                            <i class="fa fa-flag-checkered m-r-10 f-s-22"></i> 
                             <div [style.width]="'calc(100% - ' + 18 + 'px)'" >{{leg?.end_address}}</div> 
                         </div> 
                         
