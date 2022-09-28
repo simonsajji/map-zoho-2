@@ -2,7 +2,7 @@
     <div id="map" style="height: 100%;width: calc(100%);z-index: 10;overflow: hidden;"></div>
     
         <div  class="side-drawer p-r-0 p-t-5 "  [ngClass]="{'transition':rightanimationActive,'closetransition':leftanimationActive,'w-0' :showSliderMenu==false,'w-25':showSliderMenu==true } ">
-            <button  class="slide-btn" (click)="toggleSlideMenu()"> <i *ngIf="showSliderMenu" class="fa fa-angle-right"></i> <i *ngIf="!showSliderMenu" class="fa fa-angle-left"></i><img width="42%" height="60%" src="assets/route2.png" alt=""></button>
+            <button  class="slide-btn" title="Routes" (click)="toggleSlideMenu()"> <i *ngIf="showSliderMenu" class="fa fa-angle-right"></i> <i *ngIf="!showSliderMenu" class="fa fa-angle-left"></i><img width="42%" height="60%" src="assets/route2.png" alt=""></button>
             <div *ngIf="showSliderMenu " class="right-content flex-column ">
                 <div class="f-s-14 f-w-500 p-b-20  align-baseline d-flex"><span class="m-r-10">Route</span>  <i class="fa fa-angle-down f-w-600" aria-hidden="true"></i></div>
                 <p class="f-s-13 p-l-10 d-flex m-0 m-b-5">Travel Mode : Driving : fastest (optimal order of route)</p>
