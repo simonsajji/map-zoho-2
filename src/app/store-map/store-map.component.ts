@@ -1,5 +1,6 @@
 import { LocationStrategy } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, ViewChild } from '@angular/core';
+import { MapInfoWindow } from '@angular/google-maps';
 import MarkerClusterer from '@googlemaps/markerclustererplus';
 
 @Component({
@@ -118,7 +119,7 @@ export class StoreMapComponent implements OnInit,OnChanges {
    
   }
 
-  makeWaypoints(position:any,title:any){
+  makeWaypoints(position:any,title:any,locObject:any){
     let label = title + "";
     console.log(position.lat());
     let obj = {lat:position.lat(),lng:position.lng()}
@@ -127,6 +128,33 @@ export class StoreMapComponent implements OnInit,OnChanges {
      map: this.map,
      label: label
     }));
+    let options = {
+      content:  `<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${locObject?.start_address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
+                  <div style="display:flex;align-items:center; justify-content:center;gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>To Route</div> <div>Navigate</div> <div>G Map</div> <div>Street View</div>  <div>Move</div><div>
+                </div>`
+    }
+
+    let infoWindowOptions = {
+      map:this.map,
+      anchor:new google.maps.Marker({
+        position: obj,
+        map: this.map,
+        label: label
+       }),
+       shouldFocus:true
+    }
+    new google.maps.Marker({
+      position: obj,
+      map: this.map,
+      label: label
+     }).addListener('click', (event:any)=>{
+     let InfoWindow:any =  new google.maps.InfoWindow(options).open(infoWindowOptions);
+     
+     }) 
+   
+   
+
+    
 
   }
 
@@ -168,7 +196,7 @@ export class StoreMapComponent implements OnInit,OnChanges {
           this.makeMarker( leg.start_location, "start", "title" );
           this.makeMarker( leg2.end_location, "end", 'title' );
           result?.routes[0]?.legs?.forEach((element:any,idx:any) => {
-           if(idx !=0) this.makeWaypoints(element?.start_location,idx)    
+           if(idx !=0) this.makeWaypoints(element?.start_location,idx,element)    
           });
           this.makeClusters();
           this.computeTotalDistance(result);
