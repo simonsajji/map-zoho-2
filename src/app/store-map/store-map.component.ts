@@ -66,6 +66,7 @@ export class StoreMapComponent implements OnInit,OnChanges {
   leftanimationActive:boolean = false;
   totalDistance:any;
   totalDuration:any;
+  infoWin :any= new google.maps.InfoWindow();
 
   ngOnInit() {
    
@@ -84,78 +85,77 @@ export class StoreMapComponent implements OnInit,OnChanges {
     //     console.log(this.showRoutes);
   }
 
-  makeMarker( position:any, icon:any, title:any ) {
+  makeMarker( position:any, icon:any, title:any,locObject:any ) {
     let  mkr = [];
+    let label = title + "";
+    console.log(position.lat());
+    let obj = {lat:position.lat(),lng:position.lng()};
     if(icon=="start"){
-      mkr.push(new google.maps.Marker({
-       position: position,
-       map: this.map,
-       icon:"assets/flag-start.png",
-       title: title
-      }));
-   
-       new MarkerClusterer(this.map, mkr, {
-         imagePath:
-           "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-           
-       });
+        let marker = new google.maps.Marker({
+          position: obj,
+          map: this.map,
+          icon: "assets/flag-start.png",
+          label: label,
+          title: title
+        });
+
+        google.maps.event.addListener(marker, 'click', (evt:any)=> {
+          this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${locObject?.start_address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
+                      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>Remove</div> <div>G Map</div> <div>Street View</div>  <div>Move</div><div>
+                    </div>`);
+          this.infoWin.open(this.map, marker);
+        })
+        mkr.push(marker);
+          new MarkerClusterer(this.map, mkr, {
+          imagePath:
+            "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+            
+        });
 
     }
     else{
-      mkr.push(new google.maps.Marker({
-       position: position,
-       map: this.map,
-       icon:"assets/flag-end.png",
-       title: title
-      }));
-   
-       new MarkerClusterer(this.map, mkr, {
-         imagePath:
-           "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-           
-       });
+     
+        let marker = new google.maps.Marker({
+          position: obj,
+          map: this.map,
+          icon: "assets/flag-end.png",
+          label: label,
+          title: title
+        });
 
+        google.maps.event.addListener(marker, 'click', (evt:any)=> {
+          this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${locObject?.start_address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
+                      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>Remove</div> <div>G Map</div> <div>Street View</div>  <div>Move</div><div>
+                    </div>`);
+          this.infoWin.open(this.map, marker);
+        })
+        mkr.push(marker);
+          new MarkerClusterer(this.map, mkr, {
+          imagePath:
+            "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+            
+        });
     }
-   
   }
 
   makeWaypoints(position:any,title:any,locObject:any){
     let label = title + "";
     console.log(position.lat());
     let obj = {lat:position.lat(),lng:position.lng()}
-    this.mkrs.push(new google.maps.Marker({
-     position: obj,
-     map: this.map,
-     label: label
-    }));
-    let options = {
-      content:  `<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${locObject?.start_address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
-                  <div style="display:flex;align-items:center; justify-content:center;gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>To Route</div> <div>Navigate</div> <div>G Map</div> <div>Street View</div>  <div>Move</div><div>
-                </div>`
-    }
 
-    let infoWindowOptions = {
-      map:this.map,
-      anchor:new google.maps.Marker({
-        position: obj,
-        map: this.map,
-        label: label
-       }),
-       shouldFocus:true
-    }
-    new google.maps.Marker({
+    let marker = new google.maps.Marker({
       position: obj,
       map: this.map,
       label: label
-     }).addListener('click', (event:any)=>{
-     let InfoWindow:any =  new google.maps.InfoWindow(options).open(infoWindowOptions);
-     
-     }) 
-   
-   
+     });
 
-    
-
+    google.maps.event.addListener(marker, 'click', (evt:any)=> {
+      this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${locObject?.start_address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
+      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>Remove</div> <div>G Map</div> <div>Street View</div>  <div>Move</div><div>
+    </div>`);
+      this.infoWin.open(this.map, marker);
+    })
+    this.mkrs.push(marker);
   }
 
   createRoute(){
@@ -193,8 +193,8 @@ export class StoreMapComponent implements OnInit,OnChanges {
           var leg = result.routes[0].legs[0];
           var leg2 = result.routes[0].legs[legLength -1]
           console.log(leg , leg2.end_location.lat())
-          this.makeMarker( leg.start_location, "start", "title" );
-          this.makeMarker( leg2.end_location, "end", 'title' );
+          this.makeMarker( leg.start_location, "start", "title" ,leg);
+          this.makeMarker( leg2.end_location, "end", 'title' ,leg2 );
           result?.routes[0]?.legs?.forEach((element:any,idx:any) => {
            if(idx !=0) this.makeWaypoints(element?.start_location,idx,element)    
           });
