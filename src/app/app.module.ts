@@ -7,6 +7,7 @@ import { MapMarkerClusterer } from '@angular/google-maps';
 import { StoreMapComponent } from './store-map/store-map.component';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialModule } from './modules/material/material.module';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    MatSidenavModule
+    MatSidenavModule,
+    MaterialModule
   ],
   providers: [],
   bootstrap: [AppComponent]

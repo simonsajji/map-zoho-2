@@ -3,6 +3,7 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnChange
 import { MapInfoWindow } from '@angular/google-maps';
 import MarkerClusterer from '@googlemaps/markerclustererplus';
 
+
 @Component({
   selector: 'store-map',
   // template: `<div id="map" style="height: 100vh"></div>`,
@@ -67,6 +68,9 @@ export class StoreMapComponent implements OnInit,OnChanges {
   totalDistance:any;
   totalDuration:any;
   infoWin :any= new google.maps.InfoWindow();
+  wayPoints:any = [];
+  shortestResult: google.maps.DirectionsResult |any ;
+  pinSideMenu:boolean = false;
 
   ngOnInit() {
    
@@ -158,54 +162,64 @@ export class StoreMapComponent implements OnInit,OnChanges {
     this.mkrs.push(marker);
   }
 
-  createRoute(){
+  markLocations(){
     for (var i = 0, parts = [], max = 25 - 1; i < this.locations.length; i = i + max){
       parts.push(this.locations.slice(i, i + max + 1));
       }
     // Send requests to service to get route (for stations count <= 25 only one request will be sent)
      for (var i = 0; i < parts.length; i++) {
         // Waypoints does not include first station (origin) and last station (destination)
-        var waypoints = [];
         for (var j = 1; j < parts[i].length - 1; j++){
-          waypoints.push(parts[i][j]);
+          this.wayPoints.push(parts[i][j]);
         }
-     
-        this.directionsService.route({
-          origin: "illinois",
-          destination: { lat: 52.146973, lng: -106.677034},
-          waypoints: waypoints,
-          // waypoints: this.locations,
-          optimizeWaypoints: true,
-          provideRouteAlternatives: true,
-          travelMode: google.maps.TravelMode.DRIVING,
-        },
-        ((result:any,status:any) => {
-          console.log(result);
-          this.result = result;
-          if(status=='OK') this.showRoutes = true;
+     }
+  }
+
+  createRoute(){
+    this.markLocations();
+    this.directionsService.route({
+      origin: "illinois",
+      destination: { lat: 52.146973, lng: -106.677034},
+      waypoints: this.wayPoints,
+      // waypoints: this.locations,
+      optimizeWaypoints: true,
+      provideRouteAlternatives: true,
+      travelMode: google.maps.TravelMode.DRIVING,
+    },
+      ((result:any,status:any) => {
+        console.log(result);
+        this.result = result;
+        if(status=='OK'){
+          
           // document.getElementById("warnings-panel").innerHTML =
           //   "<b>" + result.routes[0].warnings + "</b>";
-          var shortest: google.maps.DirectionsResult = this.shortestRoute(result);
+          this.shortestResult = this.shortestRoute(this.result);
           console.log(this.shortestRte);
-          
-          let legLength = result.routes[0].legs.length;
-          this.directionsRenderer.setDirections(shortest); // shortest or result
-          var leg = result.routes[0].legs[0];
-          var leg2 = result.routes[0].legs[legLength -1]
+          let legLength = this.result.routes[0].legs.length;
+          var leg = this.result.routes[0].legs[0];
+          var leg2 = this.result.routes[0].legs[legLength -1]
           console.log(leg , leg2.end_location.lat())
           this.makeMarker( leg.start_location, "start", "title" ,leg);
           this.makeMarker( leg2.end_location, "end", 'title' ,leg2 );
-          result?.routes[0]?.legs?.forEach((element:any,idx:any) => {
-           if(idx !=0) this.makeWaypoints(element?.start_location,idx,element)    
+          this.result?.routes[0]?.legs?.forEach((element:any,idx:any) => {
+          if(idx !=0) this.makeWaypoints(element?.start_location,idx,element)    
           });
           this.makeClusters();
-          this.computeTotalDistance(result);
+          this.computeTotalDistance(this.result);
           // showSteps(result, markerArray, stepDisplay, map);
-        }))
+          // this.renderRoute();
+          
+        }
+      }))
       .catch((e:any) => {
         window.alert("Directions request failed due to " + e);
       });
-    }
+      
+  }
+
+  renderRoute(){
+    this.showRoutes = true;
+    this.directionsRenderer.setDirections(this.shortestResult); // shortest or result
   }
 
   computeTotalDistance(result:any) {

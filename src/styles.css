@@ -13,10 +13,8 @@ html, body {
     color:grey;
   }
 
-  .dot{
-    color: rgb(146, 146, 146);
-    font-weight: 400;
-  }
+  
+
 
   .flex-1{
     flex:1 !important;
@@ -24,7 +22,13 @@ html, body {
   .flex-2{
     flex:2 !important;
   }
+  .flex-3{
+    flex:3 !important;
+  }
 
+  .w-80{
+    width: 80%!important;
+  }
   .w-90{
     width: 90%!important;
   }
@@ -35,3 +39,9 @@ html, body {
   .w-100{
     width: 100%!important;
   }
+
+  .c-pointer{
+    cursor: pointer!important;
+  }
+
+ 
