@@ -8,16 +8,20 @@ import { StoreMapComponent } from './store-map/store-map.component';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './modules/material/material.module';
+import { CustomDatePipe } from './pipes/date.pipe';
+import { FormsModule } from '@angular/forms';
+
 
 @NgModule({
   declarations: [
     AppComponent,
     GoogleMapDemoComponent,
     StoreMapComponent,
-    
+    CustomDatePipe
   ],
   imports: [
     BrowserModule,
+    FormsModule,
     BrowserAnimationsModule,
     AppRoutingModule,
     MatSidenavModule,

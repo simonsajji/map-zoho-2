@@ -25,7 +25,9 @@
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.css",
-              "src/assets/css/commonCss.css"
+              "src/assets/css/commonCss.css",
+              "src/assets/css/angular-calendar.css",
+              "src/assets/css/flatpickr.css"
             ],
             "scripts": []
           },

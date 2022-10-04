@@ -111,6 +111,9 @@
 .w-20{
     width: 20%!important;
 }
+.w-22{
+    width: 22%!important;
+}
 
 
 
@@ -228,7 +231,8 @@
 }
 
 .primary-color{
-    color:#2452AD!important;
+    color:#285ec9!important;
+    color:#2464ad!important;
 }
 
 .dot-container{
@@ -238,10 +242,12 @@
   .dot-container:hover{
     color: rgb(153, 153, 153);
     font-weight: 400;
+    height: 15px!important;
   }
 
   .dot{
-    width:16px;
+    width:6px!important;
+    height: 12px !important;
   }
 
   .add_loc_link{
@@ -251,3 +257,43 @@
   .add_loc_link:hover{
     font-weight: 500;
   }
+
+  .calendar-parent{
+    width:1px;
+    visibility:hidden;
+    height: 0px;
+}
+
+.c-blue{
+    color:rgba(46, 88, 136, 0.8);
+}
+.c-darkblue{
+    color:rgba(14, 43, 77, 1);
+}
+
+::ng-deep ngx-material-timepicker-content{
+    --body-background-color: #fff;
+    --primary-font-family: 'Roboto',sans-serif;
+    --button-color: #285ec9 !important;
+    --dial-active-color: #fff;
+    --dial-inactive-color: rgba(255, 255, 255, 0.5);
+    --dial-background-color: #285ec9 !important;
+    --dial-editable-active-color: #285ec9 !important;
+    --dial-editable-background-color: #fff;
+    --clock-face-time-active-color: #fff;
+    --clock-face-time-inactive-color: #6c6c6c;
+    --clock-face-inner-time-inactive-color: #929292;
+    --clock-face-time-disabled-color: #c5c5c5;
+    --clock-face-background-color: #f0f0f0;
+    --clock-hand-color: #285ec9 !important;
+    position: absolute!important;
+    top: 4%!important;
+    right: 3%!important;
+  }
+
+  ::ng-deep ngx-material-timepicker-content .timepicker-dial__control {
+    border: 0!important;
+    outline: none!important;
+  }
+
+ 

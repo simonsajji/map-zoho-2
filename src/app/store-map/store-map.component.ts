@@ -71,9 +71,18 @@ export class StoreMapComponent implements OnInit,OnChanges {
   wayPoints:any = [];
   shortestResult: google.maps.DirectionsResult |any ;
   pinSideMenu:boolean = false;
+  displayDate: any;
+  currentDate:any;
+  displayTime:any;
+  currentTime:any;
+  @ViewChild('timepicker') timepicker:any;
+  isOpen:any;
 
   ngOnInit() {
-   
+    this.currentDate = new Date();
+    this.currentTime = new Date();
+    this.displayTime = this.formatAMPM(new Date());
+    this.displayDate = new Date();
     this.map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
         zoom: 3,
         center: { lat: 45.630001, lng: -73.519997},
@@ -88,6 +97,55 @@ export class StoreMapComponent implements OnInit,OnChanges {
     // if(this.result.legs?.length>0) this.showRoutes = true;
     //     console.log(this.showRoutes);
   }
+
+ 
+  
+ formatAMPM(date:any) {
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  let ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  let strTime = hours + ':' + minutes + ' ' + ampm;
+  return strTime;
+}
+
+  dateChange(event:any): void {
+    // this.initialLoader = true;
+    let date = event.value || event;
+    this.displayDate = date;
+    const yyyy = date.getFullYear();
+    let mm: any = date.getMonth() + 1; // Months start at 0!
+    let dd: any = date.getDate();
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    const formattedDate = { "date": mm + '-' + dd + '-' + yyyy };
+  }
+
+  onTimeset(ev:any){
+    let time = ev?.value || ev;
+    console.log(ev);
+    this.displayTime = time;
+
+  }
+
+
+
+  leftDateClick(): void {
+    const numOfDays = 1;
+    const daysAgo = new Date(this.displayDate.getTime());
+    daysAgo.setDate(this.displayDate.getDate() - numOfDays);
+    this.dateChange(daysAgo);
+  }
+
+  rightDateClick(): void {
+    const numOfDays = 1;
+    const daysAgo = new Date(this.displayDate.getTime());
+    daysAgo.setDate(this.displayDate.getDate() + numOfDays);
+    this.dateChange(daysAgo);
+  }
+
 
   makeMarker( position:any, icon:any, title:any,locObject:any ) {
     let  mkr = [];
