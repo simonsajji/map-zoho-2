@@ -296,4 +296,37 @@
     outline: none!important;
   }
 
- 
+ .searchArea{
+    position: absolute!important;
+    top:6px;
+    left:6px;
+    width: 40vw;
+    height: 45px;
+    z-index: 1000!important;
+    background-color: whitesmoke;
+    background-color: rgb(232, 232, 232);
+    border: 0.01rem solid rgb(152, 152, 152);
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.44) 0px 3px 8px;
+    box-shadow: rgba(0, 0, 0, 0.55) 0px 5px 15px;
+    box-shadow: rgba(14, 30, 37, 0.22) 0px 2px 4px 2px, rgba(14, 30, 37, 0.32) 0px 2px 16px 1px;
+
+ }
+
+ .searchArea > input[type="text"]{
+    width: 60%;
+    height: 50%;
+    border-radius: 10px;
+    border: 0;
+    outline: 0!important;
+    z-index: 1000!important;
+    /* border-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0; */
+    background-color: rgb(232, 232, 232);
+    padding-left: 10px;
+    font-weight: 500;
+    
+
+
+ }
