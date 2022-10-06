@@ -327,6 +327,12 @@
     padding-left: 10px;
     font-weight: 500;
     
-
-
  }
+
+ .hor-line{
+    margin-top: 15px;
+    border:0;
+    border-bottom: 0.01rem solid rgb(202, 202, 202);
+    width: 100%;
+
+}
