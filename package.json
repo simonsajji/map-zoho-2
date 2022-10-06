@@ -24,6 +24,7 @@
     "calendar-utils": "^0.10.1",
     "date-fns": "^2.29.3",
     "flatpickr": "^4.6.13",
+    "ngx-google-places-autocomplete": "^2.0.5",
     "ngx-mat-timepicker": "^14.0.2",
     "ngx-material-timepicker": "^5.5.3",
     "rxjs": "~7.5.0",

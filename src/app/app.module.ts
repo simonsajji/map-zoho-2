@@ -10,6 +10,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './modules/material/material.module';
 import { CustomDatePipe } from './pipes/date.pipe';
 import { FormsModule } from '@angular/forms';
+import { GooglePlaceModule } from 'ngx-google-places-autocomplete';
 
 
 @NgModule({
@@ -25,7 +26,8 @@ import { FormsModule } from '@angular/forms';
     BrowserAnimationsModule,
     AppRoutingModule,
     MatSidenavModule,
-    MaterialModule
+    MaterialModule,
+    GooglePlaceModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -3,7 +3,7 @@
 
     <div class="searchArea d-flex align-center p-5 j-space">
         <i class="fa fa-bars f-s-22 m-l-10 " aria-hidden="true"></i>
-        <input type="text" placeholder="Search for Name or Address" class="f-s-16">
+        <input type="text" ngx-google-places-autocomplete [options]="options" (onAddressChange)="AddressChange($event)" placeholder="Search for Name or Address" class="f-s-16">
         <img class="p-6 c-pointer" width="24px" height="24px" src="assets/current_loc.png" alt="" title="Set Current Location as Start Location">
 
         <div class="d-flex align-center " title="Map properties">

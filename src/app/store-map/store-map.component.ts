@@ -2,6 +2,7 @@ import { LocationStrategy } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { MapInfoWindow } from '@angular/google-maps';
 import MarkerClusterer from '@googlemaps/markerclustererplus';
+import { isThisSecond } from 'date-fns';
 
 
 @Component({
@@ -77,6 +78,13 @@ export class StoreMapComponent implements OnInit,OnChanges {
   currentTime:any;
   @ViewChild('timepicker') timepicker:any;
   isOpen:any;
+  formattedaddress=" ";
+  options:any ={
+    componentRestrictions:{
+    country:["CA"]
+    }
+}
+
 
   ngOnInit() {
     this.currentDate = new Date();
@@ -84,7 +92,7 @@ export class StoreMapComponent implements OnInit,OnChanges {
     this.displayTime = this.formatAMPM(new Date());
     this.displayDate = new Date();
     this.map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
-        zoom: 3,
+        zoom: 5,
         center: { lat: 45.630001, lng: -73.519997},
       }
     )
@@ -97,6 +105,37 @@ export class StoreMapComponent implements OnInit,OnChanges {
     // if(this.result.legs?.length>0) this.showRoutes = true;
     //     console.log(this.showRoutes);
   }
+
+  public AddressChange(address: any) {
+    this.formattedaddress = address.formatted_address;
+    console.log(this.formattedaddress);
+    // this.map.setCenter({lat:45.6,lng: 47.75})
+    // this.map.setCenter(new google.maps.LatLng(-123.6, 47.75));
+
+    const geocoder = new google.maps.Geocoder();
+        geocoder.geocode(
+            {
+                address: this.formattedaddress
+            },
+            (results:any, status:any) => {
+              console.log(status)
+                if (status === "OK" && results.length > 0) {
+                    const firstResult = results[0].geometry;
+                    const bounds = new google.maps.LatLngBounds();
+                    console.log(bounds)
+
+                    if (firstResult.viewport) {
+                        // Only geocodes have viewport.
+                        bounds.union(firstResult.viewport);
+                    } else {
+                        bounds.extend(firstResult.location);
+                    }
+
+                    this.map.fitBounds(bounds);
+                }
+            }
+        );
+    }
 
  
   
