@@ -3,6 +3,7 @@ import {  ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, Vie
 import { MapInfoWindow } from '@angular/google-maps';
 import MarkerClusterer from '@googlemaps/markerclustererplus';
 import { isThisSecond } from 'date-fns';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -17,24 +18,23 @@ export class StoreMapComponent implements OnInit {
    labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
    locations = [
     // { location: new google.maps.LatLng(41.661129, -91.530169) , stopover:true,title: {start_address : '102 Monto street canada',locationId:10}}, // double
-    { location: new google.maps.LatLng(41.661129, -91.530169) , stopover:true,title: {start_address : '20 CPrnto  canada',locationId:12} }, // double
+    { location: new google.maps.LatLng(41.661129, -91.530169) , stopover:true,title: {start_address : '1 S Gilbert St, Iowa City, IA 52240, USA',locationId:12} }, // double
     // { location: new google.maps.LatLng( 52.321945, -106.584167) , stopover:false }, //dest
-    { location: new google.maps.LatLng(44.500000, -89.500000) , stopover:true,title: {start_address : '102 Monto street canada',locationId:10} },
-    { location: new google.maps.LatLng(46.877186, -96.789803) , stopover:true,title: {start_address : '104 Monto street canada',locationId:17} },
-    { location: new google.maps.LatLng(41.543056, -90.590836) , stopover:true,title: {start_address : '102 Monto street canada',locationId:13} }, // davenport
-    { location: new google.maps.LatLng(43.167126,  -93.210754) , stopover:true ,title: {start_address : '102 Monto street canada',locationId:1}}, // mason city
-    { location: new google.maps.LatLng(37.871384,  -93.210754) , stopover:true ,title: {start_address : '102 Monto street canada',locationId:3}}, // monticello
-    { location: new google.maps.LatLng( 38.871384,  -93.210754) , stopover:true ,title: {start_address : '102 Monto street canada',locationId:5}}, // 
-    { location: new google.maps.LatLng(  47.925259,  -97.032852) , stopover:true,title: {start_address : '102 Monto street canada',locationId:4} }, // 
-    { location: new google.maps.LatLng(  44.925259,  -96.032852) , stopover:true,title: {start_address : '102 Monto street canada',locationId:18} }, // 
-    { location: new google.maps.LatLng(  44.825259,  -96.032852) , stopover:true,title: {start_address : '102 Monto street canada',locationId:7} }, // 
-    { location: new google.maps.LatLng(  44.825259,  -96.132852) , stopover:true,title: {start_address : '102 Monto street canada',locationId:6} }, // 
-    { location: new google.maps.LatLng(  44.925259,  -96.332852) , stopover:true ,title: {start_address : '102 Monto street canada',locationId:2}}, // 
-    { location: new google.maps.LatLng(  44.425259,  -96.232852) , stopover:true ,title: {start_address : '102 Monto street canada',locationId:11}}, // 
+    { location: new google.maps.LatLng(44.500000, -89.500000) , stopover:true,title: {start_address : '5687-5749 County Rd HH, Stevens Point, WI 54482, USA',locationId:10} },
+    { location: new google.maps.LatLng(46.877186, -96.789803) , stopover:true,title: {start_address : '4330 with ave s, apt 310, Fargo, ND 58102, USA',locationId:17} },
+    { location: new google.maps.LatLng(41.543056, -90.590836) , stopover:true,title: {start_address : '2301 N Marquette St, Davenport, IA 52804, USA',locationId:13} }, // davenport
+    { location: new google.maps.LatLng(43.167126,  -93.210754) , stopover:true ,title: {start_address : '1517 N Quincy Ave, Mason City, IA 50401, USA',locationId:1}}, // mason city
+    // { location: new google.maps.LatLng(37.871384,  -93.210754) , stopover:true ,title: {start_address : '102 Monto street canada',locationId:3}}, // monticello
+    { location: new google.maps.LatLng(  47.925259,  -97.032852) , stopover:true,title: {start_address : '215 S 3rd St #100, Grand Forks, ND 58201, USA',locationId:4} }, // 
+    { location: new google.maps.LatLng(  44.925259,  -96.032852) , stopover:true,title: {start_address : '3038 180th St, Dawson, MN 56232, USA',locationId:18} }, // 
+    { location: new google.maps.LatLng(  44.825259,  -96.032852) , stopover:true,title: {start_address : '305th Ave, Dawson, MN 56232, USA',locationId:7} }, // 
+    { location: new google.maps.LatLng(  44.825259,  -96.132852) , stopover:true,title: {start_address : 'Co Rd 21, Dawson, MN 56232, USA',locationId:6} }, // 
+    { location: new google.maps.LatLng(  44.925259,  -96.332852) , stopover:true ,title: {start_address : '161st Ave, Marietta, MN 56257, USA',locationId:2}}, // 
+    { location: new google.maps.LatLng(  44.425259,  -96.232852) , stopover:true ,title: {start_address : 'Co Rd 126, Ivanhoe, MN 56142, USA',locationId:11}}, // 
     // { location: new google.maps.LatLng(  47.925259,  -93.032852) , stopover:true }, // 
     // { location: new google.maps.LatLng(  47.925259,  -95.032852) , stopover:true }, // 
-    { location: new google.maps.LatLng(44.986656, -93.258133) , stopover:true ,title: {start_address : '102 Monto street canada',locationId:14}},
-    { location: new google.maps.LatLng(44.886656, -93.258133) , stopover:true ,title: {start_address : '102 Monto street canada',locationId:15}},
+    { location: new google.maps.LatLng(44.986656, -93.258133) , stopover:true ,title: {start_address : '15 SE Main St, Minneapolis, MN 55414, USA',locationId:14}},
+    { location: new google.maps.LatLng(44.886656, -93.258133) , stopover:true ,title: {start_address : '6410 12th Ave S, Minneapolis, MN 55423, USA',locationId:15}},
     // { location: new google.maps.LatLng(44.786656, -93.158133) , stopover:true },
     // { location: new google.maps.LatLng(44.986656, -93.858133) , stopover:true },
     // { location: new google.maps.LatLng(44.086656, -93.258133) , stopover:true },
@@ -42,11 +42,11 @@ export class StoreMapComponent implements OnInit {
     // { location: new google.maps.LatLng(44.9861656, -93.258133) , stopover:true },
     // { location: new google.maps.LatLng(44.906956, -93.858133) , stopover:true },
     // { location: new google.maps.LatLng(44.936056, -93.058133) , stopover:true },
-    { location: new google.maps.LatLng(50.247038, -99.838649) , stopover:true ,title: {start_address : '102 Monto street canada',locationId:16}}, //minnedosa
+    { location: new google.maps.LatLng(50.247038, -99.838649) , stopover:true ,title: {start_address : '42 Armitage Ave, Minnedosa, MB R0J 1E0, Canada',locationId:16}}, //minnedosa
     // { location: new google.maps.LatLng(52.146973, -106.677034) , stopover:true },
-    { location: new google.maps.LatLng(49.895077, -97.138451) , stopover:true ,title: {start_address : '102 Monto street canada',locationId:19}}, // winnipeg //double
+    { location: new google.maps.LatLng(49.895077, -97.138451) , stopover:true ,title: {start_address : '360-384 Main St, Winnipeg, MB R3C 4T3, Canada',locationId:19}}, // winnipeg //double
     // { location: new google.maps.LatLng(49.895077, -97.138451) , stopover:true }, // winnipeg  //double
-    { location: new google.maps.LatLng(51.256973, -103.677034) , stopover:true ,title: {start_address : '102 Monto street canada',locationId:9}},
+    { location: new google.maps.LatLng(51.256973, -103.677034) , stopover:true ,title: {start_address : 'Unnamed Road, Kelliher, SK S0A 1V0, Canada',locationId:9}},
     // { location: new google.maps.LatLng(51.146973, -105.427034) , stopover:true },
     // { location: new google.maps.LatLng(51.266973, -103.377034) , stopover:true },
     // { location: new google.maps.LatLng(51.246973, -106.577034) , stopover:true },
@@ -83,14 +83,23 @@ export class StoreMapComponent implements OnInit {
     country:["CA"]
     }
   };
-  origin:any = "illinois";
-  destination:any = { lat: 52.146973, lng: -106.677034};
+  origin:any = "Illinois";
+  destination:any = "Saskatoon";
   originMkr:any;
   destMkr:any;
   startstopmkr:any;
+  isHomesetasCurrent:boolean = false;
+  isHomesetasDefault:boolean = true;
+  isHomesetasFavourite:boolean = false;
+  isHomesetasEditedLocation:boolean = false;
+  isEndsetasCurrent:boolean = false;
+  isEndsetasDefault:boolean = true;
+  isEndsetasFavourite:boolean = false;
+  isEndsetasEditedLocation:boolean = false;
 
 
   ngOnInit() {
+    // this. 
     this.currentDate = new Date();
     this.currentTime = new Date();
     this.displayTime = this.formatAMPM(new Date());
@@ -145,13 +154,20 @@ export class StoreMapComponent implements OnInit {
 
     setHomeasCurrentLoc(){
       // remove the origin marker 
+      this.isHomesetasCurrent = true;
+      this.isHomesetasDefault = false;
+      this.isHomesetasEditedLocation = false;
+      this.isHomesetasFavourite = false;
       this.startstopmkr = [];
       // this.originMkr.setMap(null);
       this.origin = "St. Loius";
       // this.buildRoute();
     }
     setEndasCurrentLoc(){
-      // remove the dest marker 
+      this.isEndsetasCurrent = true;
+      this.isEndsetasDefault = false;
+      this.isEndsetasEditedLocation = false;
+      this.isEndsetasFavourite = false;
       this.startstopmkr = [];
       // this.destMkr.setMap(null);
       this.destination = "Edmonton";

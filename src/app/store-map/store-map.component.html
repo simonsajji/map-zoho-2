@@ -29,7 +29,9 @@
                 <div class="primary-color f-s-14 flex-3 t-a-right flex-end j-end m-r-20 add_loc_link c-pointer" title="Add a point to the Route"><div>
                     <img class="p-6"  width="20px" height="20px"  src="assets/star.png" alt="" title="Favourite Locations">
                     <img class="p-6"  width="20px" height="20px"  src="assets/edit.png" alt="" title="Enter Start Location Manually"></div>
+                    
                 </div>
+                <!-- <i class="fa fa-ellipsis-v f-s-18 dot m-r-30 p-10"></i> -->
                 
                 <img *ngIf="!pinSideMenu"  (click)="pinSideMenu=!pinSideMenu"  src="assets/svgs/thumbtack.svg" class="m-r-10 primary-color c-pointer p-5" width="18px" height="18px" alt="" srcset="">
                 <img *ngIf="pinSideMenu" (click)="pinSideMenu=!pinSideMenu" src="assets/svgs/thumbtack-solid.svg" class="m-r-10 primary-color c-pointer p-5" width="18px" height="18px" alt="" srcset="">
@@ -70,7 +72,7 @@
             </div>
         </div>
 
-        <div *ngIf="showSliderMenu && (result?.routes[0]?.legs?.length==0 || !result?.routes[0])" class="right-content flex-column  ">
+        <div *ngIf="showSliderMenu && (result?.routes[0]?.legs?.length==0 || !result?.routes[0]) && !showRoutes" class="right-content flex-column  ">
             <div class="d-flex align-center ">
                 <div class="f-s-16 f-w-500 p-10 flex-3 align-baseline d-flex"><span class="m-r-30">Route</span>  <i class="fa fa-angle-down f-w-600" aria-hidden="true"></i></div>
                 <div class="primary-color f-s-14 flex-2 t-a-right flex-end j-end m-r-20 add_loc_link c-pointer" title="Add a point to the Route"><div>+ Add a Point</div></div>
@@ -94,40 +96,31 @@
                 <ngx-material-timepicker #timepicker (timeSet)="onTimeset($event)"></ngx-material-timepicker>
             </div>               
 
-            <div class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5"> 
+            <div class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5 bg-gr border-light p-t-20 p-b-20"> 
                 <div  class="d-flex align-center">
                     <i  class="fa fa-home f-s-22 m-r-10 flex-1"></i> 
                     <div [style.width]="'calc(100% - ' + 18 + 'px)'" class="flex-column" >
                         <div class="d-flex gap-5 align-center">
-                            <img class="p-6" width="20px" height="20px" src="assets/current_loc.png" alt="" (click)="setHomeasCurrentLoc()" title="Set Current Location as Start Location">
-                            <img class="p-6 selected" width="20px" height="20px" src="assets/home2.png" alt="" title="Start Location">
-                            <img class="p-6"  width="20px" height="20px"  src="assets/star.png" alt="" title="Favourite Locations">
-                            <img class="p-6"  width="20px" height="20px"  src="assets/edit.png" alt="" title="Enter Start Location Manually">
+                            <img class="p-6 c-pointer" [ngClass]="isHomesetasCurrent ? 'selected': ''" width="20px" height="20px" src="assets/current_loc.png" alt="" title="Set Current Location as Home Location" (click)="setHomeasCurrentLoc()" >
+                            <img class="p-6 c-pointer " [ngClass]="isHomesetasDefault ? 'selected': ''" width="20px" height="20px" src="assets/home2.png" alt="" title="Home Location">
+                            <img class="p-6 c-pointer" [ngClass]="isHomesetasFavourite ? 'selected': ''" width="20px" height="20px"  src="assets/star.png" alt="" title="Favourite Locations">
+                            <img class="p-6 c-pointer" [ngClass]="isHomesetasEditedLocation ? 'selected': ''"  width="20px" height="20px"  src="assets/edit.png" alt="" title="Enter Home Location Manually">
                         </div>
-                        <div>100 McColm street, Canada</div> 
+                        <div class="p-t-5 p-b-5">{{this.origin}}</div> 
                     </div> 
                 </div> 
-                
-                <div class="d-flex align-center">
-                    <!-- <div class="d-flex dot-container c-pointer align-center">
-                        <i class="fa fa-ellipsis-v f-s-24 dot  p-10 p-r-2"></i>
-                        <i class="fa fa-ellipsis-v f-s-24 dot  p-10 p-l-2"></i>
-                    </div> -->
-                    <!-- <i class="fa fa-trash f-s-18   p-10"></i> -->
-                    
-                </div>
-                
+                            
             </div>
 
             <!-- <p  class="c-gr d-flex j-center">No Points in Route</p> -->
 
-            <div class="f-s-14 p-b-10 " *ngFor="let leg of result?.routes[0]?.legs;let i=index">
+            <div class="f-s-14 p-b-10 " *ngFor="let loc of locations;let i=index">
                 
-                <div class="p-r-10 f-w-500 d-flex  align-center flex-wrap gap-5"> 
+                <div class="p-r-10 f-w-500 d-flex  align-center flex-wrap gap-5 "> 
                     
-                    <div *ngIf="i!=0" class="d-flex ">
+                    <div class="d-flex ">
                         <div class="flex-column">
-                            <div  class="location-number f-s-10 f-w-400  m-r-5 p-2" #ln>{{i}}</div> 
+                            <div  class="location-number f-s-10 f-w-400  m-r-5 p-2" #ln>{{i+1}}</div> 
                                 <div class="d-flex dot-container c-pointer align-center p-6 p-t-0">
                                 <i class="fa fa-ellipsis-v f-s-12 dot  "></i>
                                 <i class="fa fa-ellipsis-v f-s-12 dot "></i>
@@ -136,12 +129,12 @@
                         </div>
                         
                         <div [style.width]="'calc(100% - ' + 18 + 'px)'" class="flex-column">
-                            <div>{{leg?.start_address}}</div> 
-                            <div *ngIf="i!=0" class=" f-w-400 f-s-12 d-flex j-space align-center flex-wrap c-gr w-90 p-t-5"> {{leg?.start_address}}</div>
+                            <div>{{loc?.title?.start_address}}</div> 
+                            <div  class=" f-w-400 f-s-12 d-flex j-space align-center flex-wrap c-gr w-90 p-t-5"> {{loc?.title?.start_address}}</div>
                         </div> 
                     </div> 
                     <div class="d-flex j-end flex-end align-center flex-1">
-                        <img *ngIf="i!=0 && i<shortestRte?.legs?.length" title="Remove Location from Route" src="assets/svgs/trash.svg" class="m-r-10 primary-color c-pointer" width="18px" height="18px" alt="" srcset="">
+                        <img *ngIf="i!=0 && i < locations.length" title="Remove Location from Route" src="assets/svgs/trash.svg" class="m-r-10 primary-color c-pointer" width="18px" height="18px" alt="" srcset="">
 
                     </div>
 
@@ -151,17 +144,17 @@
             </div>
 
 
-            <div  class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5 p-10 p-l-10"> 
+            <div  class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5 p-10 p-l-10 bg-gr border-light p-t-20 p-b-20"> 
                 <div  class="d-flex align-center">
                     <i class="fa fa-flag-checkered m-r-10 f-s-22"></i> 
                     <div [style.width]="'calc(100% - ' + 18 + 'px)'" class="flex-column" >
                         <div class="d-flex gap-5 align-center">
-                            <img class="p-6" width="20px" height="20px" src="assets/current_loc.png" (click)="setEndasCurrentLoc()" alt="" title="Set Current Location as End Location">
-                            <i class="fa fa-flag-checkered  f-s-20 p-6 selected primary-color" title="End Location"></i>
-                            <img class="p-6"  width="20px" height="20px"  src="assets/star.png" alt="" title="Favourite Locations">
-                            <img class="p-6"  width="20px" height="20px"  src="assets/edit.png" alt="" title="Enter End Location Manually">
+                            <img class="p-6 c-pointer" [ngClass]="isEndsetasCurrent ? 'selected': ''" width="20px" height="20px" src="assets/current_loc.png" alt="" title="Set Current Location as End Location" (click)="setEndasCurrentLoc()" >
+                            <i class="fa fa-flag-checkered  f-s-20 p-6  primary-color" [ngClass]="isEndsetasDefault ? 'selected': ''" title="End Location"></i>
+                            <img class="p-6 c-pointer" [ngClass]="isEndsetasFavourite ? 'selected': ''" width="20px" height="20px"  src="assets/star.png" alt="" title="Favourite Locations">
+                            <img class="p-6 c-pointer" [ngClass]="isEndsetasEditedLocation ? 'selected': ''"  width="20px" height="20px"  src="assets/edit.png" alt="" title="Enter End Location Manually">
                         </div>
-                        <div>100 McColm street, Canada</div> 
+                        <div class="p-t-5 p-b-5">{{this.destination}}</div> 
                     </div> 
                 </div> 
                 <div class="d-flex align-center">

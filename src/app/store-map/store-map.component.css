@@ -15,7 +15,7 @@
     background-color: white;
     z-index: 1000;
     padding: 20px;
-    padding-left: 10px;
+    padding-left: 0px;
     border:0;
     border-left: 0.01rem solid rgb(229, 229, 229);;
     box-shadow: rgba(0, 0, 0, 0.44) 0px 3px 8px;
@@ -101,6 +101,7 @@
 .right-content > div{
     width: 100%;
     padding: 10px;
+
    
 }
 
@@ -335,4 +336,14 @@
     border-bottom: 0.01rem solid rgb(202, 202, 202);
     width: 100%;
 
+}
+
+.bg-gr{
+    background-color: rgb(242, 242, 242)!important;
+}
+
+.border-light{
+    border: 0;
+    border-top: 0.01rem solid rgb(216, 216, 216);
+    border-bottom: 0.01rem solid rgb(216, 216, 216);
 }
