@@ -347,3 +347,64 @@
     border-top: 0.01rem solid rgb(216, 216, 216);
     border-bottom: 0.01rem solid rgb(216, 216, 216);
 }
+
+.heading{
+    margin-top:200px;
+  }
+  
+  .openDrawer{
+      padding:1%;
+      color: #000;
+      position: fixed;
+      margin: 2%;
+      font-size: 2em;
+      cursor: pointer;
+      z-index: 2;
+  }
+  
+  .navigation{
+      width: 20%;
+      position: absolute;
+      /* right:0%; */
+      top: 0;
+      height: 100%;
+      background-color: white;
+      z-index: 1000;
+  }
+  
+  .close-nav{
+      float: left;
+      font-size: 2em;
+      margin: 3%;
+      color: #fff;
+      cursor: pointer;
+  }
+  
+  .navigation ul{
+      padding: 10%;
+      margin-right: 10%;
+      list-style-type: none;
+      height: 100%;
+  }
+  .navigation .right-content{
+      padding: 0%;
+      margin-right: 1%;
+      list-style-type: none;
+      height: 100%;
+  }
+  
+  .navigation li{
+      height: 5%;
+      width: 100%;
+      margin-bottom: 10%;
+      padding: 5%;
+      border-bottom: solid 0.5px rgba(255, 255, 255, 0.11);
+      cursor: pointer;
+      color: #fff;
+  }
+  
+  .navigation li:hover{
+      border-left: solid 5px rgb(167, 167, 167);
+      border-bottom: 0px;
+      color: rgb(167, 167, 167);
+  }

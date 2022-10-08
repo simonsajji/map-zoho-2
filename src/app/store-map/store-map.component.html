@@ -1,5 +1,5 @@
-<div class="container" style="overflow:hidden" >
-    <div id="map" style="height: 100%;width: calc(100%);z-index: 10;overflow: hidden;"></div>
+<div class="container" style="overflow:hidden!important">
+    <div id="map" style="height: 100vh;width: calc(100vw);z-index: 10;overflow: hidden;"></div>
 
     <div class="searchArea d-flex align-center p-5 j-space">
         <i class="fa fa-bars f-s-22 m-l-10 " aria-hidden="true"></i>
@@ -21,9 +21,10 @@
 
     </div>
     
-    <div  class="side-drawer p-r-0 p-t-5 "  [ngClass]="{'transition':rightanimationActive,'closetransition':leftanimationActive,'w-0' :showSliderMenu==false,'w-22':showSliderMenu==true } ">
-        <button  class="slide-btn" title="Routes" (click)="toggleSlideMenu()"> <i *ngIf="showSliderMenu" class="fa fa-angle-right"></i> <i *ngIf="!showSliderMenu" class="fa fa-angle-left"></i><img width="42%" height="60%" src="assets/route2.png" alt=""></button>
-        <div *ngIf="showRoutes" class="right-content flex-column ">
+    <div  class="navigation p-r-0 p-t-5 " [@navigation]="navigation"  >
+      
+        <button  class="slide-btn" title="Routes" (click)="navigationDrawer()"> <i *ngIf="!navigation" class="fa fa-angle-right"></i> <i *ngIf="navigation" class="fa fa-angle-left"></i><img width="42%" height="60%" src="assets/route2.png" alt=""></button>
+        <div *ngIf="!navigation && showRoutes" class="right-content flex-column ">
             <div class="d-flex align-center ">
                 <div class="f-s-16 f-w-500 p-10 flex-3 align-baseline d-flex"><span class="m-r-30">Route</span>  <i class="fa fa-angle-down f-w-600" aria-hidden="true"></i></div>
                 <div class="primary-color f-s-14 flex-3 t-a-right flex-end j-end m-r-20 add_loc_link c-pointer" title="Add a point to the Route"><div>
@@ -72,7 +73,7 @@
             </div>
         </div>
 
-        <div *ngIf="showSliderMenu && (result?.routes[0]?.legs?.length==0 || !result?.routes[0]) && !showRoutes" class="right-content flex-column  ">
+        <div *ngIf="!navigation && (result?.routes[0]?.legs?.length==0 || !result?.routes[0]) && !showRoutes" class="right-content flex-column  ">
             <div class="d-flex align-center ">
                 <div class="f-s-16 f-w-500 p-10 flex-3 align-baseline d-flex"><span class="m-r-30">Route</span>  <i class="fa fa-angle-down f-w-600" aria-hidden="true"></i></div>
                 <div class="primary-color f-s-14 flex-2 t-a-right flex-end j-end m-r-20 add_loc_link c-pointer" title="Add a point to the Route"><div>+ Add a Point</div></div>
@@ -173,22 +174,7 @@
         
     </div>
 
-        <!-- #2452AD  -->
-
-
-        <!-- <mat-drawer-container class="side-drawer" autosize>
-            <mat-drawer #drawer class="example-sidenav" mode="side">
-              <p>Auto-resizing sidenav</p>
-             
-            </mat-drawer>
-          
-            <div class="example-sidenav-content">
-              <button type=" slide-btn" mat-button (click)="drawer.toggle()">
-                Toggle sidenav
-              </button>
-            </div>
-          
-          </mat-drawer-container> -->
+       
     
 </div>
 
