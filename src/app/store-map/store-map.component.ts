@@ -4,7 +4,8 @@ import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, View
 import MarkerClusterer from '@googlemaps/markerclustererplus';
 import { isThisSecond } from 'date-fns';
 import { environment } from 'src/environments/environment';
-import { animate, animation, style, transition, trigger, useAnimation, state, keyframes } from '@angular/animations'
+import { animate, animation, style, transition, trigger, useAnimation, state, keyframes } from '@angular/animations';
+// import {route} from '../../route.json'
 
 
 @Component({
@@ -93,8 +94,8 @@ export class StoreMapComponent implements OnInit {
       country: ["CA"]
     }
   };
-  origin: any = "Illinois";
-  destination: any = "Saskatoon";
+  origin: any ;
+  destination: any ;
   originMkr: any;
   destMkr: any;
   startstopmkr: any;
@@ -108,21 +109,27 @@ export class StoreMapComponent implements OnInit {
   isEndsetasEditedLocation: boolean = false;
   navigation: boolean = true;
   showOverlay: boolean = false;
-
+  locs:any = environment?.locations;
 
   ngOnInit() {
+   console.log(this.locs);
+   this.origin = this.locs[0];
+   this.destination = this.locs[this.locs.length-1];
     this.currentDate = new Date();
     this.currentTime = new Date();
     this.displayTime = this.formatAMPM(new Date());
     this.displayDate = new Date();
     this.map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
-      zoom: 5,
-      center: { lat: 45.630001, lng: -79.519997 },
+      zoom: 12,
+      center: { lat: 43.651070, lng:  -79.347015 },
     }
     )
     this.directionsRenderer = new google.maps.DirectionsRenderer({ map: this.map, suppressMarkers: true });
-    this.locations.map((location) => {
-      this.makemkrs(location?.location, location?.title)
+    // this.locations.map((location) => {
+    //   this.makemkrs(location?.location, location?.title)
+    // });
+    this.locs.map((location:any) => {
+      this.makemkrs({lat:parseFloat(location?.latitude),lng:parseFloat(location?.longitude)}, location?.Name,location?.location_id,location?.route_name)
     });
     this.makeClusters();
   }
@@ -293,9 +300,9 @@ export class StoreMapComponent implements OnInit {
     let marker = new google.maps.Marker({
       position: obj,
       map: this.map,
-      label: label
+      label:{text:label,color:'#222222'}
     });
-
+   
     google.maps.event.addListener(marker, 'click', (evt: any) => {
       this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${locObject?.start_address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
       <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>Remove</div> <div>G Map</div> <div>Street View</div>  <div>Move</div><div>
@@ -305,19 +312,20 @@ export class StoreMapComponent implements OnInit {
     this.mkrs.push(marker);
   }
 
-  makemkrs(position: any, title: any) {
+  makemkrs(position: any, title: any,loc_id:any,route_name:any) {
     let label = title + "";
-    console.log(position.lat());
-    let obj = { lat: position.lat(), lng: position.lng() }
+    // console.log(position.lat());
+    // let obj = { lat: position.lat(), lng: position.lng() }
+    let obj = position;
 
     let marker = new google.maps.Marker({
       position: obj,
       map: this.map,
-      label: title?.LocationId
+      label: title
     });
 
     google.maps.event.addListener(marker, 'click', (evt: any) => {
-      this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${title?.LocationId}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${title?.start_address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
+      this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${loc_id}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${title} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route_name} </i> </p>
       <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>Remove</div> <div>G Map</div> <div>Street View</div>  <div>Move</div><div>
     </div>`);
       this.infoWin.open(this.map, marker);
@@ -326,16 +334,18 @@ export class StoreMapComponent implements OnInit {
   }
 
   buildRoute() {
-    this.wayPoints = this.locations.map((loc) => {
-      let obj = { location: loc?.location, stopover: true }
-      return obj;
+     this.locs.map((loc:any,index:any) => {
+      if(loc.location_id != this.origin.location_id && loc.location_id != this.destination.location_id){
+        let obj = { location: {lat:parseFloat(loc?.latitude),lng:parseFloat(loc.longitude)}, stopover: true }
+     this.wayPoints.push(obj)
+      }
     });
+    console.log(this.wayPoints)
 
     this.directionsService.route({
-      origin: this.origin,
-      destination: this.destination,
+      origin: {lat:parseFloat(this.locs[0].latitude),lng:parseFloat(this.locs[0].longitude)},
+      destination: {lat:parseFloat(this.locs[this.locs.length-1].latitude),lng:parseFloat(this.locs[this.locs.length-1].longitude)},
       waypoints: this.wayPoints,
-      // waypoints: this.locations,
       optimizeWaypoints: true,
       provideRouteAlternatives: true,
       travelMode: google.maps.TravelMode.DRIVING,
@@ -346,8 +356,6 @@ export class StoreMapComponent implements OnInit {
 
         if (status == 'OK') {
           this.shortestResult = this.shortestRoute(this.result);
-
-
           console.log(this.result.routes[0])
           console.log(this.shortestRte);
           let legLength = this.result.routes[0].legs.length;
@@ -383,46 +391,7 @@ export class StoreMapComponent implements OnInit {
     }
   }
 
-  createRoute() {
-    this.markLocations();
-    this.directionsService.route({
-      origin: "illinois",
-      destination: { lat: 52.146973, lng: -106.677034 },
-      waypoints: this.wayPoints,
-      // waypoints: this.locations,
-      optimizeWaypoints: true,
-      provideRouteAlternatives: true,
-      travelMode: google.maps.TravelMode.DRIVING,
-    },
-      ((result: any, status: any) => {
-        console.log(result);
-        this.result = result;
-        if (status == 'OK') {
-
-          // document.getElementById("warnings-panel").innerHTML =
-          //   "<b>" + result.routes[0].warnings + "</b>";
-          this.shortestResult = this.shortestRoute(this.result);
-          console.log(this.shortestRte);
-          let legLength = this.result.routes[0].legs.length;
-          var leg = this.result.routes[0].legs[0];
-          var leg2 = this.result.routes[0].legs[legLength - 1]
-          console.log(leg, leg2.end_location.lat())
-          this.makeMarker(leg.start_location, "start", "title", leg);
-          this.makeMarker(leg2.end_location, "end", 'title', leg2);
-          this.result?.routes[0]?.legs?.forEach((element: any, idx: any) => {
-            if (idx != 0) this.makeWaypoints(element?.start_location, idx, element)
-          });
-          this.makeClusters();
-          this.computeTotalDistance(this.result);
-          // showSteps(result, markerArray, stepDisplay, map);
-          // this.renderRoute();
-        }
-      }))
-      .catch((e: any) => {
-        window.alert("Directions request failed due to " + e);
-      });
-
-  }
+  
 
   renderRoute() {
     this.directionsRenderer?.setDirections(this.shortestResult); // shortest or result
