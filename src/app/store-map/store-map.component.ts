@@ -1,68 +1,76 @@
 import { LocationStrategy } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, ViewChild,AfterViewInit } from '@angular/core';
 // import { MapInfoWindow } from '@angular/google-maps';
 import MarkerClusterer from '@googlemaps/markerclustererplus';
 import { isThisSecond } from 'date-fns';
 import { environment } from 'src/environments/environment';
 import { animate, animation, style, transition, trigger, useAnimation, state, keyframes } from '@angular/animations';
-// import {route} from '../../route.json'
+import {MatPaginator} from '@angular/material/paginator';
+import {MatTableDataSource} from '@angular/material/table';
+import { Pipe, PipeTransform } from '@angular/core';
+import {SelectionModel} from '@angular/cdk/collections';
 
+export interface LocationElement {
+  name: string;
+  position: number;
+  weight: number;
+  symbol: string;
+}
+
+interface TableObj {
+  value: string;
+  viewValue: string;
+}
+// const ELEMENT_DATA: LocationElement[] = environment.locations;
+
+@Pipe({ name: 'removeUnderscore' })
+export class RemoveUnderscorePipe implements PipeTransform {
+  transform(value: any, args?: any): any {
+    return value.replace(/_/g, " ");
+  }
+}
 
 @Component({
   selector: 'store-map',
-  // template: `<div id="map" style="height: 100vh"></div>`,
   templateUrl: './store-map.component.html',
   styleUrls: ['./store-map.component.css'],
   animations: [
     trigger('navigation', [
       state('false', style({ right: '0%' })),
       state('true', style({ right: '-20%' })),
-      transition('0 => 1', animate('.2s')),
-      transition('1 => 0', animate('.2s'))
-
+      transition('0 => 1', animate('.24s')),
+      transition('1 => 0', animate('.24s'))
+    ]),
+    trigger('tableview', [
+      state('false', style({ bottom: '-45%' })),
+      state('true', style({ bottom: '-99%' })),
+      transition('0 => 1', animate('.24s')),
+      transition('1 => 0', animate('.24s'))
     ])
+
   ]
 })
-export class StoreMapComponent implements OnInit {
+export class StoreMapComponent implements OnInit,AfterViewInit{
 
   @ViewChild('map', { static: false }) info: ElementRef | undefined;
   labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   locations = [
-    // { location: new google.maps.LatLng(41.661129, -91.530169) , stopover:true,title: {start_address : '102 Monto street canada',locationId:10}}, // double
     { location: new google.maps.LatLng(41.661129, -91.530169), stopover: true, title: { start_address: '1 S Gilbert St, Iowa City, IA 52240, USA', locationId: 12 } }, // double
-    // { location: new google.maps.LatLng( 52.321945, -106.584167) , stopover:false }, //dest
     { location: new google.maps.LatLng(44.500000, -89.500000), stopover: true, title: { start_address: '5687-5749 County Rd HH, Stevens Point, WI 54482, USA', locationId: 10 } },
     { location: new google.maps.LatLng(46.877186, -96.789803), stopover: true, title: { start_address: '4330 with ave s, apt 310, Fargo, ND 58102, USA', locationId: 17 } },
     { location: new google.maps.LatLng(41.543056, -90.590836), stopover: true, title: { start_address: '2301 N Marquette St, Davenport, IA 52804, USA', locationId: 13 } }, // davenport
     { location: new google.maps.LatLng(43.167126, -93.210754), stopover: true, title: { start_address: '1517 N Quincy Ave, Mason City, IA 50401, USA', locationId: 1 } }, // mason city
-    // { location: new google.maps.LatLng(37.871384,  -93.210754) , stopover:true ,title: {start_address : '102 Monto street canada',locationId:3}}, // monticello
     { location: new google.maps.LatLng(47.925259, -97.032852), stopover: true, title: { start_address: '215 S 3rd St #100, Grand Forks, ND 58201, USA', locationId: 4 } }, // 
     { location: new google.maps.LatLng(44.925259, -96.032852), stopover: true, title: { start_address: '3038 180th St, Dawson, MN 56232, USA', locationId: 18 } }, // 
     { location: new google.maps.LatLng(44.825259, -96.032852), stopover: true, title: { start_address: '305th Ave, Dawson, MN 56232, USA', locationId: 7 } }, // 
     { location: new google.maps.LatLng(44.825259, -96.132852), stopover: true, title: { start_address: 'Co Rd 21, Dawson, MN 56232, USA', locationId: 6 } }, // 
     { location: new google.maps.LatLng(44.925259, -96.332852), stopover: true, title: { start_address: '161st Ave, Marietta, MN 56257, USA', locationId: 2 } }, // 
     { location: new google.maps.LatLng(44.425259, -96.232852), stopover: true, title: { start_address: 'Co Rd 126, Ivanhoe, MN 56142, USA', locationId: 11 } }, // 
-    // { location: new google.maps.LatLng(  47.925259,  -93.032852) , stopover:true }, // 
-    // { location: new google.maps.LatLng(  47.925259,  -95.032852) , stopover:true }, // 
     { location: new google.maps.LatLng(44.986656, -93.258133), stopover: true, title: { start_address: '15 SE Main St, Minneapolis, MN 55414, USA', locationId: 14 } },
     { location: new google.maps.LatLng(44.886656, -93.258133), stopover: true, title: { start_address: '6410 12th Ave S, Minneapolis, MN 55423, USA', locationId: 15 } },
-    // { location: new google.maps.LatLng(44.786656, -93.158133) , stopover:true },
-    // { location: new google.maps.LatLng(44.986656, -93.858133) , stopover:true },
-    // { location: new google.maps.LatLng(44.086656, -93.258133) , stopover:true },
-    // { location: new google.maps.LatLng(44.086656, -93.258133) , stopover:true },
-    // { location: new google.maps.LatLng(44.9861656, -93.258133) , stopover:true },
-    // { location: new google.maps.LatLng(44.906956, -93.858133) , stopover:true },
-    // { location: new google.maps.LatLng(44.936056, -93.058133) , stopover:true },
     { location: new google.maps.LatLng(50.247038, -99.838649), stopover: true, title: { start_address: '42 Armitage Ave, Minnedosa, MB R0J 1E0, Canada', locationId: 16 } }, //minnedosa
-    // { location: new google.maps.LatLng(52.146973, -106.677034) , stopover:true },
     { location: new google.maps.LatLng(49.895077, -97.138451), stopover: true, title: { start_address: '360-384 Main St, Winnipeg, MB R3C 4T3, Canada', locationId: 19 } }, // winnipeg //double
-    // { location: new google.maps.LatLng(49.895077, -97.138451) , stopover:true }, // winnipeg  //double
     { location: new google.maps.LatLng(51.256973, -103.677034), stopover: true, title: { start_address: 'Unnamed Road, Kelliher, SK S0A 1V0, Canada', locationId: 9 } },
-    // { location: new google.maps.LatLng(51.146973, -105.427034) , stopover:true },
-    // { location: new google.maps.LatLng(51.266973, -103.377034) , stopover:true },
-    // { location: new google.maps.LatLng(51.246973, -106.577034) , stopover:true },
-    // { location: new google.maps.LatLng(51.246973, -106.577034) , stopover:true },
-    // { location: new google.maps.LatLng(40.000000, -89.000000) , stopover:false }, //orgin
   ];
 
   mkrs: any = [];
@@ -108,12 +116,38 @@ export class StoreMapComponent implements OnInit {
   isEndsetasFavourite: boolean = false;
   isEndsetasEditedLocation: boolean = false;
   navigation: boolean = true;
+  tableview: boolean = true;
   showOverlay: boolean = false;
   locs:any = environment?.locations;
+  displayedColumns: string[] = [];
+  dataBaseColumns:any;
+  dataSource = new MatTableDataSource<LocationElement>(this.locs);
+  selection = new SelectionModel<LocationElement>(true,[]);
+  pgIndex:any = 2;
+  public selected = "Location";
+  
+
+  tableObjects: TableObj[] = [
+    {value: 'route', viewValue: 'Route'},
+    {value: 'location', viewValue: 'Location'},
+  ];
+  selectedTableObject = this.tableObjects[1].value;
+
+  @ViewChild(MatPaginator) paginator: MatPaginator | any;
+  
+
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+  }
 
   ngOnInit() {
-   console.log(this.locs);
+   console.log(Object.keys(this.locs[0]));
+   this.dataBaseColumns = Object.keys(this.locs[0]);
+   this.displayedColumns = this.dataBaseColumns.slice(0,10);
+   this.displayedColumns.unshift('select');
+   console.log(this.displayedColumns)
    this.origin = this.locs[0];
+  //  this.displayedColumns
    this.destination = this.locs[this.locs.length-1];
     this.currentDate = new Date();
     this.currentTime = new Date();
@@ -125,13 +159,64 @@ export class StoreMapComponent implements OnInit {
     }
     )
     this.directionsRenderer = new google.maps.DirectionsRenderer({ map: this.map, suppressMarkers: true });
-    // this.locations.map((location) => {
-    //   this.makemkrs(location?.location, location?.title)
-    // });
     this.locs.map((location:any) => {
       this.makemkrs({lat:parseFloat(location?.latitude),lng:parseFloat(location?.longitude)}, location?.Name,location?.location_id,location?.route_name)
     });
     this.makeClusters();
+  }
+
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.length;
+    return numSelected === numRows;
+  }
+   isSelectedPage() {
+    const numSelected = this.selection.selected.length;
+    const page = this.dataSource.paginator?.pageSize;
+    let endIndex: number;
+	// First check whether data source length is greater than current page index multiply by page size.
+	// If yes then endIdex will be current page index multiply by page size.
+	// If not then select the remaining elements in current page only.
+  if(this.dataSource.paginator){
+    if ( this.dataSource.data.length > (this.dataSource?.paginator?.pageIndex + 1) * this.dataSource.paginator.pageSize) {
+      endIndex = (this.dataSource.paginator.pageIndex + 1) * this.dataSource.paginator.pageSize;
+    } else {
+      // tslint:disable-next-line:max-line-length
+      endIndex = this.dataSource.data.length - (this.dataSource.paginator.pageIndex * this.dataSource.paginator.pageSize);
+    }
+    console.log(endIndex);
+    return numSelected === endIndex;
+  }
+
+  else return;    
+  }
+
+  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  masterToggle() {
+    this.isAllSelected() ?
+        this.selection.clear() :
+        this.dataSource.data.forEach(row => this.selection.select(row));
+  }
+   selectRows() {
+    // tslint:disable-next-line:max-line-length
+    let endIndex: number;
+    if(this.dataSource.paginator){
+      // tslint:disable-next-line:max-line-length
+      if (this.dataSource.data.length > (this.dataSource.paginator.pageIndex + 1) * this.dataSource.paginator.pageSize) {
+        endIndex = (this.dataSource.paginator.pageIndex + 1) * this.dataSource.paginator.pageSize;
+      } else {
+        // tslint:disable-next-line:max-line-length
+        endIndex = this.dataSource.data.length;
+      }
+    
+      for (let index = (this.dataSource.paginator.pageIndex * this.dataSource.paginator.pageSize); index < endIndex; index++) {
+        this.selection.select(this.dataSource.data[index]);
+      }
+    }    
+  }
+
+  logSelection() {
+    this.selection.selected.forEach(s => console.log(s));
   }
 
   navigationDrawer() {
@@ -141,7 +226,6 @@ export class StoreMapComponent implements OnInit {
 
   public AddressChange(address: any) {
     this.formattedaddress = address.formatted_address;
-    console.log(this.formattedaddress);
     // this.map.setCenter({lat:45.6,lng: 47.75})
     // this.map.setCenter(new google.maps.LatLng(-123.6, 47.75));
     const geocoder = new google.maps.Geocoder();

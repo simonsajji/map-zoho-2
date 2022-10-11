@@ -11,6 +11,8 @@ import { MaterialModule } from './modules/material/material.module';
 import { CustomDatePipe } from './pipes/date.pipe';
 import { FormsModule } from '@angular/forms';
 import { GooglePlaceModule } from 'ngx-google-places-autocomplete';
+import { TitlecasePipe } from './pipes/titlecase.pipe';
+import { RemoveunderscorePipe } from './pipes/removeunderscore.pipe';
 
 
 @NgModule({
@@ -18,7 +20,9 @@ import { GooglePlaceModule } from 'ngx-google-places-autocomplete';
     AppComponent,
     GoogleMapDemoComponent,
     StoreMapComponent,
-    CustomDatePipe
+    CustomDatePipe,
+    TitlecasePipe,
+    RemoveunderscorePipe
   ],
   imports: [
     BrowserModule,

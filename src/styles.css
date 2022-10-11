@@ -13,7 +13,12 @@ html, body {
     color:grey;
   }
 
-  
+  .p-relative{
+    position: relative !important;
+  }
+  .p-abs{
+    position: absolute !important;
+  }
 
 
   .flex-1{
@@ -57,4 +62,28 @@ html, body {
   display: flex;
   justify-content: center;
 
+}
+
+.mat-checkbox-checked.mat-accent{
+  background-color: #005691!important;
+}
+
+.mat-checkbox-checked.mat-accent .mat-checkbox-background {
+  background-color: #005691;
+}
+
+.mat-checkbox-indeterminate.mat-accent .mat-checkbox-background {
+  background-color: grey!important;
+}
+
+.mat-select{
+  font-size: 14px;
+}
+
+ .mat-option-selected-value{
+  background-color : rgb(241, 241, 241)!important;
+ }
+
+.c-gr-light{
+  color: rgb(155, 155, 155);
 }

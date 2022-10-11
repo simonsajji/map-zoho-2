@@ -58,6 +58,38 @@
     color: rgb(173, 172, 172);
     font-weight: 600;
 }
+ .table-slider{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 0.01rem solid rgb(229, 229, 229);;
+    box-shadow: rgba(0, 0, 0, 0.44) -9px 7px  8px ;
+    box-shadow: 0 -3px 5px 2px rgba(0, 0, 0, 0.14);
+    border-bottom: 0;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    width: 130px;
+    height: 50px;
+    font-size: 20px;
+    left:48vw;
+    top:-50px;
+    z-index: 900;
+    /* z-index: 1000; */
+    background-color: white!important;
+    cursor: pointer;
+    gap:3%;
+    outline: none;
+}
+
+
+
+.table-slider i{
+    font-size: 22px; 
+    color: rgb(173, 172, 172);
+    font-weight: 600;
+}
 
 .d-none{
     display: none;
@@ -233,7 +265,7 @@
 
 .primary-color{
     color:#285ec9!important;
-    color:#2464ad!important;
+    /* color:#2464ad!important; */
 }
 
 .dot-container{
@@ -321,9 +353,6 @@
     border: 0;
     outline: 0!important;
     z-index: 1000!important;
-    /* border-right: 0;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0; */
     background-color: rgb(232, 232, 232);
     padding-left: 10px;
     font-weight: 500;
@@ -372,6 +401,16 @@
       z-index: 1000;
   }
   
+  .tableview{
+      width: 100%;
+      position: absolute;
+      left: 0;
+      height: 100%;
+      background-color: white;
+      box-shadow: 0 -3px 5px 2px rgba(0, 0, 0, 0.14);
+      z-index: 1000;
+  }
+  
   .close-nav{
       float: left;
       font-size: 2em;
@@ -407,4 +446,35 @@
       border-left: solid 5px rgb(167, 167, 167);
       border-bottom: 0px;
       color: rgb(167, 167, 167);
+  }
+
+  .mat-table {
+    width: 100%;
+    height: calc(50vh - 30px)!important;
+    overflow: scroll!important;
+  }
+
+  .btn-addrte{
+    height:25px;
+    display: flex;
+    align-items: center!important;
+    justify-content: center!important;
+    padding: 2px;
+  }
+
+  .round{
+    border-radius: 50%;
+  }
+
+  .actions-btn{
+    width: 20px;
+    height: 20px;
+    background-color: #3668cc!important;
+    color: white!important;
+    position: absolute;
+    top: -30%;
+    right: -50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
