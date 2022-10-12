@@ -190,7 +190,7 @@
     </div>
 
     <div class="tableview" [@tableview]="tableview">
-        <button class="table-slider" title="Table" (click)="tableview=!tableview"> <i *ngIf="!tableview"
+        <button class="table-slider" title="Table" (click)="toggleTableView()"> <i *ngIf="!tableview"
                 class="fa fa-angle-down f-s-24"></i> <i *ngIf="tableview" class="fa fa-angle-up f-s-24"></i>
             <div class="f-s-15 f-w-400">Table View <i class="fa fa-table f-s-14" aria-hidden="true"></i></div>
         </button>
@@ -213,8 +213,8 @@
                         <img  src="assets/thunderbolt.png" width="22px" height="22px" alt="" class="hover-round round p-5">
                         <div *ngIf="selection.selected.length>0 && selection?.selected" class="round actions-btn f-s-11 f-w-500">{{selection.selected.length}}</div>
                         <mat-menu #menu="matMenu">
-                            <button mat-menu-item [disabled]="selection.selected.length<=0">
-                              <span (click)="logSelection()">Add to Route</span>
+                            <button mat-menu-item [disabled]="selection.selected.length<=0" (click)="logSelection()">
+                              <span >Add to Route</span>
                             </button>
                             <button mat-menu-item [disabled]="selection.selected.length<=0">
                               <span>Clear Selection</span>
@@ -252,7 +252,10 @@
                                 </mat-checkbox>
                             </th>
                             <td mat-cell *matCellDef="let row">
-                                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                                <!-- <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                                    [checked]="selection.isSelected(row)">
+                                </mat-checkbox> -->
+                                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selectaRow(row,$event) : null"
                                     [checked]="selection.isSelected(row)">
                                 </mat-checkbox>
                             </td>

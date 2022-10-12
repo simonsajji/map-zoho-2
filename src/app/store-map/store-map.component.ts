@@ -7,8 +7,8 @@ import { environment } from 'src/environments/environment';
 import { animate, animation, style, transition, trigger, useAnimation, state, keyframes } from '@angular/animations';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatTableDataSource} from '@angular/material/table';
-import { Pipe, PipeTransform } from '@angular/core';
 import {SelectionModel} from '@angular/cdk/collections';
+import { ToastrServices } from 'src/app/services/toastr.service';
 
 // export interface LocationElement {
 //   name: string;
@@ -16,7 +16,6 @@ import {SelectionModel} from '@angular/cdk/collections';
 //   weight: number;
 //   symbol: string;
 // }
-
 interface TableObj {
   value: string;
   viewValue: string;
@@ -26,7 +25,6 @@ interface TableMode {
   viewValue: string;
 }
 // const ELEMENT_DATA: LocationElement[] = environment.locations;
-
 @Component({
   selector: 'store-map',
   templateUrl: './store-map.component.html',
@@ -44,32 +42,13 @@ interface TableMode {
       transition('0 => 1', animate('.24s')),
       transition('1 => 0', animate('.24s'))
     ])
-
   ]
 })
 export class StoreMapComponent implements OnInit,AfterViewInit{
 
   @ViewChild('map', { static: false }) info: ElementRef | undefined;
   labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  locations = [
-    { location: new google.maps.LatLng(41.661129, -91.530169), stopover: true, title: { start_address: '1 S Gilbert St, Iowa City, IA 52240, USA', locationId: 12 } }, // double
-    { location: new google.maps.LatLng(44.500000, -89.500000), stopover: true, title: { start_address: '5687-5749 County Rd HH, Stevens Point, WI 54482, USA', locationId: 10 } },
-    { location: new google.maps.LatLng(46.877186, -96.789803), stopover: true, title: { start_address: '4330 with ave s, apt 310, Fargo, ND 58102, USA', locationId: 17 } },
-    { location: new google.maps.LatLng(41.543056, -90.590836), stopover: true, title: { start_address: '2301 N Marquette St, Davenport, IA 52804, USA', locationId: 13 } }, // davenport
-    { location: new google.maps.LatLng(43.167126, -93.210754), stopover: true, title: { start_address: '1517 N Quincy Ave, Mason City, IA 50401, USA', locationId: 1 } }, // mason city
-    { location: new google.maps.LatLng(47.925259, -97.032852), stopover: true, title: { start_address: '215 S 3rd St #100, Grand Forks, ND 58201, USA', locationId: 4 } }, // 
-    { location: new google.maps.LatLng(44.925259, -96.032852), stopover: true, title: { start_address: '3038 180th St, Dawson, MN 56232, USA', locationId: 18 } }, // 
-    { location: new google.maps.LatLng(44.825259, -96.032852), stopover: true, title: { start_address: '305th Ave, Dawson, MN 56232, USA', locationId: 7 } }, // 
-    { location: new google.maps.LatLng(44.825259, -96.132852), stopover: true, title: { start_address: 'Co Rd 21, Dawson, MN 56232, USA', locationId: 6 } }, // 
-    { location: new google.maps.LatLng(44.925259, -96.332852), stopover: true, title: { start_address: '161st Ave, Marietta, MN 56257, USA', locationId: 2 } }, // 
-    { location: new google.maps.LatLng(44.425259, -96.232852), stopover: true, title: { start_address: 'Co Rd 126, Ivanhoe, MN 56142, USA', locationId: 11 } }, // 
-    { location: new google.maps.LatLng(44.986656, -93.258133), stopover: true, title: { start_address: '15 SE Main St, Minneapolis, MN 55414, USA', locationId: 14 } },
-    { location: new google.maps.LatLng(44.886656, -93.258133), stopover: true, title: { start_address: '6410 12th Ave S, Minneapolis, MN 55423, USA', locationId: 15 } },
-    { location: new google.maps.LatLng(50.247038, -99.838649), stopover: true, title: { start_address: '42 Armitage Ave, Minnedosa, MB R0J 1E0, Canada', locationId: 16 } }, //minnedosa
-    { location: new google.maps.LatLng(49.895077, -97.138451), stopover: true, title: { start_address: '360-384 Main St, Winnipeg, MB R3C 4T3, Canada', locationId: 19 } }, // winnipeg //double
-    { location: new google.maps.LatLng(51.256973, -103.677034), stopover: true, title: { start_address: 'Unnamed Road, Kelliher, SK S0A 1V0, Canada', locationId: 9 } },
-  ];
-
+  
   mkrs: any = [];
   shortestRte: google.maps.DirectionsRoute | any;
   map: any;
@@ -135,12 +114,12 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   selectedLocations:any = [];
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
 
-  constructor(private cdr:ChangeDetectorRef){ }
+  constructor(private cdr:ChangeDetectorRef,private toastr:ToastrServices){ }
   
 
   ngAfterViewInit() {
-    // this.dataSource.paginator = this.paginator;
-    this.cdr.detectChanges();
+    this.dataSource.paginator = this.paginator;
+    // this.cdr.detectChanges();
   }
 
   ngOnInit() {
@@ -198,7 +177,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     if ( this.dataSource.data.length > (this.dataSource?.paginator?.pageIndex + 1) * this.dataSource.paginator.pageSize) {
       endIndex = (this.dataSource.paginator.pageIndex + 1) * this.dataSource.paginator.pageSize;
     } else {
-      // tslint:disable-next-line:max-line-length
       endIndex = this.dataSource.data.length - (this.dataSource.paginator.pageIndex * this.dataSource.paginator.pageSize);
     }
     console.log(endIndex);
@@ -215,37 +193,43 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   }
 
    selectRows() {
-    // tslint:disable-next-line:max-line-length
     let endIndex: number;
     if(this.dataSource.paginator){
-      // tslint:disable-next-line:max-line-length
       if (this.dataSource.data.length > (this.dataSource.paginator.pageIndex + 1) * this.dataSource.paginator.pageSize) {
         endIndex = (this.dataSource.paginator.pageIndex + 1) * this.dataSource.paginator.pageSize;
       } else {
-        // tslint:disable-next-line:max-line-length
         endIndex = this.dataSource.data.length;
       }
-    
+
       for (let index = (this.dataSource.paginator.pageIndex * this.dataSource.paginator.pageSize); index < endIndex; index++) {
         this.selection.select(this.dataSource.data[index]);
       }
     }    
   }
 
+  selectaRow(row:any,ev:any){
+    console.log(ev)
+    if(ev?.checked) this.selection.select(row);
+    else this.selection.deselect(row);
+  }
+
   logSelection() {
+    let count_addedLocations = 0;
     this.selection.selected.forEach((s:any ) =>{
       if( s?.location_id!=this.origin?.location_id && s?.location_id!=this.destination?.location_id ){
         const index = this.selectedLocations.findIndex((object:any) => (object?.location_id === s?.location_id ));
-        if (index === -1) this.selectedLocations.push(s);
-        else console.log("val already exists in route")
+        if (index === -1){
+          this.selectedLocations.push(s);
+          count_addedLocations++;
+        }
+        else this.toastr.warning(`Point ${s?.Name} already exists in route`)
       }
-      else console.log("origin or dest already exists in route")
-     
-    })
-    
-    // this.cdr.detectChanges();
+      else this.toastr.warning(`The Point ${s?.Name} is either Origin or Destination`)
+    });
+
+    if(count_addedLocations>0) this.toastr.success(`Added ${count_addedLocations} Points to Route`);
     console.log(this.selectedLocations);
-    this.selection.clear()
+    this.selection.clear();
   }
 
   navigationDrawer() {
@@ -253,10 +237,13 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     this.showOverlay = !this.showOverlay;
   }
 
+  toggleTableView(){
+    this.tableview = !this.tableview;
+    // this.cdr.detectChanges();
+  }
+
   public AddressChange(address: any) {
     this.formattedaddress = address.formatted_address;
-    // this.map.setCenter({lat:45.6,lng: 47.75})
-    // this.map.setCenter(new google.maps.LatLng(-123.6, 47.75));
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode(
       {
@@ -367,9 +354,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
       new MarkerClusterer(this.map, this.startstopmkr, {
         imagePath:
           "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-
       });
-
     }
     else {
       this.destMkr = new google.maps.Marker({
@@ -394,26 +379,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
 
       });
     }
-  }
-
-  makeWaypoints(position: any, title: any, locObject: any) {
-    let label = title + "";
-    console.log(position.lat());
-    let obj = { lat: position.lat(), lng: position.lng() }
-
-    let marker = new google.maps.Marker({
-      position: obj,
-      map: this.map,
-      label:{text:label,color:'#222222'}
-    });
-   
-    google.maps.event.addListener(marker, 'click', (evt: any) => {
-      this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${locObject?.start_address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
-      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>Remove</div> <div>G Map</div> <div>Street View</div>  <div>Move</div><div>
-    </div>`);
-      this.infoWin.open(this.map, marker);
-    })
-    this.mkrs.push(marker);
   }
 
   makemkrs(position: any, title: any,loc_id:any,route_name:any) {
@@ -468,10 +433,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
           this.directionsRenderer?.setDirections(this.shortestResult, () => this.showRoutes = true); // shortest or result
           this.showRoutes = true;
         }
-      })).then(() => {
-        // this.renderRoute();
-        // this.showRoutes = true;
-      })
+      }))
       .catch((e: any) => {
         window.alert("Directions request failed due to " + e);
         this.showRoutes = true;
@@ -479,8 +441,8 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   }
 
   markLocations() {
-    for (var i = 0, parts = [], max = 25 - 1; i < this.locations.length; i = i + max) {
-      parts.push(this.locations.slice(i, i + max + 1));
+    for (var i = 0, parts = [], max = 25 - 1; i < this.selectedLocations.length; i = i + max) {
+      parts.push(this.selectedLocations.slice(i, i + max + 1));
     }
     // Send requests to service to get route (for stations count <= 25 only one request will be sent)
     for (var i = 0; i < parts.length; i++) {
@@ -516,7 +478,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     var h = Math.floor(seconds % (3600 * 24) / 3600);
     var m = Math.floor(seconds % 3600 / 60);
     var s = Math.floor(seconds % 60);
-
     var dDisplay = d > 0 ? d + (d == 1 ? " d " : " d ") : "";
     var hDisplay = h > 0 ? h + (h == 1 ? " h " : " h ") : "";
     var mDisplay = m > 0 ? m + (m == 1 ? " min " : " mins ") : "";

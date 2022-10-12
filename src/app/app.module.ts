@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { GooglePlaceModule } from 'ngx-google-places-autocomplete';
 import { TitlecasePipe } from './pipes/titlecase.pipe';
 import { RemoveunderscorePipe } from './pipes/removeunderscore.pipe';
-
+import { ToastrModule} from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -29,7 +29,11 @@ import { RemoveunderscorePipe } from './pipes/removeunderscore.pipe';
     AppRoutingModule,
     MatSidenavModule,
     MaterialModule,
-    GooglePlaceModule
+    GooglePlaceModule,
+    ToastrModule.forRoot({
+      positionClass :'toast-top-right',
+      preventDuplicates: true
+    }),
   ],
   providers: [],
   bootstrap: [AppComponent]
