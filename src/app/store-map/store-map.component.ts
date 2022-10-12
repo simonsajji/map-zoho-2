@@ -132,18 +132,15 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   ];
   selectedTableObject = this.tableObjects[1].value;
   selectedTableMode = this.tableModes[0].value;
-
+  selectedLocations:any = [];
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
 
-  constructor(private cdr:ChangeDetectorRef){
-
-  }
+  constructor(private cdr:ChangeDetectorRef){ }
   
 
   ngAfterViewInit() {
     // this.dataSource.paginator = this.paginator;
     this.cdr.detectChanges();
-    
   }
 
   ngOnInit() {
@@ -159,8 +156,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     return data?.Name.toLowerCase().includes(filter);
   };
   this.dataSource.paginator = this.paginator;
-
- 
    this.origin = this.locs[0];
    this.destination = this.locs[this.locs.length-1];
     this.currentDate = new Date();
@@ -174,7 +169,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     )
     this.directionsRenderer = new google.maps.DirectionsRenderer({ map: this.map, suppressMarkers: true });
     this.locs.map((location:any) => {
-      this.makemkrs({lat:parseFloat(location?.latitude),lng:parseFloat(location?.longitude)}, location?.Name,location?.location_id,location?.route_name)
+      if(location?.location_id!==this.origin?.location_id && location?.location_id!=this.destination?.location_id)  this.makemkrs({lat:parseFloat(location?.latitude),lng:parseFloat(location?.longitude)}, location?.Name,location?.location_id,location?.route_name)
     });
     this.makeClusters();
   }
@@ -218,6 +213,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
         this.selection.clear() :
         this.dataSource.data.forEach((row:any) => this.selection.select(row));
   }
+
    selectRows() {
     // tslint:disable-next-line:max-line-length
     let endIndex: number;
@@ -237,7 +233,19 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   }
 
   logSelection() {
-    this.selection.selected.forEach(s => console.log(s));
+    this.selection.selected.forEach((s:any ) =>{
+      if( s?.location_id!=this.origin?.location_id && s?.location_id!=this.destination?.location_id ){
+        const index = this.selectedLocations.findIndex((object:any) => (object?.location_id === s?.location_id ));
+        if (index === -1) this.selectedLocations.push(s);
+        else console.log("val already exists in route")
+      }
+      else console.log("origin or dest already exists in route")
+     
+    })
+    
+    // this.cdr.detectChanges();
+    console.log(this.selectedLocations);
+    this.selection.clear()
   }
 
   navigationDrawer() {
@@ -348,7 +356,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
         label: title,
         title: title
       });
-
       google.maps.event.addListener(this.originMkr, 'click', (evt: any) => {
         this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${locObject?.start_address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
                       <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>Remove</div> <div>G Map</div> <div>Street View</div>  <div>Move</div><div>
@@ -411,16 +418,12 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
 
   makemkrs(position: any, title: any,loc_id:any,route_name:any) {
     let label = title + "";
-    // console.log(position.lat());
-    // let obj = { lat: position.lat(), lng: position.lng() }
     let obj = position;
-
     let marker = new google.maps.Marker({
       position: obj,
       map: this.map,
       label: title
     });
-
     google.maps.event.addListener(marker, 'click', (evt: any) => {
       this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${loc_id}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${title} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route_name} </i> </p>
       <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>Remove</div> <div>G Map</div> <div>Street View</div>  <div>Move</div><div>
@@ -431,7 +434,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   }
 
   buildRoute() {
-     this.locs.map((loc:any,index:any) => {
+     this.selectedLocations.map((loc:any,index:any) => {
       if(loc.location_id != this.origin.location_id && loc.location_id != this.destination.location_id){
         let obj = { location: {lat:parseFloat(loc?.latitude),lng:parseFloat(loc.longitude)}, stopover: true }
      this.wayPoints.push(obj)
@@ -488,8 +491,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     }
   }
 
-  
-
   renderRoute() {
     this.directionsRenderer?.setDirections(this.shortestResult); // shortest or result
     this.showRoutes = true;
@@ -538,7 +539,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     for (var i = 1; i < routeResults.routes.length; i++) {
       if (routeResults.routes[i].legs[0].distance.value < shortestLength) {
         this.shortestRte = routeResults.routes[i];
-
         shortestLength = routeResults.routes[i].legs[0].distance.value;
       }
     }

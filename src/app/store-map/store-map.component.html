@@ -143,12 +143,10 @@
 
             </div>
 
-            <!-- <p  class="c-gr d-flex j-center">No Points in Route</p> -->
+            <p *ngIf="selectedLocations?.length<=0" class="c-gr d-flex j-center m-t-30 m-b-30 f-s-15">No Points in the Route</p>
 
-            <div class="f-s-14 p-b-10 " *ngFor="let loc of locs;let i=index;">
-
-                <div *ngIf="i!=0 && i<locs.length-1" class="p-r-10 f-w-500 d-flex  align-center flex-wrap gap-5 p-l-10">
-
+            <div class="f-s-14 p-b-10 " *ngFor="let loc of selectedLocations;let i=index;">
+                <div  class="p-r-10 f-w-500 d-flex  align-center flex-wrap gap-5 p-l-10">
                     <div class="d-flex flex-1">
                         <div class="flex-column">
                             <div class="location-number f-s-10 f-w-400  m-r-5 p-2" #ln>{{i}}</div>
@@ -156,9 +154,7 @@
                                 <i class="fa fa-ellipsis-v f-s-12 dot  "></i>
                                 <i class="fa fa-ellipsis-v f-s-12 dot "></i>
                             </div>
-
                         </div>
-
                         <div class="flex-column flex-1 ">
                             <div>{{loc?.Name}}</div>
                             <div class=" f-w-400 f-s-12 d-flex j-space align-center flex-wrap c-gr w-90 p-t-5">
