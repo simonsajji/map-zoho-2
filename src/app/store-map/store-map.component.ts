@@ -141,7 +141,9 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
+    // this.dataSource.paginator = this.paginator;
+    this.cdr.detectChanges();
+    
   }
 
   ngOnInit() {
@@ -156,6 +158,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
    this.dataSource.filterPredicate = function(data:any, filter: string): any {
     return data?.Name.toLowerCase().includes(filter);
   };
+  this.dataSource.paginator = this.paginator;
 
  
    this.origin = this.locs[0];
@@ -180,6 +183,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     filterValue = filterValue.target?.value?.trim(); // Remove whitespace
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
     this.dataSource.filter = filterValue;
+    console.log(this.dataSource.filteredData)
     this.cdr.detectChanges();
   }
 
@@ -209,7 +213,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   else return;    
   }
 
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
   masterToggle() {
     this.isAllSelected() ?
         this.selection.clear() :
@@ -237,8 +240,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     this.selection.selected.forEach(s => console.log(s));
   }
 
-
-
   navigationDrawer() {
     this.navigation = !this.navigation;
     this.showOverlay = !this.showOverlay;
@@ -258,8 +259,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
         if (status === "OK" && results.length > 0) {
           const firstResult = results[0].geometry;
           const bounds = new google.maps.LatLngBounds();
-          console.log(bounds)
-
           if (firstResult.viewport) {
             // Only geocodes have viewport.
             bounds.union(firstResult.viewport);
@@ -289,9 +288,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     this.isEndsetasEditedLocation = false;
     this.isEndsetasFavourite = false;
     this.startstopmkr = [];
-    // this.destMkr.setMap(null);
     this.destination = "Edmonton";
-    // this.buildRoute();
   }
 
 
@@ -320,12 +317,8 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
 
   onTimeset(ev: any) {
     let time = ev?.value || ev;
-    console.log(ev);
     this.displayTime = time;
-
   }
-
-
 
   leftDateClick(): void {
     const numOfDays = 1;
