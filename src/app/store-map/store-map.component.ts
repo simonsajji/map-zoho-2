@@ -21,14 +21,11 @@ interface TableObj {
   value: string;
   viewValue: string;
 }
-// const ELEMENT_DATA: LocationElement[] = environment.locations;
-
-@Pipe({ name: 'removeUnderscore' })
-export class RemoveUnderscorePipe implements PipeTransform {
-  transform(value: any, args?: any): any {
-    return value.replace(/_/g, " ");
-  }
+interface TableMode {
+  value: string;
+  viewValue: string;
 }
+// const ELEMENT_DATA: LocationElement[] = environment.locations;
 
 @Component({
   selector: 'store-map',
@@ -123,15 +120,18 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   dataBaseColumns:any;
   dataSource = new MatTableDataSource<LocationElement>(this.locs);
   selection = new SelectionModel<LocationElement>(true,[]);
-  pgIndex:any = 2;
-  public selected = "Location";
-  
+  pgIndex:any = 2;  
 
   tableObjects: TableObj[] = [
     {value: 'route', viewValue: 'Route'},
     {value: 'location', viewValue: 'Location'},
   ];
+  tableModes: TableMode[] = [
+    {value: 'all', viewValue: 'All'},
+    {value: 'route', viewValue: 'Route'},
+  ];
   selectedTableObject = this.tableObjects[1].value;
+  selectedTableMode = this.tableModes[0].value;
 
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
   
@@ -147,7 +147,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
    this.displayedColumns.unshift('select');
    console.log(this.displayedColumns)
    this.origin = this.locs[0];
-  //  this.displayedColumns
    this.destination = this.locs[this.locs.length-1];
     this.currentDate = new Date();
     this.currentTime = new Date();

@@ -478,3 +478,8 @@
     align-items: center;
     justify-content: center;
   }
+
+  .hover-round:hover{
+    background-color: whitesmoke;
+    
+  }
