@@ -224,12 +224,12 @@
                       </mat-form-field>
                       <div  class="p-relative m-l-20 m-r-10 d-flex align-baseline c-pointer" title="Actions" [matMenuTriggerFor]="menu">
                         <img  src="assets/thunderbolt.png" width="22px" height="22px" alt="" class="hover-round round p-5">
-                        <div *ngIf="selection.selected.length>0 && selection?.selected" class="round actions-btn f-s-11 f-w-500">{{selection?.selected?.length}}</div>
+                        <div *ngIf="selection.selected.length>0 && selection?.selected" class="round actions-btn f-s-11 f-w-500">{{selection.selected.length}}</div>
                         <mat-menu #menu="matMenu">
                             <button mat-menu-item [disabled]="selection.selected.length<=0">
                               <span (click)="logSelection()">Add to Route</span>
                             </button>
-                            <button mat-menu-item [disabled]="selection.selected.length>0 && selection?.selected">
+                            <button mat-menu-item [disabled]="selection.selected.length<=0">
                               <span>Clear Selection</span>
                             </button>
                             <button mat-menu-item>
@@ -239,21 +239,26 @@
                       </div>
                       <div class="hover-round round d-flex align-center j-center m-r-10 p-5 " style="width:22px;height:22px">
                         <i  class="fa fa-cog f-s-18 c-gr "></i>
-
                       </div>
                 </div>
                 <mat-paginator [pageSizeOptions]="[10, 20]" class="pgntr" showFirstLastButtons [pageIndex]="pgIndex" 
                 aria-label="Select page of Locations List" style="width: 50%!important;">
                 </mat-paginator>
-                
-
             </div>
            
-            <div class=" mat-table " style="flex:flex-1">
-                <table mat-table [dataSource]="dataSource">
+           
+            <div class="mat-table" >
+                <div #matTab>
+                    <table mat-table [dataSource]="dataSource" class="mat-table m-b-5" >
                     <ng-container *ngFor="let col of displayedColumns" [matColumnDef]="col">
+                        <ng-container *ngIf="col==' '">
+                            <td mat-cell *matCellDef="let row">
+                                <i class="fa fa-ellipsis-v f-s-20  c-gr-light"></i>
+                            </td>
+
+                        </ng-container>
                         <ng-container *ngIf="col=='select'">
-                            <th mat-header-cell *matHeaderCellDef>
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 d-flex" style="align-items: flex-start!important;vertical-align: top!important;">
                                 <mat-checkbox (change)="$event ? masterToggle() : null"
                                     [checked]="selection.hasValue() && isAllSelected()"
                                     [indeterminate]="selection.hasValue() && !isAllSelected()">
@@ -265,15 +270,29 @@
                                 </mat-checkbox>
                             </td>
 
-                        </ng-container>
+                        </ng-container>                        
+                        <th  mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 flex-column align-start  c-dark"> <div>{{ col | removeunderscore | titlecase }}</div> 
+                            <mat-form-field *ngIf="col=='Name'" style="height:45px!important">
+                            <input matInput (keyup)="applyFilter($event)" placeholder="Filter..." >
+                          </mat-form-field> 
+                            <mat-form-field *ngIf="col!='Name' && col!=' '" style="height:45px!important">
+                            <!-- <input matInput (keyup)="applyFilter($event)" placeholder="Filter"> -->
+                            <mat-select></mat-select>
+                          </mat-form-field> 
+                        </th>
                         
-                        <th  mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14"> {{ col | removeunderscore | titlecase }} </th>
                         <td mat-cell *matCellDef="let element"> {{ element[col] }} </td>
                     </ng-container>
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)" class="table-row"></tr>
                 </table>
+
+                </div>
+                
+                <div class="empty-table" [style.height]="'calc(50vh - ' + (matTab.clientHeight) + 'px)'">
+                    
+                </div>
             </div>
         </div>
 

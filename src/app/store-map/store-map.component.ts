@@ -1,5 +1,5 @@
 import { LocationStrategy } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, ViewChild,AfterViewInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, ViewChild,AfterViewInit,ChangeDetectorRef } from '@angular/core';
 // import { MapInfoWindow } from '@angular/google-maps';
 import MarkerClusterer from '@googlemaps/markerclustererplus';
 import { isThisSecond } from 'date-fns';
@@ -10,12 +10,12 @@ import {MatTableDataSource} from '@angular/material/table';
 import { Pipe, PipeTransform } from '@angular/core';
 import {SelectionModel} from '@angular/cdk/collections';
 
-export interface LocationElement {
-  name: string;
-  position: number;
-  weight: number;
-  symbol: string;
-}
+// export interface LocationElement {
+//   name: string;
+//   position: number;
+//   weight: number;
+//   symbol: string;
+// }
 
 interface TableObj {
   value: string;
@@ -118,8 +118,8 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   locs:any = environment?.locations;
   displayedColumns: string[] = [];
   dataBaseColumns:any;
-  dataSource = new MatTableDataSource<LocationElement>(this.locs);
-  selection = new SelectionModel<LocationElement>(true,[]);
+  dataSource :any;
+  selection = new SelectionModel<any>(true,[]);
   pgIndex:any = 2;  
 
   tableObjects: TableObj[] = [
@@ -134,6 +134,10 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   selectedTableMode = this.tableModes[0].value;
 
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
+
+  constructor(private cdr:ChangeDetectorRef){
+
+  }
   
 
   ngAfterViewInit() {
@@ -141,11 +145,19 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   }
 
   ngOnInit() {
+  
+  this.dataSource = new MatTableDataSource<any>(this.locs);
    console.log(Object.keys(this.locs[0]));
    this.dataBaseColumns = Object.keys(this.locs[0]);
    this.displayedColumns = this.dataBaseColumns.slice(0,10);
-   this.displayedColumns.unshift('select');
-   console.log(this.displayedColumns)
+   this.displayedColumns.unshift(' ','select');
+   console.log(this.displayedColumns);
+   console.log(this.dataSource)
+   this.dataSource.filterPredicate = function(data:any, filter: string): any {
+    return data?.Name.toLowerCase().includes(filter);
+  };
+
+ 
    this.origin = this.locs[0];
    this.destination = this.locs[this.locs.length-1];
     this.currentDate = new Date();
@@ -162,6 +174,13 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
       this.makemkrs({lat:parseFloat(location?.latitude),lng:parseFloat(location?.longitude)}, location?.Name,location?.location_id,location?.route_name)
     });
     this.makeClusters();
+  }
+
+  applyFilter(filterValue: any) {
+    filterValue = filterValue.target?.value?.trim(); // Remove whitespace
+    filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
+    this.dataSource.filter = filterValue;
+    this.cdr.detectChanges();
   }
 
   isAllSelected() {
@@ -194,7 +213,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   masterToggle() {
     this.isAllSelected() ?
         this.selection.clear() :
-        this.dataSource.data.forEach(row => this.selection.select(row));
+        this.dataSource.data.forEach((row:any) => this.selection.select(row));
   }
    selectRows() {
     // tslint:disable-next-line:max-line-length
@@ -217,6 +236,8 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   logSelection() {
     this.selection.selected.forEach(s => console.log(s));
   }
+
+
 
   navigationDrawer() {
     this.navigation = !this.navigation;

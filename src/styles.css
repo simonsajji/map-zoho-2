@@ -79,6 +79,9 @@ html, body {
 .mat-select{
   font-size: 14px;
 }
+.mat-input{
+  font-size: 14px;
+}
 
  .mat-option-selected-value{
   background-color : rgb(241, 241, 241)!important;
@@ -87,3 +90,13 @@ html, body {
 .c-gr-light{
   color: rgb(155, 155, 155);
 }
+
+.align-start{
+  align-items: flex-start!important;
+  justify-content: flex-start!important;
+}
+
+.c-dark{
+  color: rgb(102, 102, 102)!important;
+}
+
