@@ -100,7 +100,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   dataSource :any;
   selection = new SelectionModel<any>(true,[]);
   pgIndex:any = 2;  
-
   tableObjects: TableObj[] = [
     {value: 'route', viewValue: 'Route'},
     {value: 'location', viewValue: 'Location'},
@@ -112,7 +111,9 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   selectedTableObject = this.tableObjects[1].value;
   selectedTableMode = this.tableModes[0].value;
   selectedLocations:any = [];
+  initiatedRoute:boolean = false;
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
+  
 
   constructor(private cdr:ChangeDetectorRef,private toastr:ToastrServices){ }
   
@@ -207,6 +208,10 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     }    
   }
 
+  editRoute(){
+    this.showRoutes = !this.showRoutes;
+  }
+
   selectaRow(row:any,ev:any){
     console.log(ev)
     if(ev?.checked) this.selection.select(row);
@@ -227,9 +232,11 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
       else this.toastr.warning(`The Point ${s?.Name} is either Origin or Destination`)
     });
 
-    if(count_addedLocations>0) this.toastr.success(`Added ${count_addedLocations} Points to Route`);
+    if(count_addedLocations==1 && count_addedLocations>0) ( (this.initiatedRoute == true) ? this.toastr.success(`Added ${count_addedLocations} more point to Route`) : this.toastr.success(`Added ${count_addedLocations} point to Route`));
+    else if(count_addedLocations>1 && count_addedLocations>0) ( (this.initiatedRoute == true) ? this.toastr.success(`Added ${count_addedLocations} more points to Route`) : this.toastr.success(`Added ${count_addedLocations} points to Route`));
     console.log(this.selectedLocations);
     this.selection.clear();
+    this.initiatedRoute = true;
   }
 
   navigationDrawer() {
@@ -399,6 +406,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   }
 
   buildRoute() {
+    this.wayPoints = [];
      this.selectedLocations.map((loc:any,index:any) => {
       if(loc.location_id != this.origin.location_id && loc.location_id != this.destination.location_id){
         let obj = { location: {lat:parseFloat(loc?.latitude),lng:parseFloat(loc.longitude)}, stopover: true }

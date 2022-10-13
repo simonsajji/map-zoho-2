@@ -489,12 +489,12 @@
 /* Handle on hover */
 ::-webkit-scrollbar-track:hover {
     background: white;
-    border: 0.1rem solid grey;
+    border: 0.1rem solid rgb(156, 156, 156);
 }
   
 ::-webkit-scrollbar-thumb:hover {
-    background: rgb(148, 148, 148);
-    border: 0.1rem solid rgb(112, 112, 112);
+    background: rgb(167, 167, 167);
+    border: 0.1rem solid rgb(156, 156, 156);
 }
   
   .mat-row,
