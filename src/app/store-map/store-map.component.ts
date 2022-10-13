@@ -137,7 +137,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   };
   this.dataSource.paginator = this.paginator;
    this.origin = this.locs[0];
-   this.destination = this.locs[this.locs.length-1];
+   this.destination = this.locs[0];
     this.currentDate = new Date();
     this.currentTime = new Date();
     this.displayTime = this.formatAMPM(new Date());
@@ -246,7 +246,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
 
   toggleTableView(){
     this.tableview = !this.tableview;
-    // this.cdr.detectChanges();
   }
 
   public AddressChange(address: any) {
@@ -262,7 +261,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
           const firstResult = results[0].geometry;
           const bounds = new google.maps.LatLngBounds();
           if (firstResult.viewport) {
-            // Only geocodes have viewport.
             bounds.union(firstResult.viewport);
           } else {
             bounds.extend(firstResult.location);
@@ -416,8 +414,8 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     console.log(this.wayPoints)
 
     this.directionsService.route({
-      origin: {lat:parseFloat(this.locs[0].latitude),lng:parseFloat(this.locs[0].longitude)},
-      destination: {lat:parseFloat(this.locs[this.locs.length-1].latitude),lng:parseFloat(this.locs[this.locs.length-1].longitude)},
+      origin: {lat:parseFloat(this.origin?.latitude),lng:parseFloat(this.origin?.longitude)},
+      destination: {lat:parseFloat(this.destination?.latitude),lng:parseFloat(this.destination?.longitude)},
       waypoints: this.wayPoints,
       optimizeWaypoints: true,
       provideRouteAlternatives: true,

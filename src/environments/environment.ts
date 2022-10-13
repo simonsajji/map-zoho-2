@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  locations :  [
+  locations :  
+  [
     {
       "Name": "156 Brandon Ave",
       "account_id": 4693269000029218481,
