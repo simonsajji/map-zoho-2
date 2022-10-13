@@ -9,6 +9,8 @@ import {MatPaginator} from '@angular/material/paginator';
 import {MatTableDataSource} from '@angular/material/table';
 import {SelectionModel} from '@angular/cdk/collections';
 import { ToastrServices } from 'src/app/services/toastr.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmBoxComponent } from '../confirm-box/confirm-box.component';
 
 // export interface LocationElement {
 //   name: string;
@@ -99,7 +101,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   dataBaseColumns:any;
   dataSource :any;
   selection = new SelectionModel<any>(true,[]);
-  pgIndex:any = 2;  
+  pgIndex:any = 0;  
   tableObjects: TableObj[] = [
     {value: 'route', viewValue: 'Route'},
     {value: 'location', viewValue: 'Location'},
@@ -115,7 +117,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
   
 
-  constructor(private cdr:ChangeDetectorRef,private toastr:ToastrServices){ }
+  constructor(private cdr:ChangeDetectorRef,private toastr:ToastrServices,private dialog:MatDialog){ }
   
 
   ngAfterViewInit() {
@@ -124,20 +126,19 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   }
 
   ngOnInit() {
-  
-  this.dataSource = new MatTableDataSource<any>(this.locs);
-   console.log(Object.keys(this.locs[0]));
-   this.dataBaseColumns = Object.keys(this.locs[0]);
-   this.displayedColumns = this.dataBaseColumns.slice(0,10);
-   this.displayedColumns.unshift(' ','select');
-   console.log(this.displayedColumns);
-   console.log(this.dataSource)
-   this.dataSource.filterPredicate = function(data:any, filter: string): any {
-    return data?.Name.toLowerCase().includes(filter);
-  };
-  this.dataSource.paginator = this.paginator;
-   this.origin = this.locs[0];
-   this.destination = this.locs[0];
+    this.dataSource = new MatTableDataSource<any>(this.locs);
+    console.log(Object.keys(this.locs[0]));
+    this.dataBaseColumns = Object.keys(this.locs[0]);
+    this.displayedColumns = this.dataBaseColumns.slice(0,10);
+    this.displayedColumns.unshift(' ','select');
+    console.log(this.displayedColumns);
+    console.log(this.dataSource)
+    this.dataSource.filterPredicate = function(data:any, filter: string): any {
+      return data?.Name.toLowerCase().includes(filter);
+    };
+    this.dataSource.paginator = this.paginator;
+    this.origin = this.locs[0];
+    this.destination = this.locs[0];
     this.currentDate = new Date();
     this.currentTime = new Date();
     this.displayTime = this.formatAMPM(new Date());
@@ -155,8 +156,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   }
 
   applyFilter(filterValue: any) {
-    filterValue = filterValue.target?.value?.trim(); // Remove whitespace
-    filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
+    filterValue = filterValue.target?.value?.trim().toLowerCase();
     this.dataSource.filter = filterValue;
     console.log(this.dataSource.filteredData)
     this.cdr.detectChanges();
@@ -167,13 +167,12 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     const numRows = this.dataSource.data.length;
     return numSelected === numRows;
   }
+
+
    isSelectedPage() {
     const numSelected = this.selection.selected.length;
     const page = this.dataSource.paginator?.pageSize;
     let endIndex: number;
-	// First check whether data source length is greater than current page index multiply by page size.
-	// If yes then endIdex will be current page index multiply by page size.
-	// If not then select the remaining elements in current page only.
   if(this.dataSource.paginator){
     if ( this.dataSource.data.length > (this.dataSource?.paginator?.pageIndex + 1) * this.dataSource.paginator.pageSize) {
       endIndex = (this.dataSource.paginator.pageIndex + 1) * this.dataSource.paginator.pageSize;
@@ -183,14 +182,34 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     console.log(endIndex);
     return numSelected === endIndex;
   }
-
   else return;    
   }
 
   masterToggle() {
-    this.isAllSelected() ?
+    // this.isAllSelected() ?
+    //     this.selection.clear() :
+    //     this.dataSource.data.forEach((row:any) => this.selection.select(row));
+    this.isSelectedPage() ?
         this.selection.clear() :
-        this.dataSource.data.forEach((row:any) => this.selection.select(row));
+        this.selectRows();
+  }
+
+  onChangedPage(event:any){
+    console.log(event);
+    if(this.selection.selected.length>0){
+      const dialogRef = this.dialog.open(ConfirmBoxComponent, {
+        data: {
+          locations: `${this.selection?.selected?.length}`,
+          destinationRoute: `${this.locs[0]?.route_name}`,
+        }
+      });
+      dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+        if (confirmed == true)  this.logSelection();
+        else this.selection.clear();
+      });
+
+    }
+    
   }
 
    selectRows() {
@@ -204,6 +223,21 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
 
       for (let index = (this.dataSource.paginator.pageIndex * this.dataSource.paginator.pageSize); index < endIndex; index++) {
         this.selection.select(this.dataSource.data[index]);
+      }
+    }    
+  }
+
+   deSelectRows() {
+    let endIndex: number;
+    if(this.dataSource.paginator){
+      if (this.dataSource.data.length > (this.dataSource.paginator.pageIndex + 1) * this.dataSource.paginator.pageSize) {
+        endIndex = (this.dataSource.paginator.pageIndex + 1) * this.dataSource.paginator.pageSize;
+      } else {
+        endIndex = this.dataSource.data.length;
+      }
+
+      for (let index = (this.dataSource.paginator.pageIndex * this.dataSource.paginator.pageSize); index < endIndex; index++) {
+        this.selection.deselect(this.dataSource.data[index]);
       }
     }    
   }
@@ -282,6 +316,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     this.origin = "St. Loius";
     // this.buildRoute();
   }
+
   setEndasCurrentLoc() {
     this.isEndsetasCurrent = true;
     this.isEndsetasDefault = false;
@@ -290,7 +325,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     this.startstopmkr = [];
     this.destination = "Edmonton";
   }
-
 
   formatAMPM(date: any) {
     let hours = date.getHours();

@@ -1,0 +1,17 @@
+<div class="mat-parent flex-column">
+    <div class=" f-s-15 m-b-10 f-w-400 ">Are you sure want to move <span class="f-w-500  m-0"> {{datanew?.locations}} Locations</span></div>
+   
+    <div class=" sub-head unrouted d-flex align-center  w-100 p-t-5 p-b-5 f-w-400 f-s-13 m-t-10 m-b-10 "><div  #fr> 
+            <span class="f-s-14 p-l-2 c-gr">TO ROUTE</span></div>  
+        <hr [style.width]="'calc(100% - ' + fr.clientWidth + 'px)'"  class="hor-line ">
+    </div>
+    <div class="f-w-500 f-s-15  m-0 t-a-left   m-b-15 route-name flex-column">
+        <div ><i class="fa fa-route "></i> {{datanew?.destinationRoute}}</div>
+    </div>
+
+    <div class="btn-parent text-center d-flex align-center j-center ">
+        <button mat-button class=" bg-primary-color m-r-5 f-s-13"  (click)="okClick()">MOVE</button>
+        <button mat-button class="btn btn-secondary btn-cancel f-s-13" style="background-color:transparent!important;color:black" (click)="cancelClick()">CANCEL</button>
+    </div>
+</div> 
+

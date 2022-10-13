@@ -13,6 +13,7 @@ import { GooglePlaceModule } from 'ngx-google-places-autocomplete';
 import { TitlecasePipe } from './pipes/titlecase.pipe';
 import { RemoveunderscorePipe } from './pipes/removeunderscore.pipe';
 import { ToastrModule} from 'ngx-toastr';
+import { ConfirmBoxComponent } from './confirm-box/confirm-box.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { ToastrModule} from 'ngx-toastr';
     StoreMapComponent,
     CustomDatePipe,
     TitlecasePipe,
-    RemoveunderscorePipe
+    RemoveunderscorePipe,
+    ConfirmBoxComponent
   ],
   imports: [
     BrowserModule,
