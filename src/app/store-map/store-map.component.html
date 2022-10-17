@@ -83,7 +83,7 @@
                     <img src="assets/log-in.png" width="24px" height="22px" alt="" srcset=""> 
                     <div>{{addbyMoment(leg?.cummulativeWithNoInterval)}} </div>
                 </div> -->
-                <div *ngIf="i==0" class="d-flex align-center gap-2"><img src="assets/log-out.png" width="24px" height="22px" alt="" srcset="">  <div>{{ displayTime}}</div></div>
+                <div *ngIf="i==0" class="d-flex align-center gap-2 p-t-10 p-b-5"><img src="assets/log-out.png" width="24px" height="22px" alt="" srcset="">  <div>{{ displayTime}}</div></div>
                 <hr class="hor-line" />
                 <div class="f-s-12 f-w-400 m-b-5 m-t-10 sub-head d-flex align-center w-100 flex-1 j-end ">
                     <div class="d-flex m-r-20">
@@ -114,7 +114,18 @@
                     title="Add a point to the Route">
                     <div>+ Add a Point</div>
                 </div>
-                <i class="fa fa-ellipsis-v f-s-18 dot primary-color "></i>
+                
+                <div  class="p-relative m-l-5 m-r-10 d-flex align-baseline c-pointer" title="Actions" [matMenuTriggerFor]="routemenu">
+                    <i class="fa fa-ellipsis-v f-s-18 dot primary-color  "></i>
+                    <mat-menu #routemenu="matMenu">
+                        <button mat-menu-item [disabled]="selectedLocations.length<=0" (click)="deleteAllWaypoints()">
+                          <span >Clear all waypoints</span>
+                        </button>
+                        <button mat-menu-item disabled>
+                          <span>Edit</span>
+                        </button>
+                      </mat-menu>
+                  </div>
                 <img *ngIf="!pinSideMenu" (click)="pinSideMenu=!pinSideMenu" src="assets/svgs/thumbtack.svg"
                     class="m-r-10 primary-color c-pointer p-5 m-t-6" width="18px" height="18px" alt="" srcset="">
                 <img *ngIf="pinSideMenu" (click)="pinSideMenu=!pinSideMenu" src="assets/svgs/thumbtack-solid.svg"
@@ -174,7 +185,7 @@
                         </div>
                     </div>
                     <div class="d-flex j-end flex-end align-center ">
-                        <img title="Remove Location from Route" src="assets/svgs/trash.svg"
+                        <img title="Remove Location from Route" src="assets/svgs/trash.svg" (click)="deleteWaypoint(loc)"
                             class="m-r-10 primary-color c-pointer" width="18px" height="18px" alt="" srcset="">
                     </div>
                 </div>

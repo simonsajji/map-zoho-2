@@ -126,9 +126,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     // this.cdr.detectChanges();
   }
 
-  ngOnInit() {
-    // var theFutureTime = moment().hour(12).minute(44).add(4,'minutes').format("HH:mm");
-    
+  ngOnInit() {   
     this.dataSource = new MatTableDataSource<any>(this.locs);
     console.log(Object.keys(this.locs[0]));
     this.dataBaseColumns = Object.keys(this.locs[0]);
@@ -209,9 +207,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
         if (confirmed == true)  this.logSelection();
         else this.selection.clear();
       });
-
     }
-    
   }
 
    selectRows() {
@@ -242,6 +238,18 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
         this.selection.deselect(this.dataSource.data[index]);
       }
     }    
+  }
+
+  deleteWaypoint(loc:any){
+    this.selectedLocations.map((item:any,idx:any)=>{
+      if(loc.location_id==item.location_id) this.selectedLocations.splice(idx,1);
+    });
+    this.selection.clear();
+  }
+
+  deleteAllWaypoints(){
+    this.selectedLocations = [];
+    this.selection.clear();
   }
 
   editRoute(){
