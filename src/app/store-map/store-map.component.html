@@ -1,11 +1,11 @@
 <div class="container" style="overflow:hidden!important">
     <div id="map" style="height: 100vh;width: calc(100vw);z-index: 10;overflow: hidden;"></div>
 
-    <div class="searchArea d-flex align-center p-5 j-space">
+    <div class="searchArea d-flex align-center p-5 ">
         <i class="fa fa-bars f-s-22 m-l-10 " aria-hidden="true"></i>
         <input type="text" ngx-google-places-autocomplete [options]="options" (onAddressChange)="AddressChange($event)"
-            placeholder="Search for Name or Address" class="f-s-16">
-        <img class="p-6 c-pointer" width="24px" height="24px" src="assets/current_loc.png" alt=""
+            placeholder="Search for Name or Address" class="f-s-16 w-100">
+        <!-- <img class="p-6 c-pointer" width="24px" height="24px" src="assets/current_loc.png" alt=""
             title="Set Current Location as Start Location">
 
         <div class="d-flex align-center " title="Map properties">
@@ -21,7 +21,7 @@
             <img src="assets/svgs/route.svg" class="p-6 m-t-3 c-pointer m-l-10" width="29px" height="28px" alt=""
                 srcset="">
             <i class="fa fa-angle-down  f-s-18 c-gr m-t-4 p-4"></i>
-        </div>
+        </div> -->
 
     </div>
 
@@ -53,13 +53,14 @@
                     class="m-r-10 primary-color c-pointer p-5" width="18px" height="18px" alt="" srcset="">
             </div>
             <p class="f-s-13 p-l-10 d-flex m-0 m-b-5">Travel Mode : Driving : fastest (optimal order of route)</p>
-            <p class="f-s-13 p-l-10 d-flex m-0 m-b-10">{{totalDuration}}, ({{totalDistance}} mi)</p>
-            <div class="f-s-14 p-b-10 " *ngFor="let leg of result?.routes[0]?.legs;let i=index">
+            <p class="f-s-13 p-l-10 d-flex m-0 m-b-10"> {{secondsToDhms((result?.routes[0]?.legs[result?.routes[0]?.legs.length -1]?.cummulative + result?.routes[0]?.legs[result?.routes[0]?.legs.length -1].duration.value).toFixed(2))}}, ({{totalDistance}} mi)</p>
+            <div class="f-s-14  m-b-10" *ngFor="let leg of result?.routes[0]?.legs;let i=index">
 
                 <div class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5">
                     <div *ngIf="i==0" class="d-flex align-center">
                         <i class="fa fa-home f-s-22 m-r-10 flex-1"></i>
                         <div [style.width]="'calc(100% - ' + 18 + 'px)'">{{leg?.start_address}}</div>
+                        
                     </div>
                     <div *ngIf="i!=0" class="d-flex ">
                         <div class="location-number f-s-10 f-w-400  m-r-5 p-2" #ln>{{i}}</div>
@@ -69,13 +70,24 @@
                 </div>
 
                 <div class="p-r-10 f-w-400 d-flex j-space align-center flex-wrap c-gr w-90 p-t-5 ">
-                    {{leg?.start_address}}</div>
+                    {{leg?.start_address}}
+                </div>
+                <div *ngIf=" i!=0" class="d-flex gap-2 align-center p-t-10 p-b-5">
+                    <img src="assets/log-in.png" width="24px" height="22px" alt="" srcset=""> 
+                    <div>{{addbyMoment(leg?.cummulativeWithNoInterval)}} </div>
+                    <div class="c-gr d-flex align-center"><img src="assets/hourglass.png" width="26px" height="19px" alt="" srcset=""> <div>00:30</div> </div>
+                    <img src="assets/log-out.png" width="24px" height="22px" alt="" srcset="">
+                    <div>{{ addbyMoment(leg?.cummulative)}}</div>
+                </div>
+                <!-- <div *ngIf="i==shortestRte?.legs?.length-1" class="d-flex gap-2 align-center">
+                    <img src="assets/log-in.png" width="24px" height="22px" alt="" srcset=""> 
+                    <div>{{addbyMoment(leg?.cummulativeWithNoInterval)}} </div>
+                </div> -->
+                <div *ngIf="i==0" class="d-flex align-center gap-2"><img src="assets/log-out.png" width="24px" height="22px" alt="" srcset="">  <div>{{ displayTime}}</div></div>
                 <hr class="hor-line" />
-                <div class="f-s-12 f-w-400 m-b-5 m-t-10 sub-head d-flex align-center p-t-5 p-b-5 w-100 flex-1 j-end ">
+                <div class="f-s-12 f-w-400 m-b-5 m-t-10 sub-head d-flex align-center w-100 flex-1 j-end ">
                     <div class="d-flex m-r-20">
-                        <i class="fa fa-car f-s-14 p-2 m-r-5" aria-hidden="true"></i> {{leg?.duration?.text}} <div
-                            class="p-r-5 p-l-5">&middot;</div>
-                        <div class="c-gr p-r-5">{{leg?.distance?.text}}</div>
+                        <div class="c-gr p-r-5">{{leg?.distance?.text}}&middot; {{leg.duration?.text}}</div>
                     </div>
                 </div>
                 <div *ngIf="i==shortestRte?.legs?.length-1"
@@ -89,7 +101,7 @@
                 </div>
                 <div *ngIf="i==shortestRte?.legs?.length-1"
                     class="p-r-10 f-w-400 d-flex j-space align-center flex-wrap c-gr p-b-10">{{leg.end_address}} </div>
-
+                <div *ngIf="i==shortestRte?.legs?.length-1" class="d-flex align-center gap-2 m-b-10"><img src="assets/log-in.png" width="24px" height="22px" alt="" srcset=""> <div>{{addbyMoment(leg?.cummulative + leg.duration.value)}}</div></div>
             </div>
         </div>
 

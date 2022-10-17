@@ -11,6 +11,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import { ToastrServices } from 'src/app/services/toastr.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmBoxComponent } from '../confirm-box/confirm-box.component';
+import * as moment from 'moment'
 
 // export interface LocationElement {
 //   name: string;
@@ -126,6 +127,8 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   }
 
   ngOnInit() {
+    // var theFutureTime = moment().hour(12).minute(44).add(4,'minutes').format("HH:mm");
+    
     this.dataSource = new MatTableDataSource<any>(this.locs);
     console.log(Object.keys(this.locs[0]));
     this.dataBaseColumns = Object.keys(this.locs[0]);
@@ -179,7 +182,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     } else {
       endIndex = this.dataSource.data.length - (this.dataSource.paginator.pageIndex * this.dataSource.paginator.pageSize);
     }
-    console.log(endIndex);
     return numSelected === endIndex;
   }
   else return;    
@@ -261,13 +263,13 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
           this.selectedLocations.push(s);
           count_addedLocations++;
         }
-        else this.toastr.warning(`Point ${s?.Name} already exists in route`)
+        else this.toastr.warning(`Location ${s?.Name} already exists in route`)
       }
-      else this.toastr.warning(`The Point ${s?.Name} is either Origin or Destination`)
+      else this.toastr.warning(`The Location ${s?.Name} is either Origin or Destination`)
     });
 
-    if(count_addedLocations==1 && count_addedLocations>0) ( (this.initiatedRoute == true) ? this.toastr.success(`Added ${count_addedLocations} more point to Route`) : this.toastr.success(`Added ${count_addedLocations} point to Route`));
-    else if(count_addedLocations>1 && count_addedLocations>0) ( (this.initiatedRoute == true) ? this.toastr.success(`Added ${count_addedLocations} more points to Route`) : this.toastr.success(`Added ${count_addedLocations} points to Route`));
+    if(count_addedLocations==1 && count_addedLocations>0) ( (this.initiatedRoute == true) ? this.toastr.success(`Added ${count_addedLocations} more location to Route`) : this.toastr.success(`Added ${count_addedLocations} location to Route`));
+    else if(count_addedLocations>1 && count_addedLocations>0) ( (this.initiatedRoute == true) ? this.toastr.success(`Added ${count_addedLocations} more locations to Route`) : this.toastr.success(`Added ${count_addedLocations} locations to Route`));
     console.log(this.selectedLocations);
     this.selection.clear();
     this.initiatedRoute = true;
@@ -336,6 +338,34 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     let strTime = hours + ':' + minutes + ' ' + ampm;
     return strTime;
   }
+
+  getformatted24hrs() {
+    let date = new Date();
+    let hours:any = date.getHours();
+    let minutes:any = date.getMinutes();
+    let ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours < 10 ? ('0'+hours) : hours;
+    minutes = minutes < 10 ? ('0'+minutes) : minutes;
+    // hours = hours % 12;
+    // hours = hours ? hours : 12; // the hour '0' should be '12'
+    // minutes = minutes < 10 ? '0' + minutes : minutes;
+    let strTime = hours + ':' + minutes ;
+    return strTime;
+  }
+
+  timeFromMins(mins:any) {
+    function z(n:any){return (n<10? '0':'') + n;}
+    var h = (mins/60 |0) % 24;
+    var m = mins % 60;
+    return z(h.toFixed(2)) + ':' + z(m.toFixed(2));
+  }
+
+  addbyMoment(secs:any){
+    const number = moment(this.displayTime, ["hh:mm A"]).add(secs,'seconds').format("h:mm A");
+    return number;
+  }
+
+
 
   dateChange(event: any): void {
     // this.initialLoader = true;
@@ -461,12 +491,23 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
 
         if (status == 'OK') {
           this.shortestResult = this.shortestRoute(this.result);
-          console.log(this.result.routes[0])
+          console.log(this.result.routes[0]);
+          this.result.routes[0].legs.map((leg:any,idx:any)=>{
+          
+            if(idx!=0){
+              // leg.cummulative = this.result.routes[0].legs[idx - 1].cummulative + leg?.duration?.value;
+              leg.cummulativeWithNoInterval = this.result.routes[0].legs[idx - 1].cummulative + this.result.routes[0].legs[idx-1]?.duration?.value;
+              leg.cummulative = leg.cummulativeWithNoInterval + 1800;
+            }
+            else{
+              leg.cummulativeWithNoInterval = 0;
+              leg.cummulative = leg.cummulativeWithNoInterval;
+            }
+          })
           console.log(this.shortestRte);
           let legLength = this.result.routes[0].legs.length;
           var leg = this.result.routes[0].legs[0];
           var leg2 = this.result.routes[0].legs[legLength - 1];
-          console.log(leg, leg2.end_location.lat())
           this.makeMarker(leg.start_location, "start", "title", leg);
           this.makeMarker(leg2.end_location, "end", 'title', leg2);
           this.computeTotalDistance(this.result);
@@ -521,8 +562,8 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     var dDisplay = d > 0 ? d + (d == 1 ? " d " : " d ") : "";
     var hDisplay = h > 0 ? h + (h == 1 ? " h " : " h ") : "";
     var mDisplay = m > 0 ? m + (m == 1 ? " min " : " mins ") : "";
-    var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
-    return dDisplay + hDisplay + mDisplay;
+    var sDisplay = s > 0 ? s + (s == 1 ? " seconds" : " seconds") : "";
+    return dDisplay + hDisplay + mDisplay ;
   }
 
   makeClusters() {

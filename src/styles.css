@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
 html, body {
     height: 100%;
     margin: 0;
@@ -100,3 +101,15 @@ html, body {
   color: rgb(102, 102, 102)!important;
 }
 
+.primary-color{
+  color:#285ec9!important;
+  /* color:#2464ad!important; */
+}
+.bg-primary-color{
+  background-color:#285ec9!important;
+  /* color:#2464ad!important; */
+}
+
+.mat-dialog-container {
+  padding: 15px !important;
+}
