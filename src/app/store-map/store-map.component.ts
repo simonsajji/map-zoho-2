@@ -12,6 +12,8 @@ import { ToastrServices } from 'src/app/services/toastr.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmBoxComponent } from '../confirm-box/confirm-box.component';
 import * as moment from 'moment';
+import {FormControl} from '@angular/forms';
+import {TooltipPosition} from '@angular/material/tooltip';
 
 
 // export interface LocationElement {
@@ -53,7 +55,8 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
 
   @ViewChild('map', { static: false }) info: ElementRef | undefined;
   labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  
+  positionOptions: TooltipPosition[] = ['after', 'before', 'above', 'below', 'left', 'right'];
+  position = new FormControl(this.positionOptions[4]);
   mkrs: any = [];
   shortestRte: google.maps.DirectionsRoute | any;
   map: any;
@@ -138,7 +141,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     console.log(this.displayedColumns);
     console.log(this.dataSource)
     this.dataSource.filterPredicate = function(data:any, filter: string): any {
-      return data?.Address.toLowerCase().includes(filter);
+      return data?.Route_Name.toLowerCase().startsWith(filter);
     };
     this.dataSource.paginator = this.paginator;
     this.origin = this.locs[0];

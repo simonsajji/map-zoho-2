@@ -550,17 +550,35 @@
     hyphens: auto;
   }
 
+  .mat-column-Address{
+    /* word-wrap: ellipsis !important; */
+    /* white-space: unset !important; */
+    /* flex: 0 0 20% !important; */
+    /* width: 80px!important; */
+    /* overflow-wrap: hidden; */
+    /* word-wrap: ellipsis; */
+    overflow: hidden;
+    text-overflow: ellipsis!important;
+    /* word-break: break-word; */
+
+    /* -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto; */
+  }
+
   .mat-cell,
   .mat-header-cell {
     /* word-wrap: initial; */
     /* display: table-cell; */
-    padding-left:10px;
-    padding-right:10px;
+    padding-left:15px;
+    padding-right:15px;
     /* line-break: unset; */
-    white-space: wrap;
+    /* white-space: ellipsis; */
     /* overflow: hidden; */
     text-overflow: ellipsis!important;
     /* vertical-align: middle; */
+    
   }
  
 
