@@ -2,9 +2,9 @@
     <div id="map" style="height: 100vh;width: calc(100vw);z-index: 10;overflow: hidden;"></div>
 
     <div class="searchArea d-flex align-center p-5 ">
-        <i class="fa fa-bars f-s-22 m-l-10 " aria-hidden="true"></i>
+        <!-- <i class="fa fa-bars f-s-22 m-l-10 " aria-hidden="true"></i> -->
         <input type="text" ngx-google-places-autocomplete [options]="options" (onAddressChange)="AddressChange($event)"
-            placeholder="Search for Name or Address" class="f-s-16 w-100">
+            placeholder="Search for Name or Address" class="f-s-16 w-100" #sarea>
         <!-- <img class="p-6 c-pointer" width="24px" height="24px" src="assets/current_loc.png" alt=""
             title="Set Current Location as Start Location">
 
@@ -22,6 +22,7 @@
                 srcset="">
             <i class="fa fa-angle-down  f-s-18 c-gr m-t-4 p-4"></i>
         </div> -->
+        <i *ngIf="formattedaddress.length>0" class="fa fa-times f-s-15 c-gr-light m-r-10 c-pointer" (click)="clearSearchArea()"></i>
 
     </div>
 
@@ -33,8 +34,19 @@
         </button>
         <div *ngIf=" showRoutes" class="right-content flex-column ">
             <div class="d-flex align-center ">
-                <div class="f-s-16 f-w-500 p-10 flex-3 align-baseline d-flex"><span class="m-r-30">Route</span> <i
-                        class="fa fa-angle-down f-w-600" aria-hidden="true"></i></div>
+                <div class="f-s-16 f-w-500 p-10 p-l-0 flex-3 align-baseline d-flex"><span class="m-r-10">Route</span>
+                     
+                    <div  class="p-relative m-l-5 m-r-20 d-flex align-baseline c-pointer" title="Actions" [matMenuTriggerFor]="routebuildmenu">
+                       <i class="fa fa-angle-down f-w-600" aria-hidden="true"></i></div>
+                       <mat-menu #routebuildmenu="matMenu">
+                           <button mat-menu-item [disabled]="selectedLocations.length<=0"  (click)="deleteAllWaypoints()">
+                             <span >Clear Route</span>
+                           </button>
+                           <button mat-menu-item [disabled]="selectedLocations.length<=0"  (click)="editRoute()">
+                             <span >Edit Route</span>
+                           </button>
+                         </mat-menu>
+                     </div>
                 <div class="primary-color f-s-14 flex-3 t-a-right flex-end j-end m-r-20 add_loc_link c-pointer"
                     title="Add a point to the Route">
                     <div>
@@ -47,10 +59,10 @@
                 </div>
                 <!-- <i class="fa fa-ellipsis-v f-s-18 dot m-r-30 p-10"></i> -->
 
-                <img *ngIf="!pinSideMenu" (click)="pinSideMenu=!pinSideMenu" src="assets/svgs/thumbtack.svg"
+                <!-- <img *ngIf="!pinSideMenu" (click)="pinSideMenu=!pinSideMenu" src="assets/svgs/thumbtack.svg"
                     class="m-r-10 primary-color c-pointer p-5" width="18px" height="18px" alt="" srcset="">
                 <img *ngIf="pinSideMenu" (click)="pinSideMenu=!pinSideMenu" src="assets/svgs/thumbtack-solid.svg"
-                    class="m-r-10 primary-color c-pointer p-5" width="18px" height="18px" alt="" srcset="">
+                    class="m-r-10 primary-color c-pointer p-5" width="18px" height="18px" alt="" srcset=""> -->
             </div>
             <p class="f-s-13 p-l-10 d-flex m-0 m-b-5">Travel Mode : Driving : fastest (optimal order of route)</p>
             <p class="f-s-13 p-l-10 d-flex m-0 m-b-10"> {{secondsToDhms((result?.routes[0]?.legs[result?.routes[0]?.legs.length -1]?.cummulative + result?.routes[0]?.legs[result?.routes[0]?.legs.length -1].duration.value).toFixed(2))}}, ({{totalDistance}} mi)</p>
@@ -105,31 +117,39 @@
             </div>
         </div>
 
-        <div *ngIf="  !showRoutes"
+        <div *ngIf="!showRoutes"
             class="right-content flex-column  ">
             <div class="d-flex align-center ">
-                <div class="f-s-16 f-w-500 p-10 flex-3 align-baseline d-flex"><span class="m-r-30">Route</span> <i
-                        class="fa fa-angle-down f-w-600" aria-hidden="true"></i></div>
-                <div class="primary-color f-s-14 flex-2 t-a-right flex-end j-end m-r-20 add_loc_link c-pointer"
+                <div class="f-s-16 f-w-500 p-10 flex-3 align-baseline d-flex"><span class="m-r-10">Route</span>
+                     
+                     <div  class="p-relative m-l-5 m-r-20 d-flex align-baseline c-pointer" title="Actions" [matMenuTriggerFor]="routemenu">
+                        <i class="fa fa-angle-down f-w-600" aria-hidden="true"></i></div>
+                        <mat-menu #routemenu="matMenu">
+                            <button mat-menu-item [disabled]="selectedLocations.length<=0"  (click)="deleteAllWaypoints()">
+                              <span >Clear All</span>
+                            </button>
+                          </mat-menu>
+                      </div>
+                <!-- <div class="primary-color f-s-14 flex-2 t-a-right flex-end j-end m-r-20 add_loc_link c-pointer"
                     title="Add a point to the Route">
                     <div>+ Add a Point</div>
-                </div>
+                </div> -->
                 
-                <div  class="p-relative m-l-5 m-r-10 d-flex align-baseline c-pointer" title="Actions" [matMenuTriggerFor]="routemenu">
+                <!-- <div  class="p-relative m-l-5 m-r-20 d-flex align-baseline c-pointer" title="Actions" [matMenuTriggerFor]="routemenu">
                     <i class="fa fa-ellipsis-v f-s-18 dot primary-color  "></i>
                     <mat-menu #routemenu="matMenu">
                         <button mat-menu-item [disabled]="selectedLocations.length<=0" (click)="deleteAllWaypoints()">
-                          <span >Clear all waypoints</span>
+                          <span >Clear All</span>
                         </button>
                         <button mat-menu-item disabled>
                           <span>Edit</span>
                         </button>
                       </mat-menu>
-                  </div>
-                <img *ngIf="!pinSideMenu" (click)="pinSideMenu=!pinSideMenu" src="assets/svgs/thumbtack.svg"
+                  </div> -->
+                <!-- <img *ngIf="!pinSideMenu" (click)="pinSideMenu=!pinSideMenu" src="assets/svgs/thumbtack.svg"
                     class="m-r-10 primary-color c-pointer p-5 m-t-6" width="18px" height="18px" alt="" srcset="">
                 <img *ngIf="pinSideMenu" (click)="pinSideMenu=!pinSideMenu" src="assets/svgs/thumbtack-solid.svg"
-                    class="m-r-10 primary-color c-pointer p-5 m-t-6" width="18px" height="18px" alt="" srcset="">
+                    class="m-r-10 primary-color c-pointer p-5 m-t-6" width="18px" height="18px" alt="" srcset=""> -->
             </div>
 
             <div class="d-flex align-baseline gap-2 w-100 j-center">
@@ -181,12 +201,11 @@
                         <div class="flex-column flex-1 ">
                             <div>{{loc?.Name}}</div>
                             <div class=" f-w-400 f-s-12 d-flex j-space align-center flex-wrap c-gr w-90 p-t-5">
-                                {{loc?.address_line_1}} {{loc?.city}} Canada</div>
+                                {{loc?.Address}}</div>
                         </div>
                     </div>
-                    <div class="d-flex j-end flex-end align-center ">
-                        <img title="Remove Location from Route" src="assets/svgs/trash.svg" (click)="deleteWaypoint(loc)"
-                            class="m-r-10 primary-color c-pointer" width="18px" height="18px" alt="" srcset="">
+                    <div class="d-flex j-end flex-end align-center m-r-10">
+                        <i class="fa fa-times f-s-15 c-pointer c-gr-light" title="Remove location" (click)="deleteWaypoint(loc)"></i>
                     </div>
                 </div>
             </div>
@@ -217,7 +236,7 @@
                 class="fa fa-angle-down f-s-24"></i> <i *ngIf="tableview" class="fa fa-angle-up f-s-24"></i>
             <div class="f-s-15 f-w-400">Table View <i class="fa fa-table f-s-14" aria-hidden="true"></i></div>
         </button>
-        <div class="flex-column ">
+        <div class="flex-column w-100">
             <div  class="d-flex align-center j-space m-t-5">
                 <div class="d-flex  m-l-10 align-center">
                     <mat-form-field class="m-l-10 m-r-10" >
@@ -251,59 +270,62 @@
                         <i  class="fa fa-cog f-s-18 c-gr "></i>
                       </div>
                 </div>
-                <mat-paginator [pageSizeOptions]="[5,10, 20]" class="pgntr" showFirstLastButtons [pageIndex]="pgIndex" (page)='onChangedPage($event)'
+                <mat-paginator [pageSizeOptions]="[10, 20,40]" class="pgntr" showFirstLastButtons [pageIndex]="pgIndex" (page)='onChangedPage($event)'
                 aria-label="Select page of Locations List" style="width: 50%!important;">
                 </mat-paginator>
             </div>
            
            
-            <div class="mat-table" >
-                <div #matTab >
-                    <table mat-table [dataSource]="dataSource" class="mat-table m-b-5" >
+            <div class="mat-tbl" style="width:100vw!important">
+                <div #matTab style="width:100vw!important" >
+                    <mat-table matSort [dataSource]="dataSource" class="mat-table m-b-5 w-100"  >
                     <ng-container *ngFor="let col of displayedColumns" [matColumnDef]="col">
-                        <ng-container *ngIf="col==' '">
-                            <td mat-cell *matCellDef="let row">
-                                <i class="fa fa-ellipsis-v f-s-20  c-gr-light"></i>
-                            </td>
+                        <ng-container *ngIf="col=='op'">
+                            <mat-header-cell *matHeaderCellDef>
+                                <!-- empty  -->
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row">
+                                <i class="fa fa-ellipsis-v f-s-18  c-gr-light p-5"></i>
+                            </mat-cell>
 
                         </ng-container>
                         <ng-container *ngIf="col=='select'">
-                            <th mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 d-flex" style="align-items: flex-start!important;vertical-align: top!important;">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 d-flex" style="align-items: flex-start!important;vertical-align: top!important;">
                                 <mat-checkbox (change)="$event ? masterToggle() : null"
-                                    [checked]="isSelectedPage()  "
+                                    [checked]="isSelectedPage()" 
                                     >
                                 </mat-checkbox>
-                            </th>
-                            <td mat-cell *matCellDef="let row">
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row">
                                 <!-- <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
                                     [checked]="selection.isSelected(row)">
                                 </mat-checkbox> -->
                                 <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selectaRow(row,$event) : null"
-                                    [checked]="selection.isSelected(row)">
+                                    [checked]="selection.isSelected(row)" >
                                 </mat-checkbox>
-                            </td>
+                            </mat-cell>
 
                         </ng-container>                        
-                        <th  mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 flex-column align-start  c-dark"> <div>{{ col | removeunderscore | titlecase }}</div> 
-                            <mat-form-field *ngIf="col=='Name'" style="height:45px!important">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 flex-column align-start  c-dark"> <div>{{ col | removeunderscore | titlecase }}</div> 
+                            <mat-form-field *ngIf="col=='Name'" style="height:45px!important;width: 100%!important;">
                             <input matInput (keyup)="applyFilter($event)" placeholder="Filter..." >
                           </mat-form-field> 
-                            <mat-form-field *ngIf="col!='Name' && col!=' '" style="height:45px!important">
+                            <mat-form-field *ngIf="col!='Name' && col!='op'" style="height:45px!important;width: 100%!important;">
                             <!-- <input matInput (keyup)="applyFilter($event)" placeholder="Filter"> -->
                             <mat-select></mat-select>
                           </mat-form-field> 
-                        </th>
+                        </mat-header-cell>
                         
-                        <td mat-cell *matCellDef="let element"> {{ element[col] }} </td>
+                        <mat-cell *matCellDef="let element"> {{ element[col] }} </mat-cell>
                     </ng-container>
 
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"  class="table-row"></tr>
-                </table>
+                    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: displayedColumns;"  ></mat-row>
+                </mat-table>
 
                 </div>
                 
-                <div *ngIf="dataSource?.filteredData?.length>0" class="empty-table " [style.height]="'calc(50vh - ' + (matTab.clientHeight) + 'px)'"> </div>
+                <!-- <div *ngIf="dataSource?.filteredData?.length>0" class="empty-table " [style.height]="'calc(50vh - ' + (matTab.clientHeight) + 'px)'"> </div> -->
                 <!-- <div *ngIf="dataSource?.filteredData?.length==0" [style.height]="'calc(50vh' + 'px)'">No Records</div> -->
             </div>
             

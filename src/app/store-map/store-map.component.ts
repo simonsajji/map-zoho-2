@@ -11,7 +11,8 @@ import {SelectionModel} from '@angular/cdk/collections';
 import { ToastrServices } from 'src/app/services/toastr.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmBoxComponent } from '../confirm-box/confirm-box.component';
-import * as moment from 'moment'
+import * as moment from 'moment';
+
 
 // export interface LocationElement {
 //   name: string;
@@ -28,6 +29,7 @@ interface TableMode {
   viewValue: string;
 }
 // const ELEMENT_DATA: LocationElement[] = environment.locations;
+
 @Component({
   selector: 'store-map',
   templateUrl: './store-map.component.html',
@@ -75,7 +77,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   currentTime: any;
   @ViewChild('timepicker') timepicker: any;
   isOpen: any;
-  formattedaddress = " ";
+  formattedaddress = "";
   options: any = {
     componentRestrictions: {
       country: ["CA"]
@@ -116,6 +118,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   selectedLocations:any = [];
   initiatedRoute:boolean = false;
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
+  @ViewChild("sarea") sarea: any;
   
 
   constructor(private cdr:ChangeDetectorRef,private toastr:ToastrServices,private dialog:MatDialog){ }
@@ -131,11 +134,11 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     console.log(Object.keys(this.locs[0]));
     this.dataBaseColumns = Object.keys(this.locs[0]);
     this.displayedColumns = this.dataBaseColumns.slice(0,10);
-    this.displayedColumns.unshift(' ','select');
+    this.displayedColumns.unshift('op','select');
     console.log(this.displayedColumns);
     console.log(this.dataSource)
     this.dataSource.filterPredicate = function(data:any, filter: string): any {
-      return data?.Name.toLowerCase().includes(filter);
+      return data?.Address.toLowerCase().includes(filter);
     };
     this.dataSource.paginator = this.paginator;
     this.origin = this.locs[0];
@@ -151,7 +154,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     )
     this.directionsRenderer = new google.maps.DirectionsRenderer({ map: this.map, suppressMarkers: true });
     this.locs.map((location:any) => {
-      if(location?.location_id!==this.origin?.location_id && location?.location_id!=this.destination?.location_id)  this.makemkrs({lat:parseFloat(location?.latitude),lng:parseFloat(location?.longitude)}, location?.Name,location?.location_id,location?.route_name)
+      if(location?.Location_ID!==this.origin?.Location_ID && location?.Location_ID!=this.destination?.Location_ID)  this.makemkrs({lat:parseFloat(location?.Latitude),lng:parseFloat(location?.Longitude)}, location?.Name,location?.Location_ID,location?.Route_Name)
     });
     this.makeClusters();
   }
@@ -182,7 +185,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     }
     return numSelected === endIndex;
   }
-  else return;    
+  else return false;    
   }
 
   masterToggle() {
@@ -200,7 +203,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
       const dialogRef = this.dialog.open(ConfirmBoxComponent, {
         data: {
           locations: `${this.selection?.selected?.length}`,
-          destinationRoute: `${this.locs[0]?.route_name}`,
+          destinationRoute: `${this.locs[0]?.Route_Name}`,
         }
       });
       dialogRef.afterClosed().subscribe((confirmed: boolean) => {
@@ -242,14 +245,26 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
 
   deleteWaypoint(loc:any){
     this.selectedLocations.map((item:any,idx:any)=>{
-      if(loc.location_id==item.location_id) this.selectedLocations.splice(idx,1);
+      if(loc.Location_ID==item.Location_ID) this.selectedLocations.splice(idx,1);
     });
     this.selection.clear();
   }
 
   deleteAllWaypoints(){
-    this.selectedLocations = [];
-    this.selection.clear();
+    const dialogRef = this.dialog.open(ConfirmBoxComponent, {
+      data: {
+        locations: `${this.selectedLocations?.length}`,
+        destinationRoute: null,
+      }
+    });
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed == true){
+        this.showRoutes = false;
+        this.selectedLocations = [];
+        this.selection.clear();
+      }
+      else this.selection.clear();
+    });
   }
 
   editRoute(){
@@ -262,11 +277,12 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     else this.selection.deselect(row);
   }
 
+
   logSelection() {
     let count_addedLocations = 0;
     this.selection.selected.forEach((s:any ) =>{
-      if( s?.location_id!=this.origin?.location_id && s?.location_id!=this.destination?.location_id ){
-        const index = this.selectedLocations.findIndex((object:any) => (object?.location_id === s?.location_id ));
+      if( s?.Location_ID!=this.origin?.Location_ID && s?.Location_ID!=this.destination?.Location_ID ){
+        const index = this.selectedLocations.findIndex((object:any) => (object?.Location_ID === s?.Location_ID ));
         if (index === -1){
           this.selectedLocations.push(s);
           count_addedLocations++;
@@ -316,6 +332,13 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     );
   }
 
+  
+  clearSearchArea(){
+    this.sarea.nativeElement.value = "";
+    this.map.setCenter(new google.maps.LatLng(43.651070,  -79.347015));
+    this.map.setZoom(12);
+  }
+
   setHomeasCurrentLoc() {
     this.isHomesetasCurrent = true;
     this.isHomesetasDefault = false;
@@ -324,7 +347,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     this.startstopmkr = [];
     // this.originMkr.setMap(null);
     this.origin = "St. Loius";
-    // this.buildRoute();
   }
 
   setEndasCurrentLoc() {
@@ -354,9 +376,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     let ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours < 10 ? ('0'+hours) : hours;
     minutes = minutes < 10 ? ('0'+minutes) : minutes;
-    // hours = hours % 12;
-    // hours = hours ? hours : 12; // the hour '0' should be '12'
-    // minutes = minutes < 10 ? '0' + minutes : minutes;
     let strTime = hours + ':' + minutes ;
     return strTime;
   }
@@ -372,8 +391,6 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     const number = moment(this.displayTime, ["hh:mm A"]).add(secs,'seconds').format("h:mm A");
     return number;
   }
-
-
 
   dateChange(event: any): void {
     // this.initialLoader = true;
@@ -460,15 +477,22 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
 
   makemkrs(position: any, title: any,loc_id:any,route_name:any) {
     let label = title + "";
+    let markerIcon = {
+      url: 'assets/pin.png',
+      scaledSize: new google.maps.Size(30, 30),
+      labelOrigin:  new google.maps.Point(-30,10),
+    };
     let obj = position;
     let marker = new google.maps.Marker({
       position: obj,
       map: this.map,
-      label: title
+      icon:markerIcon,
+      label: {text:title,color: "#1440de",fontSize: "11px",fontWeight:'600',className:'marker-position'},
+            
     });
     google.maps.event.addListener(marker, 'click', (evt: any) => {
       this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${loc_id}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${title} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route_name} </i> </p>
-      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>Remove</div> <div>G Map</div> <div>Street View</div>  <div>Move</div><div>
+      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>
     </div>`);
       this.infoWin.open(this.map, marker);
     })
@@ -478,16 +502,16 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   buildRoute() {
     this.wayPoints = [];
      this.selectedLocations.map((loc:any,index:any) => {
-      if(loc.location_id != this.origin.location_id && loc.location_id != this.destination.location_id){
-        let obj = { location: {lat:parseFloat(loc?.latitude),lng:parseFloat(loc.longitude)}, stopover: true }
+      if(loc.Location_ID != this.origin.Location_ID && loc.Location_ID != this.destination.Location_ID){
+        let obj = { location: {lat:parseFloat(loc?.Latitude),lng:parseFloat(loc.Longitude)}, stopover: true }
      this.wayPoints.push(obj)
       }
     });
     console.log(this.wayPoints)
 
     this.directionsService.route({
-      origin: {lat:parseFloat(this.origin?.latitude),lng:parseFloat(this.origin?.longitude)},
-      destination: {lat:parseFloat(this.destination?.latitude),lng:parseFloat(this.destination?.longitude)},
+      origin: {lat:parseFloat(this.origin?.Latitude),lng:parseFloat(this.origin?.Longitude)},
+      destination: {lat:parseFloat(this.destination?.Latitude),lng:parseFloat(this.destination?.Longitude)},
       waypoints: this.wayPoints,
       optimizeWaypoints: true,
       provideRouteAlternatives: true,
@@ -516,8 +540,8 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
           let legLength = this.result.routes[0].legs.length;
           var leg = this.result.routes[0].legs[0];
           var leg2 = this.result.routes[0].legs[legLength - 1];
-          this.makeMarker(leg.start_location, "start", "title", leg);
-          this.makeMarker(leg2.end_location, "end", 'title', leg2);
+          this.makeMarker(leg.start_location, "start", leg.start_location, leg);
+          this.makeMarker(leg2.end_location, "end", leg2.end_location, leg2);
           this.computeTotalDistance(this.result);
           this.directionsRenderer?.setDirections(this.shortestResult, () => this.showRoutes = true); // shortest or result
           this.showRoutes = true;
