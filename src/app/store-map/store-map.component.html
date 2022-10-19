@@ -269,8 +269,9 @@
                       <div class="hover-round round d-flex align-center j-center m-r-10 p-5 " style="width:22px;height:22px">
                         <i  class="fa fa-cog f-s-18 c-gr "></i>
                       </div>
+                      <div *ngIf="isFilterActive"><img src="assets/clear-filter.png" width="22px" height="22px" alt="" srcset="" (click)="clearAllFilters()" matTooltip="Clear all filters"></div>
                 </div>
-                <mat-paginator [pageSizeOptions]="[10, 20,40]" class="pgntr" showFirstLastButtons [pageIndex]="pgIndex" (page)='onChangedPage($event)'
+                <mat-paginator #paginator [pageSizeOptions]="[10, 20,40]" class="pgntr" showFirstLastButtons [pageIndex]="pgIndex" (page)='onChangedPage($event)'
                 aria-label="Select page of Locations List" style="width: 50%!important;">
                 </mat-paginator>
             </div>
@@ -282,7 +283,7 @@
                     <ng-container *ngFor="let col of displayedColumns" [matColumnDef]="col" >
                         <ng-container *ngIf="col=='op'">
                             <mat-header-cell *matHeaderCellDef>
-                                <!-- empty  -->
+                                <!-- empty  --> 
                             </mat-header-cell>
                             <mat-cell *matCellDef="let row">
                                 <i class="fa fa-ellipsis-v f-s-18  c-gr-light p-5"></i>
@@ -292,15 +293,12 @@
                         
                         <ng-container *ngIf="col=='select'">
                             <mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 d-flex" style="align-items: flex-start!important;vertical-align: top!important;">
-                                <mat-checkbox (change)="$event ? masterToggle() : null"
-                                    [checked]="isSelectedPage()" 
+                                <mat-checkbox (change)="masterToggle($event)"
+                                    [checked]="selection.selected.length===paginator.pageSize" 
                                     >
                                 </mat-checkbox>
                             </mat-header-cell>
                             <mat-cell *matCellDef="let row">
-                                <!-- <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
-                                    [checked]="selection.isSelected(row)">
-                                </mat-checkbox> -->
                                 <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selectaRow(row,$event) : null"
                                     [checked]="selection.isSelected(row)" >
                                 </mat-checkbox>
@@ -310,9 +308,15 @@
                                              
                         <mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 flex-column align-start  c-dark"> <div>{{ col | removeunderscore | titlecase }}</div> 
                             <mat-form-field *ngIf="col=='Route_Name'" style="height:45px!important;width: 100%!important;">
-                            <input matInput (keyup)="applyFilter($event)" placeholder="Filter..." >
+                            <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..."   #filterRouteName>
                           </mat-form-field> 
-                            <mat-form-field *ngIf="col!='Route_Name' && col!='op'" style="height:45px!important;width: 100%!important;">
+                            <mat-form-field *ngIf="col=='Address'" style="height:45px!important;width: 100%!important;">
+                            <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..."   #filterAddress>
+                          </mat-form-field> 
+                            <mat-form-field *ngIf="col == 'Name'" style="height:45px!important;width: 100%!important;">
+                            <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..."   #filterName>
+                          </mat-form-field> 
+                            <mat-form-field *ngIf="col!='Route_Name' && col!='op' && col!='Address' && col!='Name'" style="height:45px!important;width: 100%!important;">
                             <!-- <input matInput (keyup)="applyFilter($event)" placeholder="Filter"> -->
                             <mat-select></mat-select>
                           </mat-form-field> 

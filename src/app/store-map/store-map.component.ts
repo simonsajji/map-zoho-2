@@ -16,6 +16,7 @@ import {FormControl} from '@angular/forms';
 import {TooltipPosition} from '@angular/material/tooltip';
 
 
+
 // export interface LocationElement {
 //   name: string;
 //   position: number;
@@ -120,8 +121,15 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   selectedTableMode = this.tableModes[0].value;
   selectedLocations:any = [];
   initiatedRoute:boolean = false;
+  masterCheckbox:boolean = false;
+  pageSizeperPage:any;
+  isFilterActive:boolean = false;
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
   @ViewChild("sarea") sarea: any;
+  @ViewChild("mastercheck") mastercheck: any;
+  @ViewChild('filterName') filterName :any;
+  @ViewChild('filterRouteName') filterRouteName :any;
+  @ViewChild('filterAddress') filterAddress :any;
   
 
   constructor(private cdr:ChangeDetectorRef,private toastr:ToastrServices,private dialog:MatDialog){ }
@@ -140,9 +148,9 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     this.displayedColumns.unshift('op','select');
     console.log(this.displayedColumns);
     console.log(this.dataSource)
-    this.dataSource.filterPredicate = function(data:any, filter: string): any {
-      return data?.Route_Name.toLowerCase().startsWith(filter);
-    };
+    // this.dataSource.filterPredicate = function(data:any, filter: string): any {
+    //   return data?.Route_Name.toLowerCase().includes(filter) ;
+    // };
     this.dataSource.paginator = this.paginator;
     this.origin = this.locs[0];
     this.destination = this.locs[0];
@@ -162,11 +170,27 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     this.makeClusters();
   }
 
-  applyFilter(filterValue: any) {
+  applyFilter(filterValue: any,column:any) {
+    console.log(column);
+    if(filterValue.target?.value == '') this.isFilterActive = false;
+    else this.isFilterActive = true;
+    this.dataSource.filterPredicate = function(data:any, filter: string): any {
+     if(column == 'Route_Name') return data?.Route_Name.toLowerCase().includes(filter) ;
+     else if(column == 'Address') return data?.Address.toLowerCase().includes(filter) ;
+     else if(column == 'Name') return data?.Name.toLowerCase().includes(filter) ;
+    };
     filterValue = filterValue.target?.value?.trim().toLowerCase();
     this.dataSource.filter = filterValue;
     console.log(this.dataSource.filteredData)
     this.cdr.detectChanges();
+  }
+
+  clearAllFilters(){
+    this.applyFilter('','');
+    // this.filterName.target.value = '';
+    this.filterName.nativeElement.value = '';
+    this.filterAddress.nativeElement.value = '';
+    this.filterRouteName.nativeElement.value = '';
   }
 
   isAllSelected() {
@@ -186,22 +210,24 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     } else {
       endIndex = this.dataSource.data.length - (this.dataSource.paginator.pageIndex * this.dataSource.paginator.pageSize);
     }
-    return numSelected === endIndex;
+    this.masterCheckbox = numSelected === endIndex;
+    return this.masterCheckbox;
   }
   else return false;    
   }
 
-  masterToggle() {
-    // this.isAllSelected() ?
-    //     this.selection.clear() :
-    //     this.dataSource.data.forEach((row:any) => this.selection.select(row));
-    this.isSelectedPage() ?
-        this.selection.clear() :
-        this.selectRows();
+  masterToggle(event:any) {
+   this.isSelectedPage() ?
+      this.selection.clear() :
+      this.selectRows();
   }
+
+
 
   onChangedPage(event:any){
     console.log(event);
+    this.pageSizeperPage = event?.pageSize;
+    this.masterCheckbox = false;
     if(this.selection.selected.length>0){
       const dialogRef = this.dialog.open(ConfirmBoxComponent, {
         data: {
@@ -210,8 +236,15 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
         }
       });
       dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-        if (confirmed == true)  this.logSelection();
-        else this.selection.clear();
+        if (confirmed == true){
+          this.logSelection();
+          this.masterCheckbox = false;
+          this.cdr.detectChanges();
+        } 
+        else {
+          this.selection.clear();
+          this.masterCheckbox = false;
+        }
       });
     }
   }
@@ -299,6 +332,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     else if(count_addedLocations>1 && count_addedLocations>0) ( (this.initiatedRoute == true) ? this.toastr.success(`Added ${count_addedLocations} more locations to Route`) : this.toastr.success(`Added ${count_addedLocations} locations to Route`));
     console.log(this.selectedLocations);
     this.selection.clear();
+    this.masterCheckbox = false;
     this.initiatedRoute = true;
   }
 
