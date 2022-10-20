@@ -111,14 +111,13 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   selection = new SelectionModel<any>(true,[]);
   pgIndex:any = 0;  
   tableObjects: TableObj[] = [
-    {value: 'route', viewValue: 'Route'},
     {value: 'location', viewValue: 'Location'},
   ];
   tableModes: TableMode[] = [
     {value: 'all', viewValue: 'All'},
     {value: 'route', viewValue: 'Route'},
   ];
-  selectedTableObject = this.tableObjects[1].value;
+  selectedTableObject = this.tableObjects[0].value;
   selectedTableMode = this.tableModes[0].value;
   selectedLocations:any = [];
   initiatedRoute:boolean = false;
@@ -131,6 +130,15 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   @ViewChild('filterName') filterName :any;
   @ViewChild('filterRouteName') filterRouteName :any;
   @ViewChild('filterAddress') filterAddress :any;
+  org = {
+    "Name": "Sparkle Solutions",
+    "Address": "100 Courtland Ave, Vaughan, Ontario, L4K 3T6",
+    "Latitude": "43.814206386",
+    "Location_ID": "1111111",
+    "Longitude": "-79.532818106",
+    "Route_Name": null,
+    "Route_ID": 1111111,
+  }
   
 
   constructor(private cdr:ChangeDetectorRef,private toastr:ToastrServices,private dialog:MatDialog,private apiService:ApiService){ }
@@ -140,24 +148,24 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     this.dataSource.paginator = this.paginator;
     // this.cdr.detectChanges();
   }
-  // 100 Courtland Ave, Concord, ON L4K 3T6, Canada
+ 
   ngOnInit() {   
-    this.apiService.get(`https://zoftmap.azurewebsites.net/`,).subscribe(data => {
-      if(data?.success) console.log(data)
-    })
+    // this.apiService.get(`https://zoftmap.azurewebsites.net/`,).subscribe(data => {
+    //   if(data?.success) console.log(data)
+    // });
+
+    // this.callApiFn();
     this.dataSource = new MatTableDataSource<any>(this.locs);
     console.log(Object.keys(this.locs[0]));
     this.dataBaseColumns = Object.keys(this.locs[0]);
-    this.displayedColumns = this.dataBaseColumns.slice(0,10);
-    this.displayedColumns.unshift('op','select');
+    this.displayedColumns = ['Name','Location_ID','Address','Route_Name','Latitude','Longitude'];
+    // this.displayedColumns.unshift('op','select');
+    this.displayedColumns.unshift('select');
+    this.displayedColumns = this.displayedColumns.filter(function(e) { return e !== 'Route_ID' })
     console.log(this.displayedColumns);
-    console.log(this.dataSource)
-    // this.dataSource.filterPredicate = function(data:any, filter: string): any {
-    //   return data?.Route_Name.toLowerCase().includes(filter) ;
-    // };
     this.dataSource.paginator = this.paginator;
-    this.origin = this.locs[0];
-    this.destination = this.locs[0];
+    this.origin = this.org;
+    this.destination = this.org;
     this.currentDate = new Date();
     this.currentTime = new Date();
     this.displayTime = this.formatAMPM(new Date());
@@ -173,6 +181,117 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     });
     this.makeClusters();
   }
+
+  // callApiFn(){
+  //   let payload = {
+  //     "data":[
+  //        {
+  //           "Location.Name":"6 Passy Garden",
+  //           "Mailing_City":null,
+  //           "Number_of_Machines":1,
+  //           "Service_Category":"Refund-Usage",
+  //           "Mailing_State":null,
+  //           "Mailing_Street":null,
+  //           "P_O_Number":null,
+  //           "Approval_Status":"Approved",
+  //           "Name":"T-1081",
+  //           "Account.Account_Name":"York University",
+  //           "Contact":{
+  //              "id":"4693269000031923384"
+  //           },
+  //           "Refund_Amount":2,
+  //           "Mailing_Country":null,
+  //           "Postal_Code":null,
+  //           "Received_Date_and_Time":null,
+  //           "id":"4693269000033403017",
+  //           "APT_Number":null,
+  //           "Approved_Date":null,
+  //           "Parent_Ticket_Number":null
+  //        },
+  //        {
+  //           "Location.Name":"1255 Pendrell St",
+  //           "Mailing_City":null,
+  //           "Number_of_Machines":1,
+  //           "Service_Category":"Refund-Audit",
+  //           "Mailing_State":null,
+  //           "Mailing_Street":null,
+  //           "P_O_Number":null,
+  //           "Approval_Status":"Approved",
+  //           "Name":"T-1082",
+  //           "Account.Account_Name":"Starlight Canadian Residential Growth Fu",
+  //           "Contact":{
+  //              "id":"4693269000031945047"
+  //           },
+  //           "Refund_Amount":25,
+  //           "Mailing_Country":null,
+  //           "Postal_Code":null,
+  //           "Received_Date_and_Time":null,
+  //           "id":"4693269000033403037",
+  //           "APT_Number":null,
+  //           "Approved_Date":null,
+  //           "Parent_Ticket_Number":null
+  //        },
+  //        {
+  //           "Location.Name":"6 Passy Garden",
+  //           "Mailing_City":null,
+  //           "Number_of_Machines":1,
+  //           "Service_Category":"Refund-Usage",
+  //           "Mailing_State":null,
+  //           "Mailing_Street":null,
+  //           "P_O_Number":null,
+  //           "Approval_Status":"Approved",
+  //           "Name":"T-1083",
+  //           "Account.Account_Name":"York University",
+  //           "Contact":{
+  //              "id":"4693269000031923384"
+  //           },
+  //           "Refund_Amount":10,
+  //           "Mailing_Country":null,
+  //           "Postal_Code":null,
+  //           "Received_Date_and_Time":null,
+  //           "id":"4693269000033431017",
+  //           "APT_Number":null,
+  //           "Approved_Date":null,
+  //           "Parent_Ticket_Number":null
+  //        },
+  //        {
+  //           "Location.Name":"789 Drake St",
+  //           "Mailing_City":"Vancouver",
+  //           "Number_of_Machines":1,
+  //           "Service_Category":"Refund-Audit",
+  //           "Mailing_State":"British Columbia",
+  //           "Mailing_Street":"789 Drake St",
+  //           "P_O_Number":"test",
+  //           "Approval_Status":"Approved",
+  //           "Name":"T-1084",
+  //           "Account.Account_Name":"The Owners Strata Plan VR2692",
+  //           "Contact":{
+  //              "id":"4693269000033413019"
+  //           },
+  //           "Refund_Amount":8,
+  //           "Mailing_Country":"Canada",
+  //           "Postal_Code":"V6Z 2N7",
+  //           "Received_Date_and_Time":"2022-10-06T15:00:00+05:30",
+  //           "id":"4693269000033436001",
+  //           "APT_Number":"1234",
+  //           "Approved_Date":"2022-10-06",
+  //           "Parent_Ticket_Number":null
+  //        }
+  //     ],
+  //     "info":{
+  //        "count":4,
+  //        "more_records":false
+  //     }
+  //  }
+  //   this.apiService.post(`https://iif-converter.azurewebsites.net/download_iif`, payload).subscribe(data => {
+  //     if(data){
+  //      console.log(data)
+  //     }
+      
+  //   }, err => {
+      
+  //   });
+  // }
 
   applyFilter(filterValue: any,column:any) {
     console.log(column);
@@ -378,7 +497,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   clearSearchArea(){
     this.sarea.nativeElement.value = "";
     this.map.setCenter(new google.maps.LatLng(43.651070,  -79.347015));
-    this.map.setZoom(12);
+    this.map.setZoom(13);
   }
 
   setHomeasCurrentLoc() {
@@ -476,7 +595,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
         position: obj,
         map: this.map,
         icon: "assets/flag-start.png",
-        label: title,
+        label:{text:title,color: "#1440de",fontSize: "11px",fontWeight:'600',className:'marker-position'},
         title: title
       });
       google.maps.event.addListener(this.originMkr, 'click', (evt: any) => {
@@ -497,7 +616,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
         position: obj,
         map: this.map,
         icon: "assets/flag-end.png",
-        label: label,
+        // label:{text:title,color: "#1440de",fontSize: "11px",fontWeight:'600',className:'marker-position'},
         title: title
       });
 
@@ -542,14 +661,16 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   }
 
   buildRoute() {
-    this.wayPoints = [];
+    if(this.wayPoints.length>0){
+      this.wayPoints = [];
      this.selectedLocations.map((loc:any,index:any) => {
       if(loc.Location_ID != this.origin.Location_ID && loc.Location_ID != this.destination.Location_ID){
         let obj = { location: {lat:parseFloat(loc?.Latitude),lng:parseFloat(loc.Longitude)}, stopover: true }
      this.wayPoints.push(obj)
       }
     });
-    console.log(this.wayPoints)
+    console.log(this.wayPoints);
+
 
     this.directionsService.route({
       origin: {lat:parseFloat(this.origin?.Latitude),lng:parseFloat(this.origin?.Longitude)},
@@ -582,8 +703,8 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
           let legLength = this.result.routes[0].legs.length;
           var leg = this.result.routes[0].legs[0];
           var leg2 = this.result.routes[0].legs[legLength - 1];
-          this.makeMarker(leg.start_location, "start", leg.start_location, leg);
-          this.makeMarker(leg2.end_location, "end", leg2.end_location, leg2);
+          this.makeMarker(leg.start_location, "start", leg.start_address, leg);
+          this.makeMarker(leg2.end_location, "end", '', leg2);
           this.computeTotalDistance(this.result);
           this.directionsRenderer?.setDirections(this.shortestResult, () => this.showRoutes = true); // shortest or result
           this.showRoutes = true;
@@ -593,6 +714,10 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
         window.alert("Directions request failed due to " + e);
         this.showRoutes = true;
       })
+      
+    }
+    else this.toastr.warning("Please select locations from building the Route");
+    
   }
 
   markLocations() {
