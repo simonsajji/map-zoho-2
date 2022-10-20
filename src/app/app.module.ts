@@ -14,6 +14,7 @@ import { TitlecasePipe } from './pipes/titlecase.pipe';
 import { RemoveunderscorePipe } from './pipes/removeunderscore.pipe';
 import { ToastrModule} from 'ngx-toastr';
 import { ConfirmBoxComponent } from './confirm-box/confirm-box.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { ConfirmBoxComponent } from './confirm-box/confirm-box.component';
       positionClass :'toast-top-right',
       preventDuplicates: true
     }),
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

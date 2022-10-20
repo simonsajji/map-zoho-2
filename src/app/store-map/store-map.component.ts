@@ -14,6 +14,7 @@ import { ConfirmBoxComponent } from '../confirm-box/confirm-box.component';
 import * as moment from 'moment';
 import {FormControl} from '@angular/forms';
 import {TooltipPosition} from '@angular/material/tooltip';
+import { ApiService } from 'src/app/services/api.service';
 
 
 
@@ -132,15 +133,18 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
   @ViewChild('filterAddress') filterAddress :any;
   
 
-  constructor(private cdr:ChangeDetectorRef,private toastr:ToastrServices,private dialog:MatDialog){ }
+  constructor(private cdr:ChangeDetectorRef,private toastr:ToastrServices,private dialog:MatDialog,private apiService:ApiService){ }
   
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
     // this.cdr.detectChanges();
   }
-
+  // 100 Courtland Ave, Concord, ON L4K 3T6, Canada
   ngOnInit() {   
+    this.apiService.get(`https://zoftmap.azurewebsites.net/`,).subscribe(data => {
+      if(data?.success) console.log(data)
+    })
     this.dataSource = new MatTableDataSource<any>(this.locs);
     console.log(Object.keys(this.locs[0]));
     this.dataBaseColumns = Object.keys(this.locs[0]);
@@ -191,6 +195,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit{
     this.filterName.nativeElement.value = '';
     this.filterAddress.nativeElement.value = '';
     this.filterRouteName.nativeElement.value = '';
+    this.isFilterActive = false;
   }
 
   isAllSelected() {
