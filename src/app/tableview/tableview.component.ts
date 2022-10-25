@@ -62,12 +62,14 @@ export class TableviewComponent implements OnInit,OnChanges {
   position = new FormControl(this.positionOptions[4]);
   dataSource :any;
   initialLoader:boolean = false;
+  OnRouteOptions:any;
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
   @ViewChild("sarea") sarea: any;
   @ViewChild("mastercheck") mastercheck: any;
   @ViewChild('filterName') filterName :any;
   @ViewChild('filterRouteName') filterRouteName :any;
   @ViewChild('filterAddress') filterAddress :any;
+  @ViewChild('filterOnRoute') filterOnRoute :any;
   @Input('fetched_locations') fetched_locations :any;
   @Input('origin') origin :any;
   @Input('destination') destination :any;
@@ -96,6 +98,9 @@ export class TableviewComponent implements OnInit,OnChanges {
     this.selection = this.locationService.getSelectionModel();
     this.dataSource = new MatTableDataSource<any>(this.fetched_locations?.data);
     this.dataSource.paginator = this.paginator;
+    this.OnRouteOptions = this.fetched_locations?.data.map((item:any)=>item?.On_Route);
+    this.OnRouteOptions = [...new Set(this.OnRouteOptions)];
+    console.log(this.OnRouteOptions)
 
   }
 
@@ -192,16 +197,23 @@ export class TableviewComponent implements OnInit,OnChanges {
 
   applyFilter(filterValue: any,column:any) {    
     if(filterValue.target?.value == '') this.isFilterActive = false;
-    else this.isFilterActive = true;
-    this.dataSource.filterPredicate = function(data:any, filter: string): any {
-     if(column == 'Route') return data?.Route.toLowerCase().includes(filter) ;
-     else if(column == 'Address_Line_1') return data?.Address_Line_1.toLowerCase().includes(filter) ;
-     else if(column == 'Location_Name') return data?.Location_Name.toLowerCase().includes(filter) ;
-    };
-    filterValue = filterValue.target?.value?.trim().toLowerCase();
-    this.dataSource.filter = filterValue;
-    this.cdr.detectChanges();
+    else { 
+      this.isFilterActive = true;
+      this.dataSource.filterPredicate = function(data:any, filter: string): any {
+      if(column == 'Route') return data?.Route.toLowerCase().includes(filter) ;
+        else if(column == 'Address_Line_1') return data?.Address_Line_1.toLowerCase().includes(filter) ;
+        else if(column == 'Location_Name') return data?.Location_Name.toLowerCase().includes(filter) ;
+        else if(column == 'On_Route') return data?.On_Route == filterValue ;
+      };
+    if(filterValue?.target?.value) filterValue = filterValue.target?.value?.trim().toLowerCase();
+    else filterValue = filterValue;
+      this.dataSource.filter = filterValue;
+      console.log(this.dataSource.filter)
+      this.cdr.detectChanges();
+   }
   }
+
+ 
 
   clearAllFilters(){
     this.applyFilter('','');
@@ -209,6 +221,7 @@ export class TableviewComponent implements OnInit,OnChanges {
     this.filterName.nativeElement.value = '';
     this.filterAddress.nativeElement.value = '';
     this.filterRouteName.nativeElement.value = '';
+    this.filterOnRoute.value = '';
     this.isFilterActive = false;
   }
 

@@ -42,8 +42,8 @@
         </div>
        
         <div class="mat-tbl" style="width:100vw!important">
-            <div #matTab style="width:100vw!important" *ngIf="displayedColumns.length>0">
-                <mat-table matSort [dataSource]="dataSource" class="mat-table m-b-5 w-100"  >
+            <div #matTab  *ngIf="displayedColumns.length>0">
+                <mat-table matSort [dataSource]="dataSource" class="mat-table m-b-5 w-100"  style="overflow-x:scroll!important">
                 <ng-container *ngFor="let col of displayedColumns" [matColumnDef]="col" >
                     <!-- <ng-container *ngIf="col=='op'">
                         <mat-header-cell *matHeaderCellDef>
@@ -69,8 +69,8 @@
 
                     </ng-container>   
                     <ng-container *ngIf="col=='Location_Name'">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 d-flex flex-column c-dark" style="align-items: flex-start!important;vertical-align: top!important;">
-                            Location Name
+                        <mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 d-flex flex-column c-dark"  style="justify-content:flex-start!important;align-items:flex-start!important">
+                           <div class="t-a-left d-flex "> Location Name</div>
                             <mat-form-field *ngIf="col == 'Location_Name'" style="height:45px!important;width: 100%!important;">
                                 <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..."   #filterName>
                               </mat-form-field> 
@@ -87,6 +87,14 @@
                       </mat-form-field> 
                         <mat-form-field *ngIf="col=='Address_Line_1'" style="height:45px!important;width: 100%!important;">
                         <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..."   #filterAddress>
+                      </mat-form-field> 
+                        <mat-form-field *ngIf="col=='On_Route'" style="height:45px!important;width: 100%!important;">
+                        <mat-select #filterOnRoute>
+                          <mat-option *ngFor="let item of OnRouteOptions" [value]="item" (click)="applyFilter(item,col)">
+                            {{item}}
+                          </mat-option>
+
+                        </mat-select>
                       </mat-form-field> 
                         
                         <!-- <mat-form-field *ngIf="col!='Route_Name' && col!='op' && col!='Address' && col!='Name'" style="height:45px!important;width: 100%!important;">
