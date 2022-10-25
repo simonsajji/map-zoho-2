@@ -329,13 +329,13 @@ export class RouteviewComponent implements OnInit,OnChanges {
 
   makeWaypointMarkers(position: any,title: any) {
     let label = title + "";
-    let obj = { lat: position.lat, lng: position.lng };
+    let obj = { lat: position.lat(), lng: position.lng() };
     
       var waypoint = new google.maps.Marker({
         position: obj,
         map: this.map,
         icon: { path: google.maps.SymbolPath.CIRCLE,
-          scale: 20,
+          scale: 18,
           fillOpacity: 1,
           strokeWeight: 2,
           fillColor: '#5384ED',
@@ -352,10 +352,7 @@ export class RouteviewComponent implements OnInit,OnChanges {
 
       waypoint.setMap(this.map)
       this.wypntMarkers.push(waypoint);
-      // new MarkerClusterer(this.map, this.startstopmkr, {
-      //   imagePath:
-      //     "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-      // });
+  
     
     
   }
@@ -391,9 +388,9 @@ export class RouteviewComponent implements OnInit,OnChanges {
       }
     });
     console.log(this.wayPoints);
-    this.wayPoints.forEach((item:any,idx:any)=>{
-      this.makeWaypointMarkers(item.location,idx)
-    })
+    // this.wayPoints.forEach((item:any,idx:any)=>{
+    //   this.makeWaypointMarkers(item.location,idx)
+    // })
 
     this.directionsService.route({
       origin: {lat:parseFloat(this.origin?.Latitude),lng:parseFloat(this.origin?.Longitude)},
@@ -409,13 +406,18 @@ export class RouteviewComponent implements OnInit,OnChanges {
 
         if (status == 'OK') {
           this.shortestResult = this.shortestRoute(this.result);
+          this.result.routes[0].legs.map((item:any,idx:any)=>{
+            if(idx<= this.result.routes[0].legs.length-1 && idx!=0) this.makeWaypointMarkers(item?.start_location,idx)
+          })
           this.result.routes[0].legs.map((leg:any,idx:any)=>{
           
             if(idx!=0){
               // leg.cummulative = this.result.routes[0].legs[idx - 1].cummulative + leg?.duration?.value;
               leg.cummulativeWithNoInterval = this.result.routes[0].legs[idx - 1].cummulative + this.result.routes[0].legs[idx-1]?.duration?.value;
               leg.cummulative = leg.cummulativeWithNoInterval + 1800;
+              
             }
+            
             else{
               leg.cummulativeWithNoInterval = 0;
               leg.cummulative = leg.cummulativeWithNoInterval;
@@ -428,6 +430,7 @@ export class RouteviewComponent implements OnInit,OnChanges {
           this.makeMarker(leg2.end_location, "end", '', leg2);
           this.computeTotalDistance(this.result);
           this.directionsRenderer?.setDirections(this.shortestResult, () => this.showRoutes = true); // shortest or result
+
           this.showRoutes = true;
         }
       }))
