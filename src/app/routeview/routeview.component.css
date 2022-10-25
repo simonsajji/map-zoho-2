@@ -627,4 +627,5 @@
     white-space: wrap!important;
     overflow: hidden;
     text-overflow: ellipsis!important;
+    z-index: 1000!important;
 }

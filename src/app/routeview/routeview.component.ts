@@ -11,7 +11,7 @@ import { LocationService } from '../services/location.service';
 import { isThisSecond } from 'date-fns';
 import { environment } from 'src/environments/environment';
 import { animate, animation, style, transition, trigger, useAnimation, state, keyframes } from '@angular/animations';
-import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit,Input,Output, ViewChild,AfterViewInit,ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit,Input,Output, ViewChild,AfterViewInit,ChangeDetectorRef,EventEmitter } from '@angular/core';
 import {SelectionModel} from '@angular/cdk/collections';
 
 
@@ -80,7 +80,9 @@ export class RouteviewComponent implements OnInit,OnChanges {
   @Input('map') map:any;
   @ViewChild('timepicker') timepicker: any;
   initialLoader:boolean = false;
-  
+  wypntMarkers:any;
+  @Output('clearClusters') clearClusters = new EventEmitter();
+  @Output('addClusters') addClusters = new EventEmitter();
 
   constructor(private locationService:LocationService,private dialog:MatDialog,private toastr:ToastrServices,private apiService:ApiService,private http: HttpClient) { }
 
@@ -131,11 +133,22 @@ export class RouteviewComponent implements OnInit,OnChanges {
         this.locationService.setSelectedPoints([]);
         // this.selection.clear();
         this.locationService.clearSelectionModel();
+        this.addClusters.emit();
+        this.clearWaypointMkrs();
+        this.removeRoute();
+        this.clearOriginDestinationMkrs();
       }
       // else this.selection.clear();
       else  this.locationService.clearSelectionModel();
     });
   }
+
+  removeRoute() {
+    this.directionsRenderer.setOptions({
+      suppressPolylines: true
+    });
+    this.directionsRenderer.setMap(this.map);
+  };
 
   editRoute(){
     this.showRoutes = !this.showRoutes;
@@ -242,7 +255,6 @@ export class RouteviewComponent implements OnInit,OnChanges {
 
 
   makeMarker(position: any, icon: any, title: any, locObject: any) {
-    this.startstopmkr = [];
     let label = title + "";
     let obj = { lat: position.lat(), lng: position.lng() };
     if (icon == "start") {
@@ -261,10 +273,10 @@ export class RouteviewComponent implements OnInit,OnChanges {
       });
       this.originMkr.setMap(this.map)
       this.startstopmkr.push(this.originMkr);
-      new MarkerClusterer(this.map, this.startstopmkr, {
-        imagePath:
-          "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-      });
+      // new MarkerClusterer(this.map, this.startstopmkr, {
+      //   imagePath:
+      //     "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+      // });
     }
     else {
       this.destMkr = new google.maps.Marker({
@@ -283,11 +295,11 @@ export class RouteviewComponent implements OnInit,OnChanges {
       })
       this.destMkr.setMap(this.map);
       this.startstopmkr.push(this.destMkr);
-      new MarkerClusterer(this.map, this.startstopmkr, {
-        imagePath:
-          "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+      // new MarkerClusterer(this.map, this.startstopmkr, {
+      //   imagePath:
+      //     "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
 
-      });
+      // });
     }
   }
 
@@ -315,8 +327,58 @@ export class RouteviewComponent implements OnInit,OnChanges {
     this.mkrs.push(marker);
   }
 
-  buildRoute() {
+  makeWaypointMarkers(position: any,title: any) {
+    let label = title + "";
+    let obj = { lat: position.lat, lng: position.lng };
+    
+      var waypoint = new google.maps.Marker({
+        position: obj,
+        map: this.map,
+        icon: { path: google.maps.SymbolPath.CIRCLE,
+          scale: 20,
+          fillOpacity: 1,
+          strokeWeight: 2,
+          fillColor: '#5384ED',
+          strokeColor: '#ffffff',},
+        label:{text:label,color: "#ffffff",fontSize: "18px",fontWeight:'600',className:'marker-position'},
+        title: title
+      });
+      // google.maps.event.addListener(waypoint, 'click', (evt: any) => {
+      //   this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${locObject?.start_address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
+      //                 <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>Remove</div> <div>G Map</div> <div>Street View</div>  <div>Move</div><div>
+      //               </div>`);
+      //   this.infoWin.open(this.map, waypoint);
+      // });
 
+      waypoint.setMap(this.map)
+      this.wypntMarkers.push(waypoint);
+      // new MarkerClusterer(this.map, this.startstopmkr, {
+      //   imagePath:
+      //     "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+      // });
+    
+    
+  }
+
+  clearWaypointMkrs() {
+    for (var i = 0; i < this.wypntMarkers?.length; i++ ) {
+      this.wypntMarkers[i].setMap(null);
+    }
+    this.wypntMarkers= [];
+  }
+
+  clearOriginDestinationMkrs() {
+    for (var i = 0; i < this.startstopmkr?.length; i++ ) {
+      this.startstopmkr[i].setMap(null);
+    }
+    this.startstopmkr= [];
+
+  }
+
+  buildRoute() {
+    this.clearWaypointMkrs();
+    this.clearOriginDestinationMkrs();
+    this.clearClusters.emit();
     if(this.selectedLocations.length>0){
       this.wayPoints = [];
         this.apiService.post(`${environment?.coreApiUrl}/build_route`,this.selectedLocations).subscribe(data => {
@@ -329,7 +391,9 @@ export class RouteviewComponent implements OnInit,OnChanges {
       }
     });
     console.log(this.wayPoints);
-
+    this.wayPoints.forEach((item:any,idx:any)=>{
+      this.makeWaypointMarkers(item.location,idx)
+    })
 
     this.directionsService.route({
       origin: {lat:parseFloat(this.origin?.Latitude),lng:parseFloat(this.origin?.Longitude)},

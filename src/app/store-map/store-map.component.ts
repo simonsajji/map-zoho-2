@@ -90,6 +90,7 @@ export class StoreMapComponent implements OnInit {
   };
   fetched_locations: any;
   initialLoader: any;
+  markerClusterer : any;
 
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService) { }
@@ -285,12 +286,17 @@ export class StoreMapComponent implements OnInit {
   makeClusters() {
     console.log(this.fetched_locations)
     console.log(this.mkrs)
-    var mkrClusters = new MarkerClusterer(this.map, this.mkrs, {
+    this.markerClusterer = new MarkerClusterer(this.map, this.mkrs, {
       imagePath:
         "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
 
     });
     console.log(this.fetched_locations)
+  }
+
+  clearCluster(){
+    this.markerClusterer.setMap(null);
+    this.markerClusterer.clearMarkers();
   }
 
 
