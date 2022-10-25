@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  coreApiUrl : "https://zoftmap.azurewebsites.net"
 };

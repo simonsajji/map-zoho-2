@@ -15,6 +15,8 @@ import { RemoveunderscorePipe } from './pipes/removeunderscore.pipe';
 import { ToastrModule} from 'ngx-toastr';
 import { ConfirmBoxComponent } from './confirm-box/confirm-box.component';
 import { HttpClientModule } from '@angular/common/http';
+import { TableviewComponent } from './tableview/tableview.component';
+import { RouteviewComponent } from './routeview/routeview.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +25,9 @@ import { HttpClientModule } from '@angular/common/http';
     CustomDatePipe,
     TitlecasePipe,
     RemoveunderscorePipe,
-    ConfirmBoxComponent
+    ConfirmBoxComponent,
+    TableviewComponent,
+    RouteviewComponent
   ],
   imports: [
     BrowserModule,

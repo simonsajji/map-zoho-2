@@ -34,7 +34,7 @@ export class ApiService {
   }
 
   get(url:any): Observable<any> {
-    return this.http.get(url, { headers: this.setHeaders() });
+    return this.http.get(url);
   }
 
   vendorImageUpload(url:any, data:any, options: {}): Observable<any> {
