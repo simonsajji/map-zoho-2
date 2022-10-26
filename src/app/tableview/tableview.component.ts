@@ -63,6 +63,7 @@ export class TableviewComponent implements OnInit,OnChanges {
   dataSource :any;
   initialLoader:boolean = false;
   OnRouteOptions:any;
+  filteredColumns:any = [];
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
   @ViewChild("sarea") sarea: any;
   @ViewChild("mastercheck") mastercheck: any;
@@ -196,17 +197,28 @@ export class TableviewComponent implements OnInit,OnChanges {
   }
 
   applyFilter(filterValue: any,column:any) {    
-    if(filterValue.target?.value == '') this.isFilterActive = false;
+    if(filterValue.target?.value == ''){
+      this.isFilterActive = false;
+      this.filteredColumns.map((item:any,idx:any)=>{
+        if(item==column) this.filteredColumns.splice(idx,1)
+      })
+    } 
     else { 
       this.isFilterActive = true;
+      this.filteredColumns.push(column);
       this.dataSource.filterPredicate = function(data:any, filter: string): any {
-      if(column == 'Route') return data?.Route.toLowerCase().includes(filter) ;
+      if(column == 'Route') return data?.Route.toLowerCase().includes(filter);
         else if(column == 'Address_Line_1') return data?.Address_Line_1.toLowerCase().includes(filter) ;
         else if(column == 'Location_Name') return data?.Location_Name.toLowerCase().includes(filter) ;
         else if(column == 'On_Route') return data?.On_Route == filterValue ;
+      //  else if(this.filterName.nativeElement.value)
+        // return data?.Route.toLowerCase().includes(filter) || data?.Address_Line_1.toLowerCase().includes(this.filterAddress.nativeElement.value) ||  data?.On_Route == filterValue || data?.Location_Name.toLowerCase().includes(this.filterName.nativeElement.value);
       };
     if(filterValue?.target?.value) filterValue = filterValue.target?.value?.trim().toLowerCase();
     else filterValue = filterValue;
+      // this.dataSource.filter((e:any)=>{
+      //   e.Address_Line_1.toLowerCase().includes(this.filterAddress.nativeElement.value) || e.Location_Name.toLowerCase().includes(filter);
+      // })
       this.dataSource.filter = filterValue;
       console.log(this.dataSource.filter)
       this.cdr.detectChanges();

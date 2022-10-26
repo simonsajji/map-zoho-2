@@ -22,8 +22,10 @@
             </div>
 
             <div class="primary-color f-s-14 flex-3 t-a-right d-flex flex-end j-end m-r-20 add_loc_link c-pointer">
-                <div><img class="p-6" src="assets/csv.png" title="Export as CSV" width="22px" height="22px" alt=""
-                        srcset=""></div>
+                <div (click)="downloadCSV()">
+                    <img class="p-6" src="assets/csv.png" title="Export as CSV" width="22px" height="22px" alt=""
+                        srcset="">
+                </div>
                 <div>
                     <!-- <img class="p-6" width="20px" height="20px" src="assets/star.png" alt=""
                         title="Favourite Locations"> -->
@@ -118,6 +120,7 @@
                     </button>
                 </mat-menu>
             </div>
+            
 
             <!-- <div class="primary-color f-s-14 flex-2 t-a-right flex-end j-end m-r-20 add_loc_link c-pointer"
                 title="Add a point to the Route">

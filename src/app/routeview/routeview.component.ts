@@ -74,6 +74,8 @@ export class RouteviewComponent implements OnInit,OnChanges {
   destMkr: any;
   startstopmkr: any;
   selection = new SelectionModel<any>(true,[]);
+  data:any;
+  rendererArray:any = [];
   @Input('fetched_locations') fetched_locations:any; 
   @Input('origin') origin:any; 
   @Input('destination') destination:any; 
@@ -144,14 +146,50 @@ export class RouteviewComponent implements OnInit,OnChanges {
   }
 
   removeRoute() {
-    this.directionsRenderer.setOptions({
-      suppressPolylines: true
-    });
-    this.directionsRenderer.setMap(this.map);
+    console.log(this.rendererArray)
+    this.rendererArray?.map((renderer:any)=>{
+      renderer?.setOptions({
+        suppressPolylines: true
+      });
+      renderer?.setMap(this.map);
+    })
+   
   };
 
   editRoute(){
     this.showRoutes = !this.showRoutes;
+  }
+
+  downloadCSV(){
+    // const rows = [
+    //   ["name1", "city1", "some other info"],
+    //   ["name2", "city2", "more info"]
+    // ];
+    if(this.selectedLocations>0){
+      let rows:any = [];
+      this.selectedLocations.map((item:any,idx:any)=>{
+        rows.push(Object.values(item))
+      })
+      rows.unshift(Object.keys(this.selectedLocations[0]));
+  
+      let csvContent = "data:text/csv;charset=utf-8,";
+      
+      rows.forEach(function(rowArray:any) {
+          let row = rowArray.join(",");
+          csvContent += row + "\r\n";
+      });
+      var encodedUri = encodeURI(csvContent);
+      var link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `${this.selectedLocations[0]?.Route}-${new Date()}.csv`);
+      document.body.appendChild(link); // Required for FF
+  
+      link.click();
+
+    }
+
+    else this.toastr.warning("There are no selected Locations for current Route")
+  
   }
 
   leftDateClick(): void {
@@ -263,7 +301,7 @@ export class RouteviewComponent implements OnInit,OnChanges {
         map: this.map,
         icon: "assets/flag-start.png",
         label:{text:title,color: "#1440de",fontSize: "11px",fontWeight:'600',className:'marker-position'},
-        title: title
+        title: label
       });
       google.maps.event.addListener(this.originMkr, 'click', (evt: any) => {
         this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${locObject?.start_address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
@@ -271,8 +309,8 @@ export class RouteviewComponent implements OnInit,OnChanges {
                     </div>`);
         this.infoWin.open(this.map, this.originMkr);
       });
-      this.originMkr.setMap(this.map)
-      this.startstopmkr.push(this.originMkr);
+      this.originMkr?.setMap(this.map)
+      this.startstopmkr?.push(this.originMkr);
       // new MarkerClusterer(this.map, this.startstopmkr, {
       //   imagePath:
       //     "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
@@ -284,7 +322,7 @@ export class RouteviewComponent implements OnInit,OnChanges {
         map: this.map,
         icon: "assets/flag-end.png",
         // label:{text:title,color: "#1440de",fontSize: "11px",fontWeight:'600',className:'marker-position'},
-        title: title
+        title: label
       });
 
       google.maps.event.addListener(this.destMkr, 'click', (evt: any) => {
@@ -294,7 +332,7 @@ export class RouteviewComponent implements OnInit,OnChanges {
         this.infoWin.open(this.map, this.destMkr);
       })
       this.destMkr.setMap(this.map);
-      this.startstopmkr.push(this.destMkr);
+      this.startstopmkr?.push(this.destMkr);
       // new MarkerClusterer(this.map, this.startstopmkr, {
       //   imagePath:
       //     "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
@@ -315,7 +353,7 @@ export class RouteviewComponent implements OnInit,OnChanges {
       position: obj,
       map: this.map,
       icon:markerIcon,
-      label: {text:title,color: "#1440de",fontSize: "11px",fontWeight:'600',className:'marker-position'},
+      label: {text:label,color: "#1440de",fontSize: "11px",fontWeight:'600',className:'marker-position'},
             
     });
     google.maps.event.addListener(marker, 'click', (evt: any) => {
@@ -329,7 +367,7 @@ export class RouteviewComponent implements OnInit,OnChanges {
 
   makeWaypointMarkers(position: any,title: any) {
     let label = title + "";
-    let obj = { lat: position.lat(), lng: position.lng() };
+    let obj = { lat: position.lat, lng: position.lng };
     
       var waypoint = new google.maps.Marker({
         position: obj,
@@ -341,7 +379,7 @@ export class RouteviewComponent implements OnInit,OnChanges {
           fillColor: '#5384ED',
           strokeColor: '#ffffff',},
         label:{text:label,color: "#ffffff",fontSize: "18px",fontWeight:'600',className:'marker-position'},
-        title: title
+        title: label
       });
       // google.maps.event.addListener(waypoint, 'click', (evt: any) => {
       //   this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${locObject?.start_address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
@@ -351,7 +389,7 @@ export class RouteviewComponent implements OnInit,OnChanges {
       // });
 
       waypoint.setMap(this.map)
-      this.wypntMarkers.push(waypoint);
+      this.wypntMarkers?.push(waypoint);
   
     
     
@@ -373,76 +411,123 @@ export class RouteviewComponent implements OnInit,OnChanges {
   }
 
   buildRoute() {
+    
     this.clearWaypointMkrs();
     this.clearOriginDestinationMkrs();
     this.clearClusters.emit();
+    console.log(this.selectedLocations)
     if(this.selectedLocations.length>0){
-      this.wayPoints = [];
-        this.apiService.post(`${environment?.coreApiUrl}/build_route`,this.selectedLocations).subscribe(data => {
-          if(data) console.log(data)
-        });
-     this.selectedLocations.map((loc:any,index:any) => {
-      if(loc.Location_Number != this.origin.Location_Number && loc.Location_Number != this.destination.Location_Number){
-        let obj = { location: {lat:parseFloat(loc?.Latitude),lng:parseFloat(loc.Longitude)}, stopover: true }
-     this.wayPoints.push(obj)
-      }
-    });
-    console.log(this.wayPoints);
-    // this.wayPoints.forEach((item:any,idx:any)=>{
-    //   this.makeWaypointMarkers(item.location,idx)
-    // })
-
-    this.directionsService.route({
-      origin: {lat:parseFloat(this.origin?.Latitude),lng:parseFloat(this.origin?.Longitude)},
-      destination: {lat:parseFloat(this.destination?.Latitude),lng:parseFloat(this.destination?.Longitude)},
-      waypoints: this.wayPoints,
-      optimizeWaypoints: true,
-      provideRouteAlternatives: true,
-      travelMode: google.maps.TravelMode.DRIVING,
-    },
-      ((result: any, status: any) => {
-        console.log(result);
-        this.result = result;
-
-        if (status == 'OK') {
-          this.shortestResult = this.shortestRoute(this.result);
-          this.result.routes[0].legs.map((item:any,idx:any)=>{
-            if(idx<= this.result.routes[0].legs.length-1 && idx!=0) this.makeWaypointMarkers(item?.start_location,idx)
-          })
-          this.result.routes[0].legs.map((leg:any,idx:any)=>{
-          
-            if(idx!=0){
-              // leg.cummulative = this.result.routes[0].legs[idx - 1].cummulative + leg?.duration?.value;
-              leg.cummulativeWithNoInterval = this.result.routes[0].legs[idx - 1].cummulative + this.result.routes[0].legs[idx-1]?.duration?.value;
-              leg.cummulative = leg.cummulativeWithNoInterval + 1800;
-              
-            }
+      this.apiService.post(`${environment?.coreApiUrl}/build_route`,this.selectedLocations).subscribe(data => {
+          if(data){
+            this.data = data;
+            this.displayRoute(this.data)
             
-            else{
-              leg.cummulativeWithNoInterval = 0;
-              leg.cummulative = leg.cummulativeWithNoInterval;
-            }
-          })
-          let legLength = this.result.routes[0].legs.length;
-          var leg = this.result.routes[0].legs[0];
-          var leg2 = this.result.routes[0].legs[legLength - 1];
-          this.makeMarker(leg.start_location, "start", leg.start_address, leg);
-          this.makeMarker(leg2.end_location, "end", '', leg2);
-          this.computeTotalDistance(this.result);
-          this.directionsRenderer?.setDirections(this.shortestResult, () => this.showRoutes = true); // shortest or result
-
-          this.showRoutes = true;
-        }
-      }))
-      .catch((e: any) => {
-        window.alert("Directions request failed due to " + e);
-        this.showRoutes = true;
-      })
+          } 
+      });
+      
       
     }
-    else this.toastr.warning("Please select locations from building the Route");
-    
+     
   }
+
+  displayRoute(locs:any){
+    this.wayPoints = [];
+    console.log(this.data)
+    locs?.Route.map((loc:any,index:any) => {
+      // if(loc.Location_Number != this.origin.Location_Number && loc.Location_Number != this.destination.Location_Number){
+        let obj = { lat:parseFloat(loc?.Latitude),lng:parseFloat(loc.Longitude) }
+      this.wayPoints.push(obj)
+      // }
+    });
+    console.log(this.wayPoints);
+    this.wayPoints.splice(-1)
+    this.wayPoints.forEach((item:any,idx:any)=>{
+       
+      this.makeWaypointMarkers(item,idx+1)
+    })
+   
+      this.wayPoints.unshift({lat:parseFloat(this.origin?.Latitude),lng:parseFloat(this.origin.Longitude)});
+      this.wayPoints.push({lat:parseFloat(this.destination?.Latitude),lng:parseFloat(this.destination.Longitude)});
+      console.log(this.wayPoints);
+      var stations = this.wayPoints;
+      let service = new google.maps.DirectionsService();
+      var map = this.map;
+  
+      // var lngs = stations.map(function(station:any) { return station.lng; });
+      // var lats = stations.map(function(station:any) { return station.lat; });
+      // map.fitBounds({
+      //     west: Math.min.apply(null, lngs),
+      //     east: Math.max.apply(null, lngs),
+      //     north: Math.min.apply(null, lats),
+      //     south: Math.max.apply(null, lats),
+      // });
+  
+     
+  
+      // Divide route to several parts because max stations limit is 25 (23 waypoints + 1 origin + 1 destination)
+      for (var i = 0, parts = [], max = 25 - 1; i < stations.length; i = i + max)
+          parts.push(stations.slice(i, i + max + 1));
+  
+      // Service callback to process service results
+      var service_callback = (response:any, status:any)=> {
+          if (status != 'OK') {
+              console.log('Directions request failed due to ' + status);
+              return;
+          }
+          else{
+            this.result = response;
+            // this.shortestResult = this.shortestRoute(this.result);
+            console.log(response.routes);
+            response.routes[0].legs.map((leg:any,idx:any)=>{
+            
+              if(idx!=0){
+                // leg.cummulative = this.result.routes[0].legs[idx - 1].cummulative + leg?.duration?.value;
+                leg.cummulativeWithNoInterval = response.routes[0].legs[idx - 1].cummulative + response.routes[0].legs[idx-1]?.duration?.value;
+                leg.cummulative = leg.cummulativeWithNoInterval + 1800;
+              }
+              else{
+                leg.cummulativeWithNoInterval = 0;
+                leg.cummulative = leg.cummulativeWithNoInterval;
+              }
+            })
+            console.log(this.shortestRte);
+            let legLength = this.result.routes[0].legs.length;
+            var leg = this.result.routes[0].legs[0];
+            var leg2 = this.result.routes[0].legs[legLength - 1];
+            this.makeMarker(leg.start_location, "start", leg.start_location, leg);
+            // this.makeMarker(leg2.end_location, "end", leg2.end_location, leg2);
+            this.computeTotalDistance(response);
+            this.showRoutes = true;
+          }
+          var renderer = new google.maps.DirectionsRenderer();
+          
+          renderer.setMap(map);
+          renderer.setOptions({ suppressMarkers: true, preserveViewport: true });
+          renderer.setDirections(response);
+          this.rendererArray.push(renderer)
+          this.showRoutes = true;
+      };
+  
+      // Send requests to service to get route (for stations count <= 25 only one request will be sent)
+      for (var i = 0; i < parts.length; i++) {
+          // Waypoints does not include first station (origin) and last station (destination)
+          var waypoints = [];
+          for (var j = 0; j < parts[i].length; j++)
+              waypoints.push({location: parts[i][j], stopover: false});
+          // Service options
+          let service_options:any = {
+              origin: parts[i][0],
+              destination: parts[i][parts[i].length - 1],
+              waypoints: waypoints,
+              travelMode: google.maps.TravelMode.DRIVING
+          };
+          // Send request
+          service.route(service_options, service_callback);
+      }
+
+  }
+
+  
 
   markLocations() {
     for (var i = 0, parts = [], max = 25 - 1; i < this.selectedLocations.length; i = i + max) {
@@ -452,10 +537,93 @@ export class RouteviewComponent implements OnInit,OnChanges {
     for (var i = 0; i < parts.length; i++) {
       // Waypoints does not include first station (origin) and last station (destination)
       for (var j = 1; j < parts[i].length - 1; j++) {
-        this.wayPoints.push(parts[i][j]);
+        this.wayPoints?.push(parts[i][j]);
       }
     }
   }
+
+  // buildRoute() {
+  //   this.clearWaypointMkrs();
+  //   this.clearOriginDestinationMkrs();
+  //   this.clearClusters.emit();
+  //   if(this.selectedLocations.length>0){
+  //     this.wayPoints = [];
+  //       this.apiService.post(`${environment?.coreApiUrl}/build_route`,this.selectedLocations).subscribe(data => {
+  //         if(data) console.log(data)
+  //       });
+  //    this.selectedLocations.map((loc:any,index:any) => {
+  //     if(loc.Location_Number != this.origin.Location_Number && loc.Location_Number != this.destination.Location_Number){
+  //       let obj = { location: {lat:parseFloat(loc?.Latitude),lng:parseFloat(loc.Longitude)}, stopover: true }
+  //    this.wayPoints.push(obj)
+  //     }
+  //   });
+  //   console.log(this.wayPoints);
+  //   this.wayPoints.forEach((item:any,idx:any)=>{
+  //     this.makeWaypointMarkers(item.location,idx)
+  //   })
+
+  //   this.directionsService.route({
+  //     origin: {lat:parseFloat(this.origin?.Latitude),lng:parseFloat(this.origin?.Longitude)},
+  //     destination: {lat:parseFloat(this.destination?.Latitude),lng:parseFloat(this.destination?.Longitude)},
+  //     waypoints: this.wayPoints,
+  //     optimizeWaypoints: true,
+  //     provideRouteAlternatives: true,
+  //     travelMode: google.maps.TravelMode.DRIVING,
+  //   },
+  //     ((result: any, status: any) => {
+  //       console.log(result);
+  //       this.result = result;
+
+  //       if (status == 'OK') {
+  //         this.shortestResult = this.shortestRoute(this.result);
+  //         this.result.routes[0].legs.map((item:any,idx:any)=>{
+  //           if(idx<= this.result.routes[0].legs.length-1 && idx!=0) this.makeWaypointMarkers(item?.start_location,idx)
+  //         })
+  //         this.result.routes[0].legs.map((leg:any,idx:any)=>{
+          
+  //           if(idx!=0){
+  //             // leg.cummulative = this.result.routes[0].legs[idx - 1].cummulative + leg?.duration?.value;
+  //             leg.cummulativeWithNoInterval = this.result.routes[0].legs[idx - 1].cummulative + this.result.routes[0].legs[idx-1]?.duration?.value;
+  //             leg.cummulative = leg.cummulativeWithNoInterval + 1800;
+              
+  //           }
+            
+  //           else{
+  //             leg.cummulativeWithNoInterval = 0;
+  //             leg.cummulative = leg.cummulativeWithNoInterval;
+  //           }
+  //         })
+  //         let legLength = this.result.routes[0].legs.length;
+  //         var leg = this.result.routes[0].legs[0];
+  //         var leg2 = this.result.routes[0].legs[legLength - 1];
+  //         this.makeMarker(leg.start_location, "start", leg.start_address, leg);
+  //         this.makeMarker(leg2.end_location, "end", '', leg2);
+  //         this.computeTotalDistance(this.result);
+  //         this.directionsRenderer?.setDirections(this.shortestResult, () => this.showRoutes = true); // shortest or result
+
+  //         this.showRoutes = true;
+  //       }
+  //     }))
+  //     .catch((e: any) => {
+  //       window.alert("Directions request failed due to " + e);
+  //       this.showRoutes = true;
+  //     })
+      
+  //   }
+  //   else this.toastr.warning("Please select locations from building the Route");
+    
+  // }
+
+  // markLocations() {
+  //   for (var i = 0, parts = [], max = 25 - 1; i < this.selectedLocations.length; i = i + max) {
+  //     parts.push(this.selectedLocations.slice(i, i + max + 1));
+  //   }
+  //   for (var i = 0; i < parts.length; i++) {
+  //     for (var j = 1; j < parts[i].length - 1; j++) {
+  //       this.wayPoints.push(parts[i][j]);
+  //     }
+  //   }
+  // }
 
   renderRoute() {
     this.directionsRenderer?.setDirections(this.shortestResult); // shortest or result
