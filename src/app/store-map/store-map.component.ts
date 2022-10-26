@@ -299,6 +299,13 @@ export class StoreMapComponent implements OnInit {
     this.markerClusterer.clearMarkers();
   }
 
+  enableLoader(){
+    this.initialLoader = true;
+  }
+  disableLoader(){
+    this.initialLoader = false;
+  }
+
 
 
 

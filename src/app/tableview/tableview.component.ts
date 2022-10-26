@@ -13,6 +13,7 @@ import {TooltipPosition} from '@angular/material/tooltip';
 import { ApiService } from 'src/app/services/api.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LocationService } from '../services/location.service';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 
 interface TableObj {
   value: string;
@@ -132,22 +133,19 @@ export class TableviewComponent implements OnInit,OnChanges {
     this.initiatedRoute = true;
   }
 
-  masterToggle(event:any) {
-    // this.isSelectedPage() ?
-    //    this.selection.clear() :
-    //    this.selectRows();
-    this.isSelectedPage() ?
-    this.locationService.clearSelectionModel() :
-       this.selectRows();
-   }
+  // masterToggle(event:any) {
+  //   this.isSelectedPage() ?
+  //   this.locationService.clearSelectionModel() :
+  //      this.selectRows();
+  //  }
 
    selectRows() {
     let endIndex: number;
     if(this.dataSource.paginator){
-      if (this.dataSource.data.length > (this.dataSource.paginator.pageIndex + 1) * this.dataSource.paginator.pageSize) {
+      if (this.dataSource.filter.length > (this.dataSource.paginator.pageIndex + 1) * this.dataSource.paginator.pageSize) {
         endIndex = (this.dataSource.paginator.pageIndex + 1) * this.dataSource.paginator.pageSize;
       } else {
-        endIndex = this.dataSource.data.length;
+        endIndex = this.dataSource.filter.length;
       }
 
       for (let index = (this.dataSource.paginator.pageIndex * this.dataSource.paginator.pageSize); index < endIndex; index++) {
@@ -155,6 +153,27 @@ export class TableviewComponent implements OnInit,OnChanges {
         this.locationService.select(this.dataSource.data[index]);
       }
     }    
+  }
+
+  getPageData() {
+    return this.dataSource._pageData(this.dataSource._orderData(this.dataSource.filteredData));
+  }
+
+  isEntirePageSelected() {
+    return this.getPageData().every((row:any) => this.selection.isSelected(row));
+  }
+
+  masterToggle(checkboxChange: MatCheckboxChange) {
+    this.isEntirePageSelected() ?
+      this.selection.deselect(...this.getPageData()) :
+      this.selection.select(...this.getPageData());
+  }
+
+  checkboxLabel(row:any): string {
+    if (!row) {
+      return `${this.isEntirePageSelected() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
   deSelectRows() {
@@ -207,9 +226,9 @@ export class TableviewComponent implements OnInit,OnChanges {
       this.isFilterActive = true;
       this.filteredColumns.push(column);
       this.dataSource.filterPredicate = function(data:any, filter: string): any {
-      if(column == 'Route') return data?.Route.toLowerCase().includes(filter);
-        else if(column == 'Address_Line_1') return data?.Address_Line_1.toLowerCase().includes(filter) ;
-        else if(column == 'Location_Name') return data?.Location_Name.toLowerCase().includes(filter) ;
+      if(column == 'Route') return data?.Route?.toLowerCase().includes(filter);
+        else if(column == 'Address_Line_1') return data?.Address_Line_1?.toLowerCase().includes(filter) ;
+        else if(column == 'Location_Name') return data?.Location_Name?.toLowerCase().includes(filter) ;
         else if(column == 'On_Route') return data?.On_Route == filterValue ;
       //  else if(this.filterName.nativeElement.value)
         // return data?.Route.toLowerCase().includes(filter) || data?.Address_Line_1.toLowerCase().includes(this.filterAddress.nativeElement.value) ||  data?.On_Route == filterValue || data?.Location_Name.toLowerCase().includes(this.filterName.nativeElement.value);
