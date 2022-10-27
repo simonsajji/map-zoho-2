@@ -3,16 +3,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmBoxComponent } from '../confirm-box/confirm-box.component';
 import MarkerClusterer from '@googlemaps/markerclustererplus';
 import * as moment from 'moment';
-import {FormControl} from '@angular/forms';
-import {TooltipPosition} from '@angular/material/tooltip';
+import { FormControl } from '@angular/forms';
+import { TooltipPosition } from '@angular/material/tooltip';
 import { ApiService } from 'src/app/services/api.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LocationService } from '../services/location.service';
 import { isThisSecond } from 'date-fns';
 import { environment } from 'src/environments/environment';
 import { animate, animation, style, transition, trigger, useAnimation, state, keyframes } from '@angular/animations';
-import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit,Input,Output, ViewChild,AfterViewInit,ChangeDetectorRef,EventEmitter } from '@angular/core';
-import {SelectionModel} from '@angular/cdk/collections';
+import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, Input, Output, ViewChild, AfterViewInit, ChangeDetectorRef, EventEmitter } from '@angular/core';
+import { SelectionModel } from '@angular/cdk/collections';
 
 
 @Component({
@@ -28,11 +28,11 @@ import {SelectionModel} from '@angular/cdk/collections';
     ])
   ]
 })
-export class RouteviewComponent implements OnInit,OnChanges {
+export class RouteviewComponent implements OnInit, OnChanges {
   navigation: boolean = false;
   showOverlay: boolean = false;
   showRoutes: boolean = false;
-  selectedLocations:any = [];
+  selectedLocations: any = [];
   isHomesetasCurrent: boolean = false;
   isHomesetasDefault: boolean = true;
   isHomesetasFavourite: boolean = false;
@@ -52,16 +52,16 @@ export class RouteviewComponent implements OnInit,OnChanges {
   mkrs: any = [];
   shortestRte: google.maps.DirectionsRoute | any;
   // map: any;
-  directionsService = new google.maps.DirectionsService();
+  directionsService :any;
   directionsRenderer: any;
-  stepDisplay = new google.maps.InfoWindow();
+  // stepDisplay = new google.maps.InfoWindow();
   showSliderMenu: boolean = false;
   result: any;
   rightanimationActive: boolean = false;
   leftanimationActive: boolean = false;
   totalDistance: any;
   totalDuration: any;
-  infoWin: any = new google.maps.InfoWindow();
+  infoWin: any ;
   wayPoints: any = [];
   shortestResult: google.maps.DirectionsResult | any;
   pinSideMenu: boolean = false;
@@ -73,25 +73,27 @@ export class RouteviewComponent implements OnInit,OnChanges {
   originMkr: any;
   destMkr: any;
   startstopmkr: any;
-  selection = new SelectionModel<any>(true,[]);
-  data:any;
-  rendererArray:any = [];
-  @Input('fetched_locations') fetched_locations:any; 
-  @Input('origin') origin:any; 
-  @Input('destination') destination:any; 
-  @Input('map') map:any;
+  selection = new SelectionModel<any>(true, []);
+  data: any;
+  rendererArray: any = [];
+  @Input('fetched_locations') fetched_locations: any;
+  @Input('origin') origin: any;
+  @Input('destination') destination: any;
+  @Input('map') map: any;
   @ViewChild('timepicker') timepicker: any;
-  initialLoader:boolean = false;
-  wypntMarkers:any;
+  initialLoader: boolean = false;
+  wypntMarkers: any;
   @Output('clearClusters') clearClusters = new EventEmitter();
   @Output('addClusters') addClusters = new EventEmitter();
   @Output('enableInitialLoader') enableInitialLoader = new EventEmitter();
   @Output('disableInitialLoader') disableInitialLoader = new EventEmitter();
 
-  constructor(private locationService:LocationService,private dialog:MatDialog,private toastr:ToastrServices,private apiService:ApiService,private http: HttpClient) { }
+  constructor(private locationService: LocationService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) { }
 
   ngOnInit(): void {
-    this.locationService.getSelectedPoints().subscribe((item:any)=>{
+    this.directionsService = new google.maps.DirectionsService();
+    this.infoWin = new google.maps.InfoWindow();
+    this.locationService.getSelectedPoints().subscribe((item: any) => {
       this.selectedLocations = item;
     });
     this.directionsRenderer = new google.maps.DirectionsRenderer({ map: this.map, suppressMarkers: true });
@@ -104,7 +106,7 @@ export class RouteviewComponent implements OnInit,OnChanges {
     this.makeClusters();
   }
 
-  ngOnChanges(){
+  ngOnChanges() {
     this.selection = this.locationService.getSelectionModel();
   }
 
@@ -114,16 +116,16 @@ export class RouteviewComponent implements OnInit,OnChanges {
   }
 
 
-  deleteWaypoint(loc:any){
-    this.selectedLocations.map((item:any,idx:any)=>{
-      if(loc.Location_Number==item.Location_Number) this.selectedLocations.splice(idx,1);
+  deleteWaypoint(loc: any) {
+    this.selectedLocations.map((item: any, idx: any) => {
+      if (loc.Location_Number == item.Location_Number) this.selectedLocations.splice(idx, 1);
     });
     this.locationService.setSelectedPoints(this.selectedLocations);
     // this.selection.clear();
     this.locationService.clearSelectionModel();
   }
 
-  deleteAllWaypoints(){
+  deleteAllWaypoints() {
     const dialogRef = this.dialog.open(ConfirmBoxComponent, {
       data: {
         locations: `${this.selectedLocations?.length}`,
@@ -131,7 +133,7 @@ export class RouteviewComponent implements OnInit,OnChanges {
       }
     });
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-      if (confirmed == true){
+      if (confirmed == true) {
         this.showRoutes = false;
         this.selectedLocations = [];
         this.locationService.setSelectedPoints([]);
@@ -143,10 +145,10 @@ export class RouteviewComponent implements OnInit,OnChanges {
         this.clearOriginDestinationMkrs();
       }
       // else this.selection.clear();
-      else  this.locationService.clearSelectionModel();
+      else this.locationService.clearSelectionModel();
     });
   }
-  clearAllWaypoints(){
+  clearAllWaypoints() {
     const dialogRef = this.dialog.open(ConfirmBoxComponent, {
       data: {
         locations: `${this.selectedLocations?.length}`,
@@ -154,72 +156,64 @@ export class RouteviewComponent implements OnInit,OnChanges {
       }
     });
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-      if (confirmed == true){
+      if (confirmed == true) {
         this.showRoutes = false;
         this.selectedLocations = [];
         this.locationService.setSelectedPoints([]);
         // this.selection.clear();
+        this.clearWaypointMkrs();
+        this.removeRoute();
+
         this.locationService.clearSelectionModel();
-        // this.addClusters.emit();
-        // this.clearWaypointMkrs();
-        // this.removeRoute();
-        // this.clearOriginDestinationMkrs();
       }
       // else this.selection.clear();
-      else  this.locationService.clearSelectionModel();
+      else this.locationService.clearSelectionModel();
     });
   }
 
   removeRoute() {
-    console.log(this.rendererArray)
-    this.rendererArray?.map((renderer:any)=>{
+    this.rendererArray?.map((renderer: any) => {
       renderer?.setOptions({
         suppressPolylines: true
       });
       renderer?.setMap(null);
-    })
-   
+    });
+    
   };
 
-  editRoute(){
+  editRoute() {
     this.showRoutes = !this.showRoutes;
   }
 
-  downloadCSV(){
-    if(this.data?.Route.length>0){
-      let rows:any = [];
-      this.data?.Route.map((item:any,idx:any)=>{
+  downloadCSV() {
+    if (this.data?.Route.length > 0) {
+      let rows: any = [];
+      this.data?.Route.map((item: any, idx: any) => {
         rows.push(Object.values(item))
       })
-
-      rows.map((item:any,idx:any)=>{
+      rows.map((item: any, idx: any) => {
         item[0] = item[0].replace(/,/g, '')
       })
       rows.unshift(Object.keys(this.data?.Route[0]));
-  
       let csvContent = "data:text/csv;charset=utf-8,";
-      console.log(rows)
-      
-      rows.forEach(function(rowArray:any) {
-          let row = rowArray.join(",");
-          csvContent += row + "\r\n";
+      rows.forEach(function (rowArray: any) {
+        let row = rowArray.join(",");
+        csvContent += row + "\r\n";
       });
       var encodedUri = encodeURI(csvContent);
       var link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      var today:any = new Date();
-      var dd = String(today. getDate()). padStart(2, '0');
-      var mm = String(today. getMonth() + 1). padStart(2, '0'); //January is 0!
-      var yyyy = today. getFullYear();
+      var today: any = new Date();
+      var dd = String(today.getDate()).padStart(2, '0');
+      var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+      var yyyy = today.getFullYear();
       today = mm + '-' + dd + '-' + yyyy;
       link.setAttribute("download", `${this.data?.Route[0]?.Route}-${today}.csv`);
       document.body.appendChild(link); // Required for FF
       link.click();
-
     }
-
     else this.toastr.warning("There are no selected Locations for current Route")
-  
+
   }
 
   leftDateClick(): void {
@@ -229,7 +223,7 @@ export class RouteviewComponent implements OnInit,OnChanges {
     this.dateChange(daysAgo);
   }
 
-  
+
   rightDateClick(): void {
     const numOfDays = 1;
     const daysAgo = new Date(this.displayDate.getTime());
@@ -268,24 +262,24 @@ export class RouteviewComponent implements OnInit,OnChanges {
 
   getformatted24hrs() {
     let date = new Date();
-    let hours:any = date.getHours();
-    let minutes:any = date.getMinutes();
+    let hours: any = date.getHours();
+    let minutes: any = date.getMinutes();
     let ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours < 10 ? ('0'+hours) : hours;
-    minutes = minutes < 10 ? ('0'+minutes) : minutes;
-    let strTime = hours + ':' + minutes ;
+    hours = hours < 10 ? ('0' + hours) : hours;
+    minutes = minutes < 10 ? ('0' + minutes) : minutes;
+    let strTime = hours + ':' + minutes;
     return strTime;
   }
 
-  timeFromMins(mins:any) {
-    function z(n:any){return (n<10? '0':'') + n;}
-    var h = (mins/60 |0) % 24;
+  timeFromMins(mins: any) {
+    function z(n: any) { return (n < 10 ? '0' : '') + n; }
+    var h = (mins / 60 | 0) % 24;
     var m = mins % 60;
     return z(h.toFixed(2)) + ':' + z(m.toFixed(2));
   }
 
-  addbyMoment(secs:any){
-    const number = moment(this.displayTime, ["hh:mm A"]).add(secs,'seconds').format("h:mm A");
+  addbyMoment(secs: any) {
+    const number = moment(this.displayTime, ["hh:mm A"]).add(secs, 'seconds').format("h:mm A");
     return number;
   }
 
@@ -305,11 +299,11 @@ export class RouteviewComponent implements OnInit,OnChanges {
     this.displayTime = time;
   }
 
-  initMap(){
-      this.fetched_locations?.data?.map((location:any) => {
-        if(location?.Location_Number!==this.origin?.Location_Number && location?.Location_Number!=this.destination?.Location_Number)  this.makemkrs({lat:parseFloat(location?.Latitude),lng:parseFloat(location?.Longitude)}, location?.Location_Name,parseFloat(location?.Location_Number),location?.Route)
-      });
-      this.initialLoader = false;
+  initMap() {
+    this.fetched_locations?.data?.map((location: any) => {
+      if (location?.Location_Number !== this.origin?.Location_Number && location?.Location_Number != this.destination?.Location_Number) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_Number), location?.Route)
+    });
+    this.initialLoader = false;
 
   }
 
@@ -322,29 +316,25 @@ export class RouteviewComponent implements OnInit,OnChanges {
   }
 
 
-  makeMarker(position: any, icon: any, title: any, locObject: any) {
-    let label = title + "";
-    let obj = { lat: position.lat(), lng: position.lng() };
+  makeMarker(position: any, icon: any, address: any, route: any) {
+    let label = address + "";
+    let obj = { lat: parseFloat(position.lat) , lng: parseFloat(position.lng ) };
     if (icon == "start") {
       this.originMkr = new google.maps.Marker({
         position: obj,
         map: this.map,
         icon: "assets/flag-start.png",
-        label:{text:title,color: "#1440de",fontSize: "11px",fontWeight:'600',className:'marker-position'},
+        // label: { text: label, color: "#1440de", fontSize: "11px", fontWeight: '600', className: 'marker-position' },
         title: label
       });
       google.maps.event.addListener(this.originMkr, 'click', (evt: any) => {
-        this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${locObject?.start_address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
-                      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>Remove</div> <div>G Map</div> <div>Street View</div>  <div>Move</div><div>
+        this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route} </i> </p>
+                      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" ><div>
                     </div>`);
         this.infoWin.open(this.map, this.originMkr);
       });
       this.originMkr?.setMap(this.map)
       this.startstopmkr?.push(this.originMkr);
-      // new MarkerClusterer(this.map, this.startstopmkr, {
-      //   imagePath:
-      //     "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-      // });
     }
     else {
       this.destMkr = new google.maps.Marker({
@@ -356,35 +346,30 @@ export class RouteviewComponent implements OnInit,OnChanges {
       });
 
       google.maps.event.addListener(this.destMkr, 'click', (evt: any) => {
-        this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${locObject?.start_address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
-                      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>Remove</div> <div>G Map</div> <div>Street View</div>  <div>Move</div><div>
+        this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
+                      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" >><div>
                     </div>`);
         this.infoWin.open(this.map, this.destMkr);
       })
       this.destMkr.setMap(this.map);
       this.startstopmkr?.push(this.destMkr);
-      // new MarkerClusterer(this.map, this.startstopmkr, {
-      //   imagePath:
-      //     "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-
-      // });
     }
   }
 
-  makemkrs(position: any, title: any,loc_id:any,route_name:any) {
+  makemkrs(position: any, title: any, loc_id: any, route_name: any) {
     let label = title + "";
     let markerIcon = {
       url: 'assets/pin.png',
       scaledSize: new google.maps.Size(30, 30),
-      labelOrigin:  new google.maps.Point(-30,10),
+      labelOrigin: new google.maps.Point(-30, 10),
     };
     let obj = position;
     let marker = new google.maps.Marker({
       position: obj,
       map: this.map,
-      icon:markerIcon,
-      label: {text:label,color: "#1440de",fontSize: "11px",fontWeight:'600',className:'marker-position'},
-            
+      icon: markerIcon,
+      label: { text: label, color: "#1440de", fontSize: "11px", fontWeight: '600', className: 'marker-position' },
+
     });
     google.maps.event.addListener(marker, 'click', (evt: any) => {
       this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${loc_id}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${title} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route_name} </i> </p>
@@ -395,283 +380,181 @@ export class RouteviewComponent implements OnInit,OnChanges {
     this.mkrs.push(marker);
   }
 
-  makeWaypointMarkers(position:any,Address:any,Route_Name:any,i:any,Location_ID:any) {
+  makeWaypointMarkers(position: any, Address: any, Route_Name: any, i: any, Location_ID: any) {
     let label = i + "";
     let obj = { lat: position.lat, lng: position.lng };
-    
-      var waypoint = new google.maps.Marker({
-        position: obj,
-        map: this.map,
-        icon: { path: google.maps.SymbolPath.CIRCLE,
-          scale: 18,
-          fillOpacity: 1,
-          strokeWeight: 2,
-          fillColor: '#5384ED',
-          strokeColor: '#ffffff',},
-        label:{text:label,color: "#ffffff",fontSize: "18px",fontWeight:'600',className:'marker-position'},
-        title: label
-      });
-      google.maps.event.addListener(waypoint, 'click', (evt: any) => {
-        this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${Location_ID}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${Address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${Route_Name} </i> </p>
+
+    var waypoint = new google.maps.Marker({
+      position: obj,
+      map: this.map,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 14,
+        fillOpacity: 1,
+        strokeWeight: 2,
+        fillColor: '#5384ED',
+        strokeColor: '#ffffff',
+      },
+      label: { text: label, color: "#ffffff", fontSize: "16px", fontWeight: '600', className: 'marker-position' },
+      title: label
+    });
+    google.maps.event.addListener(waypoint, 'click', (evt: any) => {
+      this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${Location_ID}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${Address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${Route_Name} </i> </p>
                       <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>
                     </div>`);
-        this.infoWin.open(this.map, waypoint);
-      });
+      this.infoWin.open(this.map, waypoint);
+    });
 
-      waypoint.setMap(this.map)
-      this.wypntMarkers?.push(waypoint);
-  
-    
-    
+    waypoint.setMap(this.map)
+    this.wypntMarkers?.push(waypoint);
+
   }
 
   clearWaypointMkrs() {
-    for (var i = 0; i < this.wypntMarkers?.length; i++ ) {
+    for (var i = 0; i < this.wypntMarkers?.length; i++) {
       this.wypntMarkers[i].setMap(null);
     }
-    this.wypntMarkers= [];
+    this.wypntMarkers = [];
   }
 
   clearOriginDestinationMkrs() {
-    for (var i = 0; i < this.startstopmkr?.length; i++ ) {
+    for (var i = 0; i < this.startstopmkr?.length; i++) {
       this.startstopmkr[i].setMap(null);
     }
-    this.startstopmkr= [];
+    this.startstopmkr = [];
 
   }
 
   buildRoute() {
-    
     this.clearWaypointMkrs();
     this.clearOriginDestinationMkrs();
     this.clearClusters.emit();
     this.enableInitialLoader.emit();
-    console.log(this.selectedLocations)
-    if(this.selectedLocations.length>0){
-      this.apiService.post(`${environment?.coreApiUrl}/build_route`,this.selectedLocations).subscribe(data => {
-          if(data){
-            this.data = data;
-            // this.data.Route.splice(-1);
-            this.data?.Route.map((item:any,idx:any)=>{
-              
-              item["distance_text"] = this.data?.Route_Details[idx]?.Distance_Text;
-              item["distance_value"] = this.data?.Route_Details[idx]?.Distance_Value;
-              item["duration_text"] = this.data?.Route_Details[idx]?.Duration_Text;
-              item["duration_value"] = this.data?.Route_Details[idx]?.Duration_Value;
-              
-            if(idx!=0){
-              // item.cummulative = this.data?.Route[idx - 1].cummulative + item?.duration?.value;
-              item.cummulativeWithNoInterval = this.data?.Route[idx - 1].cummulative + this.data?.Route_Details[idx-1]?.Duration_Value;
+    if (this.selectedLocations.length > 0) {
+      this.selectedLocations.unshift(this.origin);
+      this.apiService.post(`${environment?.coreApiUrl}/build_route`, this.selectedLocations).subscribe(data => {
+        if (data) {
+          this.data = data;
+          // this.data.Route.splice(-1);
+          this.data?.Route.map((item: any, idx: any) => {
+            item["distance_text"] = this.data?.Route_Details[idx]?.Distance_Text;
+            item["distance_value"] = this.data?.Route_Details[idx]?.Distance_Value;
+            item["duration_text"] = this.data?.Route_Details[idx]?.Duration_Text;
+            item["duration_value"] = this.data?.Route_Details[idx]?.Duration_Value;
+            if (idx != 0) {
+              item.cummulativeWithNoInterval = this.data?.Route[idx - 1].cummulative + this.data?.Route_Details[idx - 1]?.Duration_Value;
               item.cummulative = item?.cummulativeWithNoInterval + 1800;
-              
             }
-            else{
+            else {
               item.cummulativeWithNoInterval = 0;
               item.cummulative = item.cummulativeWithNoInterval;
             }
-            })
-            
-            this.displayRoute(this.data);
-            this.disableInitialLoader.emit();
-            
-          } 
+          })
+          this.displayRoute(this.data);
+          this.disableInitialLoader.emit();
+        }
       });
-      
-      
     }
-     
   }
 
-  displayRoute(locs:any){
+  displayRoute(locs: any) {
     this.wayPoints = [];
-    console.log(this.data)
-    locs?.Route.map((loc:any,index:any) => {
-      // if(loc.Location_Number != this.origin.Location_Number && loc.Location_Number != this.destination.Location_Number){
-        let obj = { lat:parseFloat(loc?.Latitude),lng:parseFloat(loc.Longitude) }
-      this.wayPoints.push(obj)
-      // }
+    locs?.Route.map((loc: any, index: any) => {
+      if((loc?.Latitude)==0 || parseFloat(loc?.Longitude) == 0 || loc?.Latitude=="0" || loc?.Longitude=="0") {
+        this.wayPoints.push(loc?.Address)
+      }
+      else{
+        let obj = { lat: parseFloat(loc?.Latitude), lng: parseFloat(loc.Longitude) };
+        this.wayPoints.push(obj)
+      }
+      
     });
-    console.log(this.wayPoints);
     // this.wayPoints.splice(-1)
-    // this.wayPoints.forEach((item:any,idx:any)=>{
-       
-    //   this.makeWaypointMarkers(item,idx+1)
-    // })
-
-    locs?.Route.map((item:any,i:any)=>{
-      if(i!=0){
-        let loc_obj = { lat: parseFloat(item?.Latitude), lng: parseFloat(item?.Longitude)};
-        this.makeWaypointMarkers(loc_obj,item.Address,item?.Route,i,item?.Location_ID)
+    locs?.Route.map((item: any, i: any) => {
+      if (i != 0) {
+        let loc_obj = { lat: parseFloat(item?.Latitude), lng: parseFloat(item?.Longitude) };
+        this.makeWaypointMarkers(loc_obj, item.Address, item?.Route, i, item?.Location_ID)
       }
-     
-    })
+
+    });
+    this.makeMarker({ lat:this.origin.Latitude,lng:this.origin.Longitude}, "start", this.origin.Address, this.origin.Route);
+    var stations = this.wayPoints;
+    console.log(this.wayPoints)
+    let service = new google.maps.DirectionsService();
+    var map = this.map;
+
+    var lngs = stations.map(function(station:any) { if(station?.lng) return station.lng; });
+    var lats = stations.map(function(station:any) { if(station?.lat) return station.lat; });
+    lngs = lngs.filter(( element:any)=> {
+      return element !== undefined && element !== null;
+   });
+    lats = lats.filter(( element:any)=> {
+      return element !== undefined && element !== null;
+   });
    
-      // this.wayPoints.unshift({lat:parseFloat(this.origin?.Latitude),lng:parseFloat(this.origin.Longitude)});
-      // this.wayPoints.push({lat:parseFloat(this.destination?.Latitude),lng:parseFloat(this.destination.Longitude)});
-      console.log(this.wayPoints);
-      var stations = this.wayPoints;
-      let service = new google.maps.DirectionsService();
-      var map = this.map;
-  
-      // var lngs = stations.map(function(station:any) { return station.lng; });
-      // var lats = stations.map(function(station:any) { return station.lat; });
-      // map.fitBounds({
-      //     west: Math.min.apply(null, lngs),
-      //     east: Math.max.apply(null, lngs),
-      //     north: Math.min.apply(null, lats),
-      //     south: Math.max.apply(null, lats),
-      // });
-  
-     
-  
-      // Divide route to several parts because max stations limit is 25 (23 waypoints + 1 origin + 1 destination)
-      for (var i = 0, parts = [], max = 25 - 1; i < stations.length; i = i + max)
-          parts.push(stations.slice(i, i + max + 1));
-  
-      // Service callback to process service results
-      var service_callback = (response:any, status:any)=> {
-          if (status != 'OK') {
-              console.log('Directions request failed due to ' + status);
-              return;
-          }
-          else{
-            this.result = response;
-           
-            console.log(this.shortestRte);
-            let legLength = this.result.routes[0].legs.length;
-            var leg = this.result.routes[0].legs[0];
-            var leg2 = this.result.routes[0].legs[legLength - 1];
-            this.makeMarker(leg.start_location, "start", leg.start_location, leg);
-            // this.makeMarker(leg2.end_location, "end", leg2.end_location, leg2);
-            this.computeTotalDistance(response);
-            this.showRoutes = true;
-          }
-          var renderer = new google.maps.DirectionsRenderer();
-          
-          renderer.setMap(map);
-          renderer.setOptions({ suppressMarkers: true, preserveViewport: true });
-          renderer.setDirections(response);
-          
-          this.rendererArray.push(renderer)
-          this.showRoutes = true;
-      };
-  
-      // Send requests to service to get route (for stations count <= 25 only one request will be sent)
-      for (var i = 0; i < parts.length; i++) {
-          // Waypoints does not include first station (origin) and last station (destination)
-          var waypoints = [];
-          for (var j = 0; j < parts[i].length; j++)
-              waypoints.push({location: parts[i][j], stopover: false});
-          // Service options
-          let service_options:any = {
-              origin: parts[i][0],
-              destination: parts[i][parts[i].length - 1],
-              waypoints: waypoints,
-              travelMode: google.maps.TravelMode.DRIVING
-          };
-          // Send request
-          service.route(service_options, service_callback);
+    map.fitBounds({
+        west: Math.min.apply(null, lngs),
+        east: Math.max.apply(null, lngs),
+        north: Math.min.apply(null, lats),
+        south: Math.max.apply(null, lats),
+    });
+
+    for (var i = 0, parts = [], max = 25 - 1; i < stations.length; i = i + max)
+      parts.push(stations.slice(i, i + max + 1));
+
+    var service_callback = (response: any, status: any) => {
+      if (status != 'OK') {
+        console.log('Directions request failed due to ' + status);
+        this.toastr.warning('Directions request failed due to ' + status);
+        this.locationService.clearSelectionModel();
+        this.addClusters.emit();
+        this.clearWaypointMkrs();
+        this.removeRoute();
+        this.clearOriginDestinationMkrs();
+        return;
       }
+      else {
+        this.result = response;
+        let legLength = this.result.routes[0].legs.length;
+        var leg = this.result.routes[0].legs[0];
+        var leg2 = this.result.routes[0].legs[legLength - 1];
+        // this.makeMarker(leg2.end_location, "end", leg2.end_location, leg2);
+        this.computeTotalDistance(response);
+        this.showRoutes = true;
+      }
+      var renderer = new google.maps.DirectionsRenderer();
+      renderer.setMap(map);
+      renderer.setOptions({ suppressMarkers: true, preserveViewport: true });
+      renderer.setDirections(response);
+      this.rendererArray.push(renderer)
+      this.showRoutes = true;
+    };
 
+    // Send requests to service to get route (for stations count <= 25 only one request will be sent)
+    for (var i = 0; i < parts.length; i++) {
+      var waypoints = [];
+      for (var j = 0; j < parts[i].length; j++)
+        waypoints.push({ location: parts[i][j], stopover: false });
+      let service_options: any = {
+        origin: parts[i][0],
+        destination: parts[i][parts[i].length - 1],
+        waypoints: waypoints,
+        travelMode: google.maps.TravelMode.DRIVING
+      };
+      service.route(service_options, service_callback);
+    }
   }
-
-  
 
   markLocations() {
     for (var i = 0, parts = [], max = 25 - 1; i < this.selectedLocations.length; i = i + max) {
       parts.push(this.selectedLocations.slice(i, i + max + 1));
     }
-    // Send requests to service to get route (for stations count <= 25 only one request will be sent)
     for (var i = 0; i < parts.length; i++) {
-      // Waypoints does not include first station (origin) and last station (destination)
       for (var j = 1; j < parts[i].length - 1; j++) {
         this.wayPoints?.push(parts[i][j]);
       }
     }
   }
-
-  // buildRoute() {
-  //   this.clearWaypointMkrs();
-  //   this.clearOriginDestinationMkrs();
-  //   this.clearClusters.emit();
-  //   if(this.selectedLocations.length>0){
-  //     this.wayPoints = [];
-  //       this.apiService.post(`${environment?.coreApiUrl}/build_route`,this.selectedLocations).subscribe(data => {
-  //         if(data) console.log(data)
-  //       });
-  //    this.selectedLocations.map((loc:any,index:any) => {
-  //     if(loc.Location_Number != this.origin.Location_Number && loc.Location_Number != this.destination.Location_Number){
-  //       let obj = { location: {lat:parseFloat(loc?.Latitude),lng:parseFloat(loc.Longitude)}, stopover: true }
-  //    this.wayPoints.push(obj)
-  //     }
-  //   });
-  //   console.log(this.wayPoints);
-  //   this.wayPoints.forEach((item:any,idx:any)=>{
-  //     this.makeWaypointMarkers(item.location,idx)
-  //   })
-
-  //   this.directionsService.route({
-  //     origin: {lat:parseFloat(this.origin?.Latitude),lng:parseFloat(this.origin?.Longitude)},
-  //     destination: {lat:parseFloat(this.destination?.Latitude),lng:parseFloat(this.destination?.Longitude)},
-  //     waypoints: this.wayPoints,
-  //     optimizeWaypoints: true,
-  //     provideRouteAlternatives: true,
-  //     travelMode: google.maps.TravelMode.DRIVING,
-  //   },
-  //     ((result: any, status: any) => {
-  //       console.log(result);
-  //       this.result = result;
-
-  //       if (status == 'OK') {
-  //         this.shortestResult = this.shortestRoute(this.result);
-  //         this.result.routes[0].legs.map((item:any,idx:any)=>{
-  //           if(idx<= this.result.routes[0].legs.length-1 && idx!=0) this.makeWaypointMarkers(item?.start_location,idx)
-  //         })
-  //         this.result.routes[0].legs.map((leg:any,idx:any)=>{
-          
-  //           if(idx!=0){
-  //             // leg.cummulative = this.result.routes[0].legs[idx - 1].cummulative + leg?.duration?.value;
-  //             leg.cummulativeWithNoInterval = this.result.routes[0].legs[idx - 1].cummulative + this.result.routes[0].legs[idx-1]?.duration?.value;
-  //             leg.cummulative = leg.cummulativeWithNoInterval + 1800;
-              
-  //           }
-            
-  //           else{
-  //             leg.cummulativeWithNoInterval = 0;
-  //             leg.cummulative = leg.cummulativeWithNoInterval;
-  //           }
-  //         })
-  //         let legLength = this.result.routes[0].legs.length;
-  //         var leg = this.result.routes[0].legs[0];
-  //         var leg2 = this.result.routes[0].legs[legLength - 1];
-  //         this.makeMarker(leg.start_location, "start", leg.start_address, leg);
-  //         this.makeMarker(leg2.end_location, "end", '', leg2);
-  //         this.computeTotalDistance(this.result);
-  //         this.directionsRenderer?.setDirections(this.shortestResult, () => this.showRoutes = true); // shortest or result
-
-  //         this.showRoutes = true;
-  //       }
-  //     }))
-  //     .catch((e: any) => {
-  //       window.alert("Directions request failed due to " + e);
-  //       this.showRoutes = true;
-  //     })
-      
-  //   }
-  //   else this.toastr.warning("Please select locations from building the Route");
-    
-  // }
-
-  // markLocations() {
-  //   for (var i = 0, parts = [], max = 25 - 1; i < this.selectedLocations.length; i = i + max) {
-  //     parts.push(this.selectedLocations.slice(i, i + max + 1));
-  //   }
-  //   for (var i = 0; i < parts.length; i++) {
-  //     for (var j = 1; j < parts[i].length - 1; j++) {
-  //       this.wayPoints.push(parts[i][j]);
-  //     }
-  //   }
-  // }
 
   renderRoute() {
     this.directionsRenderer?.setDirections(this.shortestResult); // shortest or result
@@ -682,12 +565,11 @@ export class RouteviewComponent implements OnInit,OnChanges {
     var totalDist = 0;
     var totalTime = 0;
     var myroute = result.routes[0];
-    for (let i = 0; i < myroute.legs.length; i++) {
-      totalDist += myroute.legs[i].distance.value;
-      totalTime += myroute.legs[i].duration.value;
+    for (let i = 0; i < this.data?.Route.length-1; i++) {
+      totalDist += this.data?.Route[i].distance_value;
+      totalTime += this.data?.Route[i].duration_value;
     }
-    totalDist = totalDist / 1000.
-    console.log("total distance is: " + totalDist + " km<br>total time is: " + (totalTime / 60).toFixed(2) + " minutes");
+    totalDist = totalDist / 1000;
     this.totalDistance = totalDist;
     this.totalDuration = this.secondsToDhms(totalTime.toFixed(2));
   }
@@ -702,7 +584,7 @@ export class RouteviewComponent implements OnInit,OnChanges {
     var hDisplay = h > 0 ? h + (h == 1 ? " h " : " h ") : "";
     var mDisplay = m > 0 ? m + (m == 1 ? " min " : " mins ") : "";
     var sDisplay = s > 0 ? s + (s == 1 ? " seconds" : " seconds") : "";
-    return dDisplay + hDisplay + mDisplay ;
+    return dDisplay + hDisplay + mDisplay;
   }
 
 
@@ -720,8 +602,5 @@ export class RouteviewComponent implements OnInit,OnChanges {
     this.showRoutes = true;
     return routeResults;
   }
-
-
-
 
 }

@@ -1,5 +1,5 @@
 <div class="container" style="overflow:hidden!important">
-    <div id="map" style="height: 100vh;width: calc(100vw);z-index: 10;overflow: hidden;"></div>
+    <div id="map" #mapContainer style="height: 100vh;width: calc(100vw);z-index: 10;overflow: hidden;"></div>
     <div *ngIf="initialLoader" style="z-index:1200!important">
         <mat-spinner style="z-index:1000!important;position: absolute!important;top:50%;left:49%" diameter="45">
         </mat-spinner>
@@ -28,10 +28,11 @@
         </div> -->
         <i *ngIf="sarea.value!=''" class="fa fa-times f-s-15 c-gr-light m-r-10 c-pointer"
             (click)="clearSearchArea()"></i>
-
     </div>
 
-    <app-routeview (enableInitialLoader)="enableLoader()" (disableInitialLoader)="disableLoader()" [origin]="origin" [destination]="destination" [fetched_locations]="fetched_locations" [map]="map" (addClusters)="makeClusters()" (clearClusters)="clearCluster()">
+    <app-routeview (enableInitialLoader)="enableLoader()" (disableInitialLoader)="disableLoader()" [origin]="origin"
+        [destination]="destination" [fetched_locations]="fetched_locations" [map]="map" (addClusters)="makeClusters()"
+        (clearClusters)="clearCluster()">
     </app-routeview>
 
     <app-tableview [fetched_locations]="fetched_locations" [origin]="origin" [destination]="destination"

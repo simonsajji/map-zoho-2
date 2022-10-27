@@ -9,7 +9,6 @@ export class ToastrServices {
   constructor(private toastr: ToastrService) { }
 
   success(message:any) {
-    console.log(message)
     this.toastr.success(message);
   }
 
