@@ -78,9 +78,7 @@ export class TableviewComponent implements OnInit,OnChanges {
   @Input('displayedColumns')   displayedColumns: string[] = [];
   
 
-  constructor(private http: HttpClient,private cdr:ChangeDetectorRef,private toastr:ToastrServices,private dialog:MatDialog,private apiService:ApiService,private locationService:LocationService) {
-    // this.dataSource.paginator = this.paginator;
-   }
+  constructor(private http: HttpClient,private cdr:ChangeDetectorRef,private toastr:ToastrServices,private dialog:MatDialog,private apiService:ApiService,private locationService:LocationService) { }
 
   ngOnInit(): void {
     this.locationService.getSelectedPoints().subscribe((item:any)=>{
@@ -88,12 +86,9 @@ export class TableviewComponent implements OnInit,OnChanges {
     });
   }
 
- 
-
   ngOnViewInit(){
     this.dataSource = new MatTableDataSource<any>(this.fetched_locations?.data);
     this.dataSource.paginator = this.paginator;
-   
   }
 
   ngOnChanges(){
@@ -230,25 +225,17 @@ export class TableviewComponent implements OnInit,OnChanges {
         else if(column == 'Address_Line_1') return data?.Address_Line_1?.toLowerCase().includes(filter) ;
         else if(column == 'Location_Name') return data?.Location_Name?.toLowerCase().includes(filter) ;
         else if(column == 'On_Route') return data?.On_Route == filterValue ;
-      //  else if(this.filterName.nativeElement.value)
-        // return data?.Route.toLowerCase().includes(filter) || data?.Address_Line_1.toLowerCase().includes(this.filterAddress.nativeElement.value) ||  data?.On_Route == filterValue || data?.Location_Name.toLowerCase().includes(this.filterName.nativeElement.value);
       };
     if(filterValue?.target?.value) filterValue = filterValue.target?.value?.trim().toLowerCase();
     else filterValue = filterValue;
-      // this.dataSource.filter((e:any)=>{
-      //   e.Address_Line_1.toLowerCase().includes(this.filterAddress.nativeElement.value) || e.Location_Name.toLowerCase().includes(filter);
-      // })
       this.dataSource.filter = filterValue;
       console.log(this.dataSource.filter)
       this.cdr.detectChanges();
    }
   }
 
- 
-
   clearAllFilters(){
     this.applyFilter('','');
-    // this.filterName.target.value = '';
     this.filterName.nativeElement.value = '';
     this.filterAddress.nativeElement.value = '';
     this.filterRouteName.nativeElement.value = '';

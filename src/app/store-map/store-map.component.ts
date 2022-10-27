@@ -70,7 +70,7 @@ export class StoreMapComponent implements OnInit {
   originMkr: any;
   destMkr: any;
   startstopmkr: any;
-  locs: any = environment?.locations;
+  // locs: any = environment?.locations;
   displayedColumns: string[] = [];
   dataBaseColumns: any;
   dataSource: any;
@@ -132,7 +132,7 @@ export class StoreMapComponent implements OnInit {
   initTable() {
     console.log(this.fetched_locations)
     this.dataSource = new MatTableDataSource<any>(this.fetched_locations?.data);
-    console.log(Object.keys(this.locs[0]));
+    // console.log(Object.keys(this.locs[0]));
     // this.dataBaseColumns = Object.keys(this.locs[0]);
     this.displayedColumns = ['Location_Name', 'Zones', 'On_Route', 'Route', 'Billable', 'Location_Type', 'On_Hold', 'Rental', 'Washers', 'Dryers', 'Address_Line_1', 'City'];
     // this.displayedColumns.unshift('op','select');
