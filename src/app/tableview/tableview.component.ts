@@ -97,8 +97,6 @@ export class TableviewComponent implements OnInit,OnChanges {
     this.dataSource.paginator = this.paginator;
     this.OnRouteOptions = this.fetched_locations?.data.map((item:any)=>item?.On_Route);
     this.OnRouteOptions = [...new Set(this.OnRouteOptions)];
-    console.log(this.OnRouteOptions)
-
   }
 
   toggleTableView(){
@@ -215,7 +213,8 @@ export class TableviewComponent implements OnInit,OnChanges {
       this.isFilterActive = false;
       this.filteredColumns.map((item:any,idx:any)=>{
         if(item==column) this.filteredColumns.splice(idx,1)
-      })
+      });
+      this.clearAllFilters();
     } 
     else { 
       this.isFilterActive = true;
@@ -229,7 +228,6 @@ export class TableviewComponent implements OnInit,OnChanges {
     if(filterValue?.target?.value) filterValue = filterValue.target?.value?.trim().toLowerCase();
     else filterValue = filterValue;
       this.dataSource.filter = filterValue;
-      console.log(this.dataSource.filter)
       this.cdr.detectChanges();
    }
   }

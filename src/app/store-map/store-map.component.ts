@@ -17,6 +17,7 @@ import { TooltipPosition } from '@angular/material/tooltip';
 import { ApiService } from 'src/app/services/api.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LocationService } from '../services/location.service';
+import { Loader } from "@googlemaps/js-api-loader"
 
 interface TableObj {
   value: string;
@@ -32,26 +33,26 @@ interface TableMode {
   templateUrl: './store-map.component.html',
   styleUrls: ['./store-map.component.css']
 })
-export class StoreMapComponent implements OnInit {
+export class StoreMapComponent implements OnInit,AfterViewInit {
 
   @ViewChild('map', { static: false }) info: ElementRef | undefined;
   labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   positionOptions: TooltipPosition[] = ['after', 'before', 'above', 'below', 'left', 'right'];
   position = new FormControl(this.positionOptions[4]);
   mkrs: any = [];
-  shortestRte: google.maps.DirectionsRoute | any;
+  shortestRte:any;
   map: any;
-  directionsService = new google.maps.DirectionsService();
+  // directionsService = new google.maps.DirectionsService();
   directionsRenderer: any;
-  stepDisplay = new google.maps.InfoWindow();
+  // stepDisplay = new google.maps.InfoWindow() ;
   showSliderMenu: boolean = false;
   showRoutes: boolean = false;
   result: any;
   totalDistance: any;
   totalDuration: any;
-  infoWin: any = new google.maps.InfoWindow();
+  infoWin: any ;
   wayPoints: any = [];
-  shortestResult: google.maps.DirectionsResult | any;
+  shortestResult: any;
   pinSideMenu: boolean = false;
   displayDate: any;
   currentDate: any;
@@ -78,16 +79,70 @@ export class StoreMapComponent implements OnInit {
   selectedLocations: any = [];
   initiatedRoute: boolean = false;
   @ViewChild("sarea") sarea: any;
+  @ViewChild('mapContainer', {static: false}) gmap: ElementRef | any;
 
   org = {
-    "Location_Name": "Sparkle Solutions",
-    "Address_Line_1": "100 Courtland Ave, Vaughan, Ontario, L4K 3T6",
+    "Account_ID": 4693269000024893259,
+    "Address_Line_1": "100 Courtland Ave",
+    "Address_Line_2": null,
+    "Billable": false,
+    "COD": false,
+    "City": "Vaughan",
+    "Coin_Card_Location": "Card-Mitech",
+    "Collection_Frequency": null,
+    "Collector_ID": null,
+    "Country": "Canada",
+    "Created_By_ID": 4693269000000297001,
+    "Created_Time": "Wed, 23 Mar 2022 19:24:47 GMT",
+    "Dryer_Coinage": "0.00",
+    "Dryer_Time": "0.00",
+    "Dryers": 3,
+    "Effective_Date": null,
+    "External_Key": null,
+    "ID": 4693269000019033330,
+    "Last_Activity_Time": "Wed, 24 Aug 2022 17:05:51 GMT",
+    "Last_Collection_Date": "Tue, 14 Jul 2015 00:00:00 GMT",
     "Latitude": "43.814206386",
+    "Location_ID": 1111111,
+    "Location_Name": "Sparkle Solutions",
     "Location_Number": "1111111",
+    "Location_Quotes_ID": 4693269000026883296,
+    "Location_Status": "Active",
+    "Location_Super": null,
+    "Location_Super_Email": null,
+    "Location_Super_Phone": null,
+    "Location_Type": "Single Unit Building",
     "Longitude": "-79.532818106",
+    "Modified_By_ID": 4693269000000297001,
+    "Modified_Time": "Wed, 24 Aug 2022 17:05:51 GMT",
+    "Next_Collection_Date": null,
+    "Notes": null,
+    "On_Hold": false,
+    "On_Route": false,
+    "Owner_ID": 4693269000000297001,
+    "PO_Needed": false,
+    "PO_Number": null,
+    "Parent_Account_ID": null,
+    "Phone_Number": null,
+    "Postal_Code": "L4K 3T6",
+    "Province": "Ontario",
+    "Refund": false,
+    "Refund_Amount": null,
+    "Rental": true,
     "Route": null,
-    "Route_ID": 1111111,
-  };
+    "Route_ID": null,
+    "Super_Address": null,
+    "Super_Amount": "0.00",
+    "Super_City": null,
+    "Super_Province": null,
+    "Super_Zip": null,
+    "Tag": "[{\"name\":\"Original\",\"id\":\"4693269000036006126\"}]",
+    "Unsubscribed_Mode": null,
+    "Unsubscribed_Time": null,
+    "Washer_Coinage": "0.00",
+    "Washers": 3,
+    "Zones": null
+}
   fetched_locations: any;
   initialLoader: any;
   markerClusterer : any;
@@ -103,7 +158,6 @@ export class StoreMapComponent implements OnInit {
     this.apiService.get(`${environment?.coreApiUrl}/api/`).subscribe(
       (dat) => {
         this.fetched_locations = dat;
-        console.log(this.fetched_locations);
         this.initMap();
         this.initTable();
         this.makeClusters();
@@ -111,15 +165,24 @@ export class StoreMapComponent implements OnInit {
   }
 
   ngOnInit() {
+    const loader = new Loader({
+      apiKey: "AIzaSyDHDZE9BzqQu0UUT_TuaS0pBzTbCoHEPJs",
+      libraries: ['drawing','places','geometry','visualization'],
+      language:"en"
+    });
+    
     this.locationService.getSelectedPoints().subscribe((item: any) => {
       this.selectedLocations = item;
     })
     this.initialLoader = true;
-    this.map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
-      zoom: 12,
-      center: { lat: 43.651070, lng: -79.347015 },
-    })
-    // this.directionsRenderer = new google.maps.DirectionsRenderer({ map: this.map, suppressMarkers: true });
+    loader.load().then(() => {
+      this.infoWin = new google.maps.InfoWindow();
+      this.map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
+        zoom: 12,
+        center: { lat: 43.651070, lng: -79.347015 },
+      });
+    });
+   
     this.origin = this.org;
     this.destination = this.org;
     this.currentDate = new Date();
@@ -129,23 +192,21 @@ export class StoreMapComponent implements OnInit {
     this.callFnApi();
   }
 
+  ngAfterViewInit(): void {}
+
   initTable() {
-    console.log(this.fetched_locations)
     this.dataSource = new MatTableDataSource<any>(this.fetched_locations?.data);
-    // console.log(Object.keys(this.locs[0]));
-    // this.dataBaseColumns = Object.keys(this.locs[0]);
     this.displayedColumns = ['Location_Name', 'Zones', 'On_Route', 'Route', 'Billable', 'Location_Type', 'On_Hold', 'Rental', 'Washers', 'Dryers', 'Address_Line_1', 'City'];
     // this.displayedColumns.unshift('op','select');
     this.displayedColumns.unshift('select');
-    console.log(this.displayedColumns);
   }
 
   initMap() {
-    console.log(this.fetched_locations)
     this.fetched_locations?.data?.map((location: any) => {
       if (location?.Location_Number !== this.origin?.Location_Number && location?.Location_Number != this.destination?.Location_Number) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_Number), location?.Route)
     });
     this.initialLoader = false;
+    
 
   }
 
@@ -157,7 +218,6 @@ export class StoreMapComponent implements OnInit {
         address: this.formattedaddress
       },
       (results: any, status: any) => {
-        console.log(status)
         if (status === "OK" && results.length > 0) {
           const firstResult = results[0].geometry;
           const bounds = new google.maps.LatLngBounds();
@@ -284,14 +344,18 @@ export class StoreMapComponent implements OnInit {
   }
 
   makeClusters() {
-    console.log(this.fetched_locations)
-    console.log(this.mkrs)
     this.markerClusterer = new MarkerClusterer(this.map, this.mkrs, {
       imagePath:
         "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
 
     });
-    console.log(this.fetched_locations)
+    this.alignMaptoCenter();
+   
+  }
+
+  alignMaptoCenter(){
+    this.map.setCenter( { lat: 43.651070, lng: -79.347015 });
+    this.map.setZoom(13)
   }
 
   clearCluster(){
