@@ -109,9 +109,19 @@ export class TableviewComponent implements OnInit,OnChanges {
       if( s?.Location_Number!=this.origin?.Location_Number && s?.Location_Number!=this.destination?.Location_Number ){
         const index = this.selectedLocations.findIndex((object:any) => (object?.Location_Number === s?.Location_Number ));
         if (index === -1){
-          this.selectedLocations.push(s);
-          this.locationService.setSelectedPoints(this.selectedLocations);
-          count_addedLocations++;
+          if(this.selectedLocations.length>0){
+            if(this.selectedLocations[0]?.Route==s?.Route){
+              this.selectedLocations.push(s);
+              this.locationService.setSelectedPoints(this.selectedLocations);
+              count_addedLocations++;
+            }
+            else  this.toastr.warning(`The Location (s) is part of a different Route`);
+          }
+          else{
+            this.selectedLocations.push(s);
+            this.locationService.setSelectedPoints(this.selectedLocations);
+            count_addedLocations++;
+          }
         }
         else this.toastr.warning(`Location ${s?.Location_Name} already exists in route`)
       }
@@ -215,6 +225,7 @@ export class TableviewComponent implements OnInit,OnChanges {
         if(item==column) this.filteredColumns.splice(idx,1)
       });
       this.clearAllFilters();
+      this.locationService.clearSelectionModel();
     } 
     else { 
       this.isFilterActive = true;

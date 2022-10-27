@@ -76,6 +76,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
   selection = new SelectionModel<any>(true, []);
   data: any;
   rendererArray: any = [];
+  csvData:any;
   @Input('fetched_locations') fetched_locations: any;
   @Input('origin') origin: any;
   @Input('destination') destination: any;
@@ -178,7 +179,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
       });
       renderer?.setMap(null);
     });
-    
+
   };
 
   editRoute() {
@@ -186,16 +187,19 @@ export class RouteviewComponent implements OnInit, OnChanges {
   }
 
   downloadCSV() {
-    if (this.data?.Route.length > 0) {
+    if (this.csvData.length > 0) {
       let rows: any = [];
-      this.data?.Route.map((item: any, idx: any) => {
+      this.csvData.map((item: any, idx: any) => {
         rows.push(Object.values(item))
       })
       rows.map((item: any, idx: any) => {
         item[0] = item[0].replace(/,/g, '')
       })
-      rows.unshift(Object.keys(this.data?.Route[0]));
+      rows.unshift(Object.keys(this.csvData?.[0]));
       let csvContent = "data:text/csv;charset=utf-8,";
+      rows.map((item:any,idx:any)=>{
+        item.splice(item.length - 6,6)
+      })
       rows.forEach(function (rowArray: any) {
         let row = rowArray.join(",");
         csvContent += row + "\r\n";
@@ -208,7 +212,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
       var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
       var yyyy = today.getFullYear();
       today = mm + '-' + dd + '-' + yyyy;
-      link.setAttribute("download", `${this.data?.Route[0]?.Route}-${today}.csv`);
+      link.setAttribute("download", `${this.csvData?.[1]?.Route}-${today}.csv`);
       document.body.appendChild(link); // Required for FF
       link.click();
     }
@@ -435,6 +439,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
       this.apiService.post(`${environment?.coreApiUrl}/build_route`, this.selectedLocations).subscribe(data => {
         if (data) {
           this.data = data;
+          this.csvData = [...data?.Route];
           // this.data.Route.splice(-1);
           this.data?.Route.map((item: any, idx: any) => {
             item["distance_text"] = this.data?.Route_Details[idx]?.Distance_Text;
@@ -479,7 +484,6 @@ export class RouteviewComponent implements OnInit, OnChanges {
     });
     this.makeMarker({ lat:this.origin.Latitude,lng:this.origin.Longitude}, "start", this.origin.Address, this.origin.Route);
     var stations = this.wayPoints;
-    console.log(this.wayPoints)
     let service = new google.maps.DirectionsService();
     var map = this.map;
 
