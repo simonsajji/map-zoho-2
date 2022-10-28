@@ -447,10 +447,15 @@
 
   .mat-tbl{
     width: 100vw!important;
-    height: calc(50vh - 40px)!important;
+    height: calc(50vh - 60px)!important;
     overflow: auto!important;
+    overflow-y: hidden!important;
     overflow-x: scroll;
     display: table-row;
+  }
+
+  .mat-tbl .inner-mat-tbl{
+    height: 100%!important;
   }
 
   table{
@@ -600,7 +605,7 @@
 
   .mat-table {
     overflow-x: scroll!important;
-    height: 45vh!important;
+    height: 100%!important;
   }
 
   .mat-cell {

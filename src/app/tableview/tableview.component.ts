@@ -218,7 +218,7 @@ export class TableviewComponent implements OnInit,OnChanges {
     else this.locationService.deselect(row);
   }
 
-  applyFilter(filterValue: any,column:any) {    
+  applyFilter(filterValue: any,column:any) {  
     if(filterValue.target?.value == ''){
       this.isFilterActive = false;
       this.filteredColumns.map((item:any,idx:any)=>{
@@ -228,6 +228,7 @@ export class TableviewComponent implements OnInit,OnChanges {
       this.locationService.clearSelectionModel();
     } 
     else { 
+
       this.isFilterActive = true;
       this.filteredColumns.push(column);
       this.dataSource.filterPredicate = function(data:any, filter: string): any {

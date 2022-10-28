@@ -404,7 +404,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
     });
     google.maps.event.addListener(waypoint, 'click', (evt: any) => {
       this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${Location_ID}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${Address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${Route_Name} </i> </p>
-                      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>
+                      <div style="display:flex;flex-direction:column;flex-wrap:wrap; gap:5%;font-weight:400;font-size:12px" > <div>
                     </div>`);
       this.infoWin.open(this.map, waypoint);
     });
@@ -508,7 +508,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
 
     var service_callback = (response: any, status: any) => {
       if (status != 'OK') {
-        console.log('Directions request failed due to ' + status);
+        console.warn('Directions request failed due to ' + status);
         this.toastr.warning('Directions request failed due to ' + status);
         this.locationService.clearSelectionModel();
         this.addClusters.emit();
