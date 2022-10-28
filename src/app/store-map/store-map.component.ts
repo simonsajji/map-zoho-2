@@ -180,6 +180,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
       this.map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
         zoom: 12,
         center: { lat: 43.651070, lng: -79.347015 },
+        gestureHandling: 'greedy'
       });
     });
    
@@ -355,7 +356,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
 
   alignMaptoCenter(){
     this.map.setCenter( { lat: 43.651070, lng: -79.347015 });
-    this.map.setZoom(13)
+    // this.map.setZoom(13)
   }
 
   clearCluster(){

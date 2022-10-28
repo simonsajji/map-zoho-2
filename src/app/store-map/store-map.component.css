@@ -445,46 +445,7 @@
       color: rgb(167, 167, 167);
   }
 
-  .mat-tbl{
-    width: 100vw!important;
-    height: calc(50vh - 40px)!important;
-    overflow: auto!important;
-    overflow-x: scroll;
-    display: table-row;
-  }
-
-  table{
-    width:100%!important;
-  }
-  /* .mat-table {
-    width: 100vw!important;
-    height: calc(50vh - 40px)!important;
-    overflow: scroll!important;
-    overflow-x: scroll;
-    display: table-row;
-    width: 100vw;
-  } */
-
-  /* .mat-footer-row,
-.mat-header-row,
-.mat-row {
-    display: inline-flex;
-    width: 100vw!important;
-} */
-
-  /* .mat-cell,
-  .mat-header-cell {
-    word-wrap: initial;
-    display: table-cell;
-    padding: 0px 5px;
-    line-break: unset;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-  }
-
-  */
+  
 
   ::-webkit-scrollbar {
     width: 8px;

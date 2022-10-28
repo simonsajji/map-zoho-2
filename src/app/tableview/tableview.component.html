@@ -49,7 +49,7 @@
     </div>
 
     <div class="mat-tbl" style="width:100vw!important">
-      <div #matTab *ngIf="displayedColumns.length>0">
+      <div #matTab *ngIf="displayedColumns.length>0" class="inner-mat-tbl">
         <mat-table matSort [dataSource]="dataSource" class="mat-table m-b-5 w-100" style="overflow-x:scroll!important">
           <ng-container *ngFor="let col of displayedColumns" [matColumnDef]="col">
             <!-- <ng-container *ngIf="col=='op'">
@@ -83,7 +83,7 @@
                 style="justify-content:flex-start!important;align-items:flex-start!important">
                 <div class="t-a-left d-flex "> Location Name</div>
                 <mat-form-field *ngIf="col == 'Location_Name'" style="height:45px!important;width: 100%!important;">
-                  <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..." #filterName>
+                  <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..." #filterName >
                 </mat-form-field>
               </mat-header-cell>
               <mat-cell *matCellDef="let element" class="p-relative"
