@@ -106,8 +106,8 @@ export class TableviewComponent implements OnInit,OnChanges {
   logSelection() {
     let count_addedLocations = 0;
     this.selection.selected.forEach((s:any ) =>{
-      if( s?.Location_Number!=this.origin?.Location_Number && s?.Location_Number!=this.destination?.Location_Number ){
-        const index = this.selectedLocations.findIndex((object:any) => (object?.Location_Number === s?.Location_Number ));
+      if( s?.Location_ID!=this.origin?.Location_ID && s?.Lcoation_ID!=this.destination?.Location_ID ){
+        const index = this.selectedLocations.findIndex((object:any) => (object?.Lcoation_ID === s?.Location_ID ));
         if (index === -1){
           if(this.selectedLocations.length>0){
             if(this.selectedLocations[0]?.Route==s?.Route){

@@ -119,7 +119,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
 
   deleteWaypoint(loc: any) {
     this.selectedLocations.map((item: any, idx: any) => {
-      if (loc.Location_Number == item.Location_Number) this.selectedLocations.splice(idx, 1);
+      if (loc.Location_ID == item.Location_ID) this.selectedLocations.splice(idx, 1);
     });
     this.locationService.setSelectedPoints(this.selectedLocations);
     // this.selection.clear();
@@ -189,17 +189,43 @@ export class RouteviewComponent implements OnInit, OnChanges {
   downloadCSV() {
     if (this.csvData.length > 0) {
       let rows: any = [];
+      this.csvData = this.csvData.filter((item:any,idx:any)=>{
+        if(idx!=0 &&idx!=this.csvData.length-1) return item;
+      })
       this.csvData.map((item: any, idx: any) => {
-        rows.push(Object.values(item))
+        let values = Object.values(item);
+        values = values.map((value:any, index) => {
+          return  String(value).replace('#', '');
+        });
+       rows.push(values)
       })
       rows.map((item: any, idx: any) => {
         item[0] = item[0].replace(/,/g, '')
       })
-      rows.unshift(Object.keys(this.csvData?.[0]));
+      let keys = Object.keys(this.csvData?.[0]);
+     keys = keys.map((key, index) => {
+       return key.replace(/_/g, ' ');
+    });
+      rows.unshift(keys);
       let csvContent = "data:text/csv;charset=utf-8,";
       rows.map((item:any,idx:any)=>{
         item.splice(item.length - 6,6)
       })
+      rows[0].push("Amount");
+      //
+      let summaryData = this.findOcc(this.csvData,"Coin_Card_Location");
+      rows.push([" "," "," "]);
+      rows.push([" "," "," "]);
+      rows.push([" "," "," "]);
+      rows.push(["Coin/Card Location","Count"]);
+      summaryData.map((item: any, idx: any) => {
+        if(summaryData.length==1){
+          rows.push(Object.values(item))
+          rows.push([' ',' ']);
+        }
+        else  rows.push(Object.values(item))
+        
+        })
       rows.forEach(function (rowArray: any) {
         let row = rowArray.join(",");
         csvContent += row + "\r\n";
@@ -218,6 +244,25 @@ export class RouteviewComponent implements OnInit, OnChanges {
     }
     else this.toastr.warning("There are no selected Locations for current Route")
 
+  }
+
+  
+
+  findOcc(arr:any, key:any){
+    let arr2:any = [];   
+    arr.forEach((x:any)=>{
+       if(arr2.some((val:any)=>{ return val[key] == x[key] })){
+         arr2.forEach((k:any)=>{
+           if(k[key] === x[key]) k["occurrence"]++
+        })
+       }else{
+         let a:any = {}
+         a[key] = x[key]
+         a["occurrence"] = 1
+         arr2.push(a);
+       }
+    })
+    return arr2
   }
 
   leftDateClick(): void {
@@ -305,7 +350,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
 
   initMap() {
     this.fetched_locations?.data?.map((location: any) => {
-      if (location?.Location_Number !== this.origin?.Location_Number && location?.Location_Number != this.destination?.Location_Number) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_Number), location?.Route)
+      if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_ID), location?.Route)
     });
     this.initialLoader = false;
 

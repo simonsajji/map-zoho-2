@@ -197,14 +197,14 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
 
   initTable() {
     this.dataSource = new MatTableDataSource<any>(this.fetched_locations?.data);
-    this.displayedColumns = ['Location_Name', 'Zones', 'On_Route', 'Route', 'Billable', 'Location_Type', 'On_Hold', 'Rental', 'Washers', 'Dryers', 'Address_Line_1', 'City'];
+    this.displayedColumns = ['Location_Name', 'On_Route', 'Route', 'Billable', 'Location_Type', 'On_Hold', 'Rental', 'Washers', 'Dryers', 'Address_Line_1', 'City'];
     // this.displayedColumns.unshift('op','select');
     this.displayedColumns.unshift('select');
   }
 
   initMap() {
     this.fetched_locations?.data?.map((location: any) => {
-      if (location?.Location_Number !== this.origin?.Location_Number && location?.Location_Number != this.destination?.Location_Number) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_Number), location?.Route)
+      if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_ID), location?.Route)
     });
     this.initialLoader = false;
     
