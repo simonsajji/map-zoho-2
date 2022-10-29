@@ -65,6 +65,10 @@ export class TableviewComponent implements OnInit,OnChanges {
   initialLoader:boolean = false;
   OnRouteOptions:any;
   filteredColumns:any = [];
+  enabledAddressFilter:any;
+  enabledLocationNameFilter:any;
+  enabledRouteFilter:any;
+  enabledOnRouteFilter:any;
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
   @ViewChild("sarea") sarea: any;
   @ViewChild("mastercheck") mastercheck: any;
@@ -107,7 +111,7 @@ export class TableviewComponent implements OnInit,OnChanges {
     let count_addedLocations = 0;
     this.selection.selected.forEach((s:any ) =>{
       if( s?.Location_ID!=this.origin?.Location_ID && s?.Lcoation_ID!=this.destination?.Location_ID ){
-        const index = this.selectedLocations.findIndex((object:any) => (object?.Lcoation_ID === s?.Location_ID ));
+        const index = this.selectedLocations.findIndex((object:any) => (object?.Location_ID === s?.Location_ID ));
         if (index === -1){
           if(this.selectedLocations.length>0){
             if(this.selectedLocations[0]?.Route==s?.Route){
@@ -218,7 +222,8 @@ export class TableviewComponent implements OnInit,OnChanges {
     else this.locationService.deselect(row);
   }
 
-  applyFilter(filterValue: any,column:any) {  
+  applyFilter(filterValue: any,column:any) { 
+    
     if(filterValue.target?.value == ''){
       this.isFilterActive = false;
       this.filteredColumns.map((item:any,idx:any)=>{
@@ -228,7 +233,7 @@ export class TableviewComponent implements OnInit,OnChanges {
       this.locationService.clearSelectionModel();
     } 
     else { 
-
+   
       this.isFilterActive = true;
       this.filteredColumns.push(column);
       this.dataSource.filterPredicate = function(data:any, filter: string): any {
@@ -246,10 +251,10 @@ export class TableviewComponent implements OnInit,OnChanges {
 
   clearAllFilters(){
     this.applyFilter('','');
-    this.filterName.nativeElement.value = '';
-    this.filterAddress.nativeElement.value = '';
-    this.filterRouteName.nativeElement.value = '';
-    this.filterOnRoute.value = '';
+    if(this.filterName?.nativeElement) this.filterName.nativeElement.value = '';
+    if(this.filterAddress?.nativeElement) this.filterAddress.nativeElement.value = '';
+    if(this.filterRouteName?.nativeElement)  this.filterRouteName.nativeElement.value = '';
+    if(this.filterOnRoute?.value) this.filterOnRoute.value = '';
     this.isFilterActive = false;
   }
 

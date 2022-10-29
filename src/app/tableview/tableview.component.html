@@ -82,9 +82,9 @@
               <mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 d-flex flex-column c-dark"
                 style="justify-content:flex-start!important;align-items:flex-start!important">
                 <div class="t-a-left d-flex "> Location Name</div>
-                <mat-form-field *ngIf="col == 'Location_Name'" style="height:45px!important;width: 100%!important;">
-                  <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..." #filterName >
-                </mat-form-field>
+                <!-- <mat-form-field *ngIf="col == 'Location_Name'" style="height:45px!important;width: 100%!important;" >
+                  <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..." #filterName   >
+                </mat-form-field> -->
               </mat-header-cell>
               <mat-cell *matCellDef="let element" class="p-relative"
                 style="white-space: nowrap; text-overflow:ellipsis; overflow: hidden; "
@@ -93,21 +93,22 @@
               </mat-cell>
             </ng-container>
 
-            <mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 flex-column align-start  c-dark">
-              <div>{{ col | removeunderscore | titlecase }}</div>
-              <mat-form-field *ngIf="col=='Route'" style="height:45px!important;width: 100%!important;">
-                <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..." #filterRouteName>
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 flex-column align-start  c-dark" >
+              <div >{{ col | removeunderscore | titlecase }}</div>
+              <mat-form-field *ngIf="col=='Route'" style="height:45px!important;width: 100%!important;" >
+                <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..." #filterRouteName  >
               </mat-form-field>
-              <mat-form-field *ngIf="col=='Address_Line_1'" style="height:45px!important;width: 100%!important;">
-                <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..." #filterAddress>
-              </mat-form-field>
-              <mat-form-field *ngIf="col=='On_Route'" style="height:45px!important;width: 100%!important;">
+              <!-- <mat-form-field *ngIf="col=='Address_Line_1'" style="height:45px!important;width: 100%!important;" >
+                <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..." #filterAddress  >
+              </mat-form-field> -->
+              <!-- <mat-form-field *ngIf="col=='On_Route'" style="height:45px!important;width: 100%!important;">
                 <mat-select #filterOnRoute>
                   <mat-option *ngFor="let item of OnRouteOptions" [value]="item" (click)="applyFilter(item,col)">
                     {{item}}
                   </mat-option>
                 </mat-select>
-              </mat-form-field>
+              </mat-form-field> -->
+
               <!-- <mat-form-field *ngIf="col!='Route_Name' && col!='op' && col!='Address' && col!='Name'" style="height:45px!important;width: 100%!important;">
                         <mat-select></mat-select>
                       </mat-form-field>  -->
