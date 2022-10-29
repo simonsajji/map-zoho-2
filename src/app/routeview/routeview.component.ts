@@ -510,15 +510,18 @@ export class RouteviewComponent implements OnInit, OnChanges {
   displayRoute(locs: any) {
     this.wayPoints = [];
     locs?.Route.map((loc: any, index: any) => {
-      if((loc?.Latitude)==0 || parseFloat(loc?.Longitude) == 0 || loc?.Latitude=="0" || loc?.Longitude=="0") {
-        this.wayPoints.push(loc?.Address)
-      }
-      else{
-        let obj = { lat: parseFloat(loc?.Latitude), lng: parseFloat(loc.Longitude) };
-        this.wayPoints.push(obj)
-      }
+      // if(parseFloat(loc?.Latitude)==0 || parseFloat(loc?.Longitude) == 0 || loc?.Latitude=="0" || loc?.Longitude=="0") {
+      //   this.wayPoints.push(loc?.Address)
+      // }
+      // else{
+      //   let obj = { lat: parseFloat(loc?.Latitude), lng: parseFloat(loc.Longitude) };
+      //   this.wayPoints.push(obj)
+      // }
+      this.wayPoints.push(loc?.Address)
       
     });
+
+    console.log(this.wayPoints)
     // this.wayPoints.splice(-1)
     locs?.Route.map((item: any, i: any) => {
       if (i != 0) {
@@ -532,13 +535,13 @@ export class RouteviewComponent implements OnInit, OnChanges {
     let service = new google.maps.DirectionsService();
     var map = this.map;
 
-    var lngs = stations.map(function(station:any) { if(station?.lng) return station.lng; });
-    var lats = stations.map(function(station:any) { if(station?.lat) return station.lat; });
+    var lngs = locs?.Route.map(function(location:any) { return parseFloat(location.Longitude);});
+    var lats = locs?.Route.map(function(location:any) { return parseFloat(location.Latitude); });
     lngs = lngs.filter(( element:any)=> {
-      return element !== undefined && element !== null;
+      if(element !== undefined && element !== null && element != NaN && !isNaN(element)) return element;
    });
     lats = lats.filter(( element:any)=> {
-      return element !== undefined && element !== null;
+      if(element !== undefined && element !== null && element != NaN && !isNaN(element)) return element;
    });
    
     map.fitBounds({
