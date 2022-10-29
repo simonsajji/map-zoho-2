@@ -77,6 +77,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
   data: any;
   rendererArray: any = [];
   csvData:any;
+  selectedPoints:any;
   @Input('fetched_locations') fetched_locations: any;
   @Input('origin') origin: any;
   @Input('destination') destination: any;
@@ -163,6 +164,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
         this.locationService.setSelectedPoints([]);
         // this.selection.clear();
         this.clearWaypointMkrs();
+        this.clearOriginDestinationMkrs();
         this.removeRoute();
 
         this.locationService.clearSelectionModel();
@@ -365,7 +367,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
   }
 
 
-  makeMarker(position: any, icon: any, address: any, route: any) {
+  makeMarker(position: any, icon: any, address: any, route: any,loc_id:any) {
     let label = address + "";
     let obj = { lat: parseFloat(position.lat) , lng: parseFloat(position.lng ) };
     if (icon == "start") {
@@ -377,7 +379,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
         title: label
       });
       google.maps.event.addListener(this.originMkr, 'click', (evt: any) => {
-        this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route} </i> </p>
+        this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${loc_id}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route} </i> </p>
                       <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" ><div>
                     </div>`);
         this.infoWin.open(this.map, this.originMkr);
@@ -429,10 +431,11 @@ export class RouteviewComponent implements OnInit, OnChanges {
     this.mkrs.push(marker);
   }
 
-  makeWaypointMarkers(position: any, Address: any, Route_Name: any, i: any, Location_ID: any) {
+  makeWaypointMarkers(position: any, Address: any, Route_Name: any, i: any, Location_ID: any,washers:any,dryers:any) {
     let label = i + "";
     let obj = { lat: position.lat, lng: position.lng };
-
+    washers = (washers===null) ? 0 : washers;
+    dryers = (dryers===null) ? 0 : dryers;
     var waypoint = new google.maps.Marker({
       position: obj,
       map: this.map,
@@ -449,6 +452,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
     });
     google.maps.event.addListener(waypoint, 'click', (evt: any) => {
       this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${Location_ID}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${Address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${Route_Name} </i> </p>
+                    <p style="font-weight:400;font-size:13px"> Washers  &emsp;: &emsp; ${washers} </p> <p style="font-weight:400;font-size:13px"> Dryers  &emsp;&emsp;  : &emsp; ${dryers} </p>
                       <div style="display:flex;flex-direction:column;flex-wrap:wrap; gap:5%;font-weight:400;font-size:12px" > <div>
                     </div>`);
       this.infoWin.open(this.map, waypoint);
@@ -480,8 +484,9 @@ export class RouteviewComponent implements OnInit, OnChanges {
     this.clearClusters.emit();
     this.enableInitialLoader.emit();
     if (this.selectedLocations.length > 0) {
-      this.selectedLocations.unshift(this.origin);
-      this.apiService.post(`${environment?.coreApiUrl}/build_route`, this.selectedLocations).subscribe(data => {
+      this.selectedPoints = [...this.selectedLocations]
+      this.selectedPoints.unshift(this.origin);
+      this.apiService.post(`${environment?.coreApiUrl}/build_route`, this.selectedPoints).subscribe(data => {
         if (data) {
           this.data = data;
           this.csvData = [...data?.Route];
@@ -520,17 +525,15 @@ export class RouteviewComponent implements OnInit, OnChanges {
       this.wayPoints.push(loc?.Address)
       
     });
-
-    console.log(this.wayPoints)
     // this.wayPoints.splice(-1)
     locs?.Route.map((item: any, i: any) => {
       if (i != 0) {
         let loc_obj = { lat: parseFloat(item?.Latitude), lng: parseFloat(item?.Longitude) };
-        this.makeWaypointMarkers(loc_obj, item.Address, item?.Route, i, item?.Location_ID)
+        this.makeWaypointMarkers(loc_obj, item.Address, item?.Route, i, item?.Location_ID,item?.Washers,item?.Dryers)
       }
 
     });
-    this.makeMarker({ lat:this.origin.Latitude,lng:this.origin.Longitude}, "start", this.origin.Address, this.origin.Route);
+    this.makeMarker({ lat:this.origin.Latitude,lng:this.origin.Longitude}, "start", this.origin.Address_Line_1, this.origin.Route,this.origin.Location_ID);
     var stations = this.wayPoints;
     let service = new google.maps.DirectionsService();
     var map = this.map;

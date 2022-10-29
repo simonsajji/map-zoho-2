@@ -44,7 +44,7 @@
         <p class="f-s-13 p-l-10 d-flex m-0 m-b-5">Travel Mode : Driving : fastest (optimal order of route)</p>
         <p class="f-s-13 p-l-10 d-flex m-0 m-b-10">
             {{(totalDuration)}},
-            ({{(totalDistance).toFixed(2)}} km)</p>
+            ({{(totalDistance).toFixed(2)}} mi)</p>
     
         <div class="f-s-14  m-b-10" *ngFor="let leg of data?.Route;let i=index">
             <div class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5">
@@ -174,10 +174,10 @@
         </p>
 
         <div class="f-s-14 p-b-10 " *ngFor="let loc of selectedLocations;let i=index;">
-            <div *ngIf="i!=0" class="p-r-10 f-w-500 d-flex  align-center flex-wrap gap-5 p-l-10">
+            <div  class="p-r-10 f-w-500 d-flex  align-center flex-wrap gap-5 p-l-10">
                 <div class="d-flex flex-1">
                     <div class="flex-column">
-                        <div class="location-number f-s-10 f-w-400  m-r-5 p-2" #ln>{{i}}</div>
+                        <div class="location-number f-s-10 f-w-400  m-r-5 p-2" #ln>{{i+1}}</div>
                         <!-- <div class="d-flex dot-container c-pointer align-center p-6 p-t-0">
                             <i class="fa fa-ellipsis-v f-s-12 dot  "></i>
                             <i class="fa fa-ellipsis-v f-s-12 dot "></i>
