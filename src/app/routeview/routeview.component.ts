@@ -397,12 +397,12 @@ export class RouteviewComponent implements OnInit, OnChanges {
       });
 
       google.maps.event.addListener(this.destMkr, 'click', (evt: any) => {
-        this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${label}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> Empty </i> </p>
-                      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" >><div>
+        this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${loc_id}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route} </i> </p>
+                      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" ><div>
                     </div>`);
         this.infoWin.open(this.map, this.destMkr);
       })
-      this.destMkr.setMap(this.map);
+      this.destMkr?.setMap(this.map);
       this.startstopmkr?.push(this.destMkr);
     }
   }
@@ -522,18 +522,22 @@ export class RouteviewComponent implements OnInit, OnChanges {
       //   let obj = { lat: parseFloat(loc?.Latitude), lng: parseFloat(loc.Longitude) };
       //   this.wayPoints.push(obj)
       // }
-      this.wayPoints.push(loc?.Address)
+     if(loc?.Address) this.wayPoints.push(loc?.Address)
+     else{
+      let obj = {lat: parseFloat(loc?.Latitude), lng: parseFloat(loc.Longitude) };
+        this.wayPoints.push(obj)
+     }
       
     });
     // this.wayPoints.splice(-1)
     locs?.Route.map((item: any, i: any) => {
-      if (i != 0) {
+      if (i != 0 && i!=locs?.Route.length-1) {
         let loc_obj = { lat: parseFloat(item?.Latitude), lng: parseFloat(item?.Longitude) };
         this.makeWaypointMarkers(loc_obj, item.Address, item?.Route, i, item?.Location_ID,item?.Washers,item?.Dryers)
       }
-
     });
     this.makeMarker({ lat:this.origin.Latitude,lng:this.origin.Longitude}, "start", this.origin.Address_Line_1, this.origin.Route,this.origin.Location_ID);
+    this.makeMarker({ lat:this.destination.Latitude,lng:this.destination.Longitude}, "end", this.destination.Address_Line_1, this.destination.Route,this.destination.Location_ID);
     var stations = this.wayPoints;
     let service = new google.maps.DirectionsService();
     var map = this.map;
