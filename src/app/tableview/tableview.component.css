@@ -570,7 +570,7 @@
   }
  
 
-  .mat-column-Address_Line_1{
+  /* .mat-column-Address_Line_1{
 
     flex: 0 0 10% !important;
     width: 10%!important;
@@ -578,6 +578,22 @@
     overflow: hidden;
     text-overflow: ellipsis!important;
 
+  } */
+  .mat-column-Address_Line_1 {
+
+    flex: 0 0 150px !important;
+    width: 150px !important;
+  }
+  .mat-column-On_Route {
+
+    flex: 0 0 150px !important;
+    width: 150px !important;
+  }
+
+  .mat-column-On_Hold {
+
+    flex: 0 0 150px !important;
+    width: 150px !important;
   }
 
   .mat-column-Location_Type{
@@ -606,6 +622,7 @@
 
   .mat-header-cell{
     padding-bottom: 2px!important;
+    
   }
 
   .mat-table {
@@ -672,3 +689,4 @@
     overflow: hidden;
     text-overflow: ellipsis!important;
 }
+

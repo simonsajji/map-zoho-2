@@ -1,0 +1,19 @@
+<div  class="mat-parent flex-column">
+    <p class="f-s-20 p-l-10 f-w-500">Location: columns</p>
+    <div class="column-list f-s-13">
+        <mat-selection-list #list [(ngModel)]="selectedOptions" (ngModelChange)="onNgModelChange($event)"  [disableRipple]="true">
+            <mat-list-option *ngFor="let column of columns" [value]="column" class="f-s-14" [disableRipple]="true"
+            >
+              {{column | removeunderscore | titlecase }}
+            </mat-list-option>
+          </mat-selection-list>
+
+    </div>
+   
+
+      <div class="btn-parent text-center d-flex align-center j-end w-100 t-a-right">
+        <button mat-button class="btn primary-color btn-cancel f-s-15 p-5 m-r-5"  [disableRipple]="true" (click)="cancelClick()">CANCEL</button>
+        <button mat-button class=" primary-color  f-s-15 btn-ok p-5"  [disableRipple]="true"  (click)="okClick()">SAVE</button>
+    </div>
+
+</div>
