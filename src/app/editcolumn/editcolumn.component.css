@@ -1,23 +1,46 @@
+
+::-webkit-scrollbar {
+    width: 7px;
+  }
+  
+::-webkit-scrollbar-track {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+  }
+  
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background: rgb(227, 227, 227);
+  }
+
 .btn-parent{
     margin-top: 30px;
 }
 
 .btn-ok{
-    margin-right: 10px;
-    padding: 6px 20px;
+    /* margin-right: 10px;
+    padding: 6px 20px; */
     border-radius: 4px!important;
+    background-color: transparent;
 }
 
 .btn-cancel{
-    background-color: #6d7f8e !important;
+    background-color: transparent;
+
 }
 
 .mat-parent{
-    padding: 5px 5px;
+    padding: 0px 0px;
     width: fit-content;
-    height: fit-content;
+  
 }
 
+.column-list{
+    height: 60vh;
+    width: 35vw;
+    overflow-y: auto;
+}
 
 button{
     border: none;
@@ -86,7 +109,24 @@ button:focus {
     font-weight: 500!important;
 }
 
+.mat-list-option:hover{
+    background-color: transparent!important;
+}
+
+.mat-list-option:nth-child(1){
+    background-color: transparent!important;
+}
+
+
+
+::ng-deep .mat-pseudo-checkbox-checked{
+    background-color: #3668cc !important;
+}
+
 .mat-dialog-container {
-    padding: 10px !important;
+    padding: 5px !important;
   }
+.primary-color{
+    color: #0b4ed5!important
+}
   

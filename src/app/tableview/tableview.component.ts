@@ -14,6 +14,7 @@ import { ApiService } from 'src/app/services/api.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LocationService } from '../services/location.service';
 import { MatCheckboxChange } from '@angular/material/checkbox';
+import {EditcolumnComponent} from '../editcolumn/editcolumn.component'
 
 interface TableObj {
   value: string;
@@ -65,10 +66,11 @@ export class TableviewComponent implements OnInit,OnChanges {
   initialLoader:boolean = false;
   OnRouteOptions:any;
   filteredColumns:any = [];
-  enabledAddressFilter:any;
-  enabledLocationNameFilter:any;
-  enabledRouteFilter:any;
-  enabledOnRouteFilter:any;
+  enabledAddressFilter:boolean = true;
+  enabledLocationNameFilter:boolean = true;
+  enabledRouteFilter:boolean = true;
+  enabledOnRouteFilter:boolean = true;
+  orderedColumns:any;
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
   @ViewChild("sarea") sarea: any;
   @ViewChild("mastercheck") mastercheck: any;
@@ -98,6 +100,14 @@ export class TableviewComponent implements OnInit,OnChanges {
   ngOnChanges(){
     this.selection = this.locationService.getSelectionModel();
     this.dataSource = new MatTableDataSource<any>(this.fetched_locations?.data);
+   if(this.fetched_locations?.data) this.dataBaseColumns = Object.keys(this.fetched_locations?.data[0]);
+   this.orderedColumns = [...this.displayedColumns];
+   if(this.dataBaseColumns){
+    this.dataBaseColumns?.map((item:any,idx:any)=>{
+      if(!this.orderedColumns.includes(item)) this.orderedColumns.push(item)
+     })
+
+   } 
     this.dataSource.paginator = this.paginator;
     this.OnRouteOptions = this.fetched_locations?.data.map((item:any)=>item?.On_Route);
     this.OnRouteOptions = [...new Set(this.OnRouteOptions)];
@@ -105,6 +115,27 @@ export class TableviewComponent implements OnInit,OnChanges {
 
   toggleTableView(){
     this.tableview = !this.tableview;
+  }
+
+  editColumns(){
+    // this.displayedColumns.push('Route_ID')
+  }
+
+  editTableColumns() {
+    const dialogRef = this.dialog.open(EditcolumnComponent, {
+      data: {
+        selectedcolumns: this.displayedColumns,
+        columns: this.dataBaseColumns,
+        orderedColumns:this.orderedColumns
+      }
+    });
+    dialogRef.afterClosed().subscribe((data: []) => {
+      if (data){
+        this.displayedColumns = data;
+        this.displayedColumns.unshift('select');
+        this.displayedColumns.push('Distance');
+      } 
+    });
   }
 
   logSelection() {
@@ -233,6 +264,8 @@ export class TableviewComponent implements OnInit,OnChanges {
       this.locationService.clearSelectionModel();
     } 
     else { 
+      if(column=='Location_Name') this.enabledRouteFilter = false;
+      if(column=='Route') this.enabledLocationNameFilter = false;
    
       this.isFilterActive = true;
       this.filteredColumns.push(column);
@@ -251,6 +284,8 @@ export class TableviewComponent implements OnInit,OnChanges {
 
   clearAllFilters(){
     this.applyFilter('','');
+    this.enabledRouteFilter = true;
+    this.enabledLocationNameFilter = true;
     if(this.filterName?.nativeElement) this.filterName.nativeElement.value = '';
     if(this.filterAddress?.nativeElement) this.filterAddress.nativeElement.value = '';
     if(this.filterRouteName?.nativeElement)  this.filterRouteName.nativeElement.value = '';

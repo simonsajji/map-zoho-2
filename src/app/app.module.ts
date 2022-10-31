@@ -17,6 +17,7 @@ import { ConfirmBoxComponent } from './confirm-box/confirm-box.component';
 import { HttpClientModule } from '@angular/common/http';
 import { TableviewComponent } from './tableview/tableview.component';
 import { RouteviewComponent } from './routeview/routeview.component';
+import { EditcolumnComponent } from './editcolumn/editcolumn.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { RouteviewComponent } from './routeview/routeview.component';
     RemoveunderscorePipe,
     ConfirmBoxComponent,
     TableviewComponent,
-    RouteviewComponent
+    RouteviewComponent,
+    EditcolumnComponent
   ],
   imports: [
     BrowserModule,
