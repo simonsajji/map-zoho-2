@@ -217,7 +217,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
       //
       let summaryData = this.findOcc(this.csvData,"Coin_Card_Location");
       rows.push([" "," "," "]);
-      rows.push([" "," "," "]);
+      rows.push(["Summary"]);
       rows.push([" "," "," "]);
       rows.push(["Coin/Card Location","Count"]);
       summaryData.map((item: any, idx: any) => {
@@ -430,10 +430,9 @@ export class RouteviewComponent implements OnInit, OnChanges {
     })
     this.mkrs.push(marker);
   }
-
-  makeWaypointMarkers(position: any, Address: any, Route_Name: any, i: any, Location_ID: any,washers:any,dryers:any) {
+  makeWaypointMarkersbyLatLng(position: any, Address: any, Route_Name: any, i: any, Location_ID: any,washers:any,dryers:any){
     let label = i + "";
-    let obj = { lat: position.lat, lng: position.lng };
+    let obj = { lat: position?.lat, lng: position?.lng };
     washers = (washers===null) ? 0 : washers;
     dryers = (dryers===null) ? 0 : dryers;
     var waypoint = new google.maps.Marker({
@@ -460,6 +459,50 @@ export class RouteviewComponent implements OnInit, OnChanges {
 
     waypoint.setMap(this.map)
     this.wypntMarkers?.push(waypoint);
+
+  }
+
+  makeWaypointMarkers(position: any, Address: any, Route_Name: any, i: any, Location_ID: any,washers:any,dryers:any) {
+    let label = i + "";
+    let pos;
+    let geocoder = new google.maps.Geocoder();
+    geocoder.geocode( { 'address': Address}, (results:any, status:any)=> {
+      if (status == 'OK') {
+        pos = results[0].geometry.location;
+        let obj = { lat: pos.lat(), lng: pos.lng() };
+        washers = (washers===null) ? 0 : washers;
+        dryers = (dryers===null) ? 0 : dryers;
+        var waypoint = new google.maps.Marker({
+          position: obj,
+          map: this.map,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 14,
+            fillOpacity: 1,
+            strokeWeight: 2,
+            fillColor: '#5384ED',
+            strokeColor: '#ffffff',
+          },
+          label: { text: label, color: "#ffffff", fontSize: "16px", fontWeight: '600', className: 'marker-position' },
+          title: label
+        });
+        google.maps.event.addListener(waypoint, 'click', (evt: any) => {
+          this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${Location_ID}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${Address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${Route_Name} </i> </p>
+                        <p style="font-weight:400;font-size:13px"> Washers  &emsp;: &emsp; ${washers} </p> <p style="font-weight:400;font-size:13px"> Dryers  &emsp;&emsp;  : &emsp; ${dryers} </p>
+                          <div style="display:flex;flex-direction:column;flex-wrap:wrap; gap:5%;font-weight:400;font-size:12px" > <div>
+                        </div>`);
+          this.infoWin.open(this.map, waypoint);
+        });
+
+        waypoint.setMap(this.map)
+        this.wypntMarkers?.push(waypoint);
+        
+      } else {
+        this.toastr.warning('Geocode was not successful for the following reason: ' + status);
+      }
+    });
+    
+    
 
   }
 
@@ -533,7 +576,8 @@ export class RouteviewComponent implements OnInit, OnChanges {
     locs?.Route.map((item: any, i: any) => {
       if (i != 0 && i!=locs?.Route.length-1) {
         let loc_obj = { lat: parseFloat(item?.Latitude), lng: parseFloat(item?.Longitude) };
-        this.makeWaypointMarkers(loc_obj, item.Address, item?.Route, i, item?.Location_ID,item?.Washers,item?.Dryers)
+        if((parseFloat(item?.Latitude)== parseFloat(locs?.Route[i-1]?.Latitude) && parseFloat(item?.Longitude) == parseFloat(locs?.Route[i-1]?.Longitude) && locs?.Route[i-1]?.Latitude) || (parseFloat(item?.Longitude)==0 && parseFloat(item?.Latitude)==0) || (parseFloat(item?.Latitude)== parseFloat(locs?.Route[i+1]?.Latitude) && parseFloat(item?.Longitude) == parseFloat(locs?.Route[i+1]?.Longitude) && locs?.Route[i+1]?.Latitude)) this.makeWaypointMarkers(loc_obj,item?.Location_Name + ', ' + item.Address, item?.Route, i, item?.Location_ID,item?.Washers,item?.Dryers)
+        else  this.makeWaypointMarkersbyLatLng(loc_obj,item?.Location_Name + ', '+ item.Address, item?.Route, i, item?.Location_ID,item?.Washers,item?.Dryers)
       }
     });
     this.makeMarker({ lat:this.origin.Latitude,lng:this.origin.Longitude}, "start", this.origin.Address_Line_1, this.origin.Route,this.origin.Location_ID);
@@ -598,6 +642,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
         origin: parts[i][0],
         destination: parts[i][parts[i].length - 1],
         waypoints: waypoints,
+        optimizeWaypoints:false,
         travelMode: google.maps.TravelMode.DRIVING
       };
       service.route(service_options, service_callback);
