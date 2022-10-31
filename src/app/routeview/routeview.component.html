@@ -54,12 +54,12 @@
                 </div>
                 <div *ngIf=" i!=0 && i!=data?.Route.length-1" class="d-flex m-r-10">
                     <div class="location-number f-s-10 f-w-400  m-r-5 p-2" #ln>{{i}}</div>
-                    <div [style.width]="'calc(100% - ' + 18 + 'px)'">{{leg?.Address}}</div>
+                    <div [style.width]="'calc(100% - ' + 18 + 'px)'">{{leg?.Location_Name}}</div>
                 </div>
             </div>
 
             <div *ngIf="i!=data?.Route.length-1" class="p-r-10 f-w-400 d-flex j-space align-center flex-wrap c-gr w-90 p-t-5 ">
-                {{leg?.Address}}
+                {{leg?.Location_Name}}
             </div>
 
             <div *ngIf=" i!=0 && i!=data?.Route.length-1" class="d-flex gap-2 align-center p-t-10 p-b-5">

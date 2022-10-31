@@ -92,6 +92,20 @@
                 {{ element[col] }}
               </mat-cell>
             </ng-container>
+            <ng-container *ngIf="col=='Coin_Card_Location'">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 d-flex flex-column c-dark"
+                style="justify-content:flex-start!important;align-items:flex-start!important;width:120px!important">
+                <div class="t-a-left d-flex "> Coin\Card Location</div>
+                <!-- <mat-form-field *ngIf="col == 'Location_Name'" style="height:45px!important;width: 100%!important;" >
+                  <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..." #filterName   >
+                </mat-form-field> -->
+              </mat-header-cell>
+              <mat-cell *matCellDef="let element" class="p-relative"
+                style="white-space: nowrap; text-overflow:ellipsis; overflow: hidden; "
+                [matTooltipPosition]="position.value!" matTooltip={{element[col]}}>
+                {{ element[col] }}
+              </mat-cell>
+            </ng-container>
 
             <mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 flex-column align-start  c-dark" >
               <div >{{ col | removeunderscore | titlecase }}</div>
@@ -115,7 +129,8 @@
             </mat-header-cell>
             <mat-cell *matCellDef="let element" class="p-relative"
               style="white-space: nowrap; text-overflow:ellipsis; overflow: hidden; "
-              [matTooltipPosition]="position.value!" matTooltip={{element[col]}}> {{ element[col] }} </mat-cell>
+              [matTooltipPosition]="position.value!" matTooltip={{element[col]}}> {{ element[col] }} 
+            </mat-cell>
           </ng-container>
           <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
           <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>

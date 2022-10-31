@@ -197,7 +197,8 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
 
   initTable() {
     this.dataSource = new MatTableDataSource<any>(this.fetched_locations?.data);
-    this.displayedColumns = ['Location_Name', 'On_Route', 'Route', 'Billable', 'Location_Type', 'On_Hold', 'Rental', 'Washers', 'Dryers', 'Address_Line_1', 'City'];
+    this.displayedColumns = ['Location_Name', 'Route','On_Route', 'Billable', 'Location_Type', 'On_Hold' ,'Rental', 'Washers', 'Dryers' , 'Coin_Card_Location', 'Address_Line_1',
+    'Address_Line_2','City', 'Distance'];
     // this.displayedColumns.unshift('op','select');
     this.displayedColumns.unshift('select');
   }
