@@ -18,6 +18,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { TableviewComponent } from './tableview/tableview.component';
 import { RouteviewComponent } from './routeview/routeview.component';
 import { EditcolumnComponent } from './editcolumn/editcolumn.component';
+import { LocationService } from './services/location.service';
 
 @NgModule({
   declarations: [

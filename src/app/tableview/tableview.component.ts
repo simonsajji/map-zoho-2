@@ -82,6 +82,7 @@ export class TableviewComponent implements OnInit,OnChanges {
   @Input('origin') origin :any;
   @Input('destination') destination :any;
   @Input('displayedColumns')   displayedColumns: string[] = [];
+  @Input('showRoutes')  showRoutes:boolean = false;
   
 
   constructor(private http: HttpClient,private cdr:ChangeDetectorRef,private toastr:ToastrServices,private dialog:MatDialog,private apiService:ApiService,private locationService:LocationService) { }
@@ -140,6 +141,10 @@ export class TableviewComponent implements OnInit,OnChanges {
 
   logSelection() {
     let count_addedLocations = 0;
+    if(this.showRoutes==true){
+      this.toastr.warning("Please Switch to Editing Mode");
+      return;
+    }
     this.selection.selected.forEach((s:any ) =>{
       if( s?.Location_ID!=this.origin?.Location_ID && s?.Lcoation_ID!=this.destination?.Location_ID ){
         const index = this.selectedLocations.findIndex((object:any) => (object?.Location_ID === s?.Location_ID ));

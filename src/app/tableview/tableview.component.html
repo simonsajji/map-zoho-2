@@ -1,5 +1,5 @@
 <div class="tableview" [@tableview]="tableview">
-  <button class="table-slider" matTooltip="Table" (click)="toggleTableView()"> <i *ngIf="!tableview"
+  <button class="table-slider"  (click)="toggleTableView()"> <i *ngIf="!tableview"
       class="fa fa-angle-down f-s-24"></i> <i *ngIf="tableview" class="fa fa-angle-up f-s-24"></i>
     <div class="f-s-15 f-w-400">Table View <i class="fa fa-table f-s-14" aria-hidden="true"></i></div>
   </button>
@@ -24,12 +24,12 @@
                     </mat-select>
                   </mat-form-field> -->
         <div class="p-relative m-l-20 m-r-10 d-flex align-baseline c-pointer" matTooltip="Actions"
-          [matMenuTriggerFor]="menu">
+          [matMenuTriggerFor]="menu" >
           <img src="assets/thunderbolt.png" width="22px" height="22px" alt="" class="hover-round round p-5">
           <div *ngIf="selection.selected.length>0 && selection?.selected" class="round actions-btn f-s-11 f-w-500">
             {{selection.selected.length}}</div>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item [disabled]="selection.selected.length<=0" (click)="logSelection()">
+            <button mat-menu-item [disabled]="selection.selected.length<=0 " (click)="logSelection()">
               <span>Add to Route</span>
             </button>
             <button mat-menu-item [disabled]="selection.selected.length<=0" (click)="selection.clear()">

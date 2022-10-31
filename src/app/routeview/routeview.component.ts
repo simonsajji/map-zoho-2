@@ -89,6 +89,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
   @Output('addClusters') addClusters = new EventEmitter();
   @Output('enableInitialLoader') enableInitialLoader = new EventEmitter();
   @Output('disableInitialLoader') disableInitialLoader = new EventEmitter();
+  @Output('showBuildRoute') showBuildRoute = new EventEmitter();
 
   constructor(private locationService: LocationService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) { }
 
@@ -137,6 +138,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (confirmed == true) {
         this.showRoutes = false;
+        this.showBuildRoute.emit(this.showRoutes);
         this.selectedLocations = [];
         this.locationService.setSelectedPoints([]);
         // this.selection.clear();
@@ -160,6 +162,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (confirmed == true) {
         this.showRoutes = false;
+        this.showBuildRoute.emit(this.showRoutes);
         this.selectedLocations = [];
         this.locationService.setSelectedPoints([]);
         // this.selection.clear();
@@ -186,6 +189,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
 
   editRoute() {
     this.showRoutes = !this.showRoutes;
+    this.showBuildRoute.emit(this.showRoutes);
   }
 
   downloadCSV() {
@@ -624,6 +628,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
         // this.makeMarker(leg2.end_location, "end", leg2.end_location, leg2);
         this.computeTotalDistance(response);
         this.showRoutes = true;
+        this.showBuildRoute.emit(this.showRoutes);
       }
       var renderer = new google.maps.DirectionsRenderer();
       renderer.setMap(map);
@@ -631,6 +636,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
       renderer.setDirections(response);
       this.rendererArray.push(renderer)
       this.showRoutes = true;
+      this.showBuildRoute.emit(this.showRoutes);
     };
 
     // Send requests to service to get route (for stations count <= 25 only one request will be sent)
@@ -663,6 +669,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
   renderRoute() {
     this.directionsRenderer?.setDirections(this.shortestResult); // shortest or result
     this.showRoutes = true;
+    this.showBuildRoute.emit(this.showRoutes);
   }
 
   computeTotalDistance(result: any) {
@@ -704,6 +711,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
     }
     routeResults.routes = [this.shortestRte];
     this.showRoutes = true;
+    this.showBuildRoute.emit(this.showRoutes);
     return routeResults;
   }
 
