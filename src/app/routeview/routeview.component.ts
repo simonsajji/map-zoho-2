@@ -78,6 +78,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
   rendererArray: any = [];
   csvData:any;
   selectedPoints:any;
+  minTime:any;
   @Input('fetched_locations') fetched_locations: any;
   @Input('origin') origin: any;
   @Input('destination') destination: any;
@@ -109,6 +110,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
     this.currentTime = this.formatAMPM(new Date());
     this.displayTime = this.formatAMPM(new Date());
     this.displayDate = new Date();
+    this.minTime = this.currentTime;
     this.initMap();
     this.makeClusters();
   }
@@ -343,9 +345,26 @@ export class RouteviewComponent implements OnInit, OnChanges {
     return number;
   }
 
+  compareDates(d1:Date, d2:Date){
+    let date1 = new Date(d1).getDate();
+    let date2 = new Date(d2).getDate();
+    let month1 = new Date(d1).getMonth();
+    let month2 = new Date(d2).getMonth();
+    let year1 = new Date(d1).getFullYear();
+    let year2 = new Date(d2).getFullYear();
+ 
+    this.currentTime = this.formatAMPM(new Date());
+    if (date1 < date2 || month1 < month2 || year1 < year2) this.minTime = '0:00'
+     else if (date1 > date2 || month1 > month2 || year1 > year2) this.minTime = '0:00'
+    else this.minTime = this.currentTime;
+  };
+
   dateChange(event: any): void {
     let date = event.value || event;
     this.displayDate = date;
+    this.currentTime = this.formatAMPM(new Date());
+    this.currentDate = new Date();
+    this.compareDates(this.displayDate,this.currentDate)
     const yyyy = date.getFullYear();
     let mm: any = date.getMonth() + 1; // Months start at 0!
     let dd: any = date.getDate();

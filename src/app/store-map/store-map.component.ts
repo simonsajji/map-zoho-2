@@ -58,6 +58,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
   currentDate: any;
   displayTime: any;
   currentTime: any;
+  minTime:any;
   @ViewChild('timepicker') timepicker: any;
   isOpen: any;
   formattedaddress = "";
@@ -180,16 +181,18 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
       this.map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
         zoom: 12,
         center: { lat: 43.651070, lng: -79.347015 },
-        gestureHandling: 'greedy'
+        gestureHandling: 'greedy',
+        streetViewControl: false,
       });
     });
    
     this.origin = this.org;
     this.destination = this.org;
     this.currentDate = new Date();
-    this.currentTime = new Date();
+    this.currentTime = this.formatAMPM(new Date());
     this.displayTime = this.formatAMPM(new Date());
-    this.displayDate = new Date();
+    this.displayDate = this.currentDate;
+    this.minTime = this.currentTime;
     this.callFnApi();
   }
 
@@ -281,6 +284,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
     // this.initialLoader = true;
     let date = event.value || event;
     this.displayDate = date;
+   
     const yyyy = date.getFullYear();
     let mm: any = date.getMonth() + 1; // Months start at 0!
     let dd: any = date.getDate();
