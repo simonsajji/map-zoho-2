@@ -80,7 +80,7 @@
             <hr *ngIf="i!=data?.Route.length-1" class="hor-line" />
             <div class="f-s-12 f-w-400 m-b-5 m-t-10 sub-head d-flex align-center w-100 flex-1 j-end ">
                 <div class="d-flex m-r-20">
-                    <div class="c-gr p-r-5">{{leg?.distance_text}}&middot; {{leg.duration_text}}</div>
+                    <div class="c-gr p-r-5">{{leg?.distance_text}},  {{leg.duration_text}}</div>
                 </div>
             </div>
             <div *ngIf="i==data?.Route?.length-1"
@@ -211,7 +211,7 @@
                 </div>
             </div>
         </div>
-        <div class="example-button-row j-center align-center d-flex w-100 m-t-10"><button mat-raised-button
+        <div class="example-button-row j-center align-center d-flex w-100 m-t-10"><button mat-raised-button [disabled]="selectedLocations.length==0"
                 (click)="buildRoute()" class="w-80 m-b-20  f-s-14" color="primary">BUILD ROUTE</button>
         </div>
     </div>

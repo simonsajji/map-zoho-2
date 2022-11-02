@@ -9,6 +9,7 @@ export class LocationService {
 
   selectedPoints = new BehaviorSubject<any>([]);
   selection = new SelectionModel<any>(true, []);
+  showRoutes:any = new BehaviorSubject<any>(false);
 
   constructor() { }
 
@@ -36,6 +37,20 @@ export class LocationService {
     return this.selection.deselect(temp);
   }
 
+  // getShowRoutes(){
+  //   return this.showRoutes;
+  // }
+  // setShowRoutes(temp:boolean){
+  //    this.showRoutes = temp;
+  // }
+
+  setShowRoutes(temp: any): void {
+    return this.showRoutes.next(temp);
+  }
+
+  getShowRoutes() {
+    return this.showRoutes.asObservable();
+  }
  
 
 }

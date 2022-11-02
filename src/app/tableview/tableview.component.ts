@@ -15,6 +15,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LocationService } from '../services/location.service';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import {EditcolumnComponent} from '../editcolumn/editcolumn.component'
+import { isThisSecond } from 'date-fns';
 
 interface TableObj {
   value: string;
@@ -141,12 +142,10 @@ export class TableviewComponent implements OnInit,OnChanges {
 
   logSelection() {
     let count_addedLocations = 0;
-    if(this.showRoutes==true){
-      this.toastr.warning("Please Switch to Editing Mode");
-      return;
-    }
+    if(this.selectedLocations.length==0) this.initiatedRoute = false;
+    this.locationService.setShowRoutes(false);
     this.selection.selected.forEach((s:any ) =>{
-      if( s?.Location_ID!=this.origin?.Location_ID && s?.Lcoation_ID!=this.destination?.Location_ID ){
+      if( s?.Location_ID!=this.origin?.Location_ID && s?.Location_ID!=this.destination?.Location_ID ){
         const index = this.selectedLocations.findIndex((object:any) => (object?.Location_ID === s?.Location_ID ));
         if (index === -1){
           if(this.selectedLocations.length>0){
@@ -269,8 +268,14 @@ export class TableviewComponent implements OnInit,OnChanges {
       this.locationService.clearSelectionModel();
     } 
     else { 
-      if(column=='Location_Name') this.enabledRouteFilter = false;
-      if(column=='Route') this.enabledLocationNameFilter = false;
+      if(column=='Location_Name'){
+        this.enabledRouteFilter = false;
+        this.enabledLocationNameFilter = true;
+      }
+      if(column=='Route'){
+        this.enabledLocationNameFilter = false;
+        this.enabledRouteFilter = true;
+      }
    
       this.isFilterActive = true;
       this.filteredColumns.push(column);
