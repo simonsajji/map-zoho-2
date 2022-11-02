@@ -169,6 +169,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
         this.showBuildRoute.emit(this.showRoutes);
         this.selectedLocations = [];
         this.locationService.setSelectedPoints([]);
+        this.addClusters.emit();
         // this.selection.clear();
         this.clearWaypointMkrs();
         this.clearOriginDestinationMkrs();
