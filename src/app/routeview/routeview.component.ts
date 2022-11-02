@@ -633,8 +633,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
 
     var service_callback = (response: any, status: any) => {
       if (status != 'OK') {
-         console.warn('Directions request failed due to ' + status);
-         console.log("err")
+        console.warn('Directions request failed due to ' + status);
         this.toastr.warning('Directions request failed due to ' + status);
         this.locationService.clearSelectionModel();
         this.addClusters.emit();
