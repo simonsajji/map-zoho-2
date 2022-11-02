@@ -212,6 +212,8 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
 
   }
 
+  
+
   public AddressChange(address: any) {
     this.formattedaddress = address.formatted_address;
     const geocoder = new google.maps.Geocoder();
@@ -370,6 +372,10 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
   }
   disableLoader(){
     this.initialLoader = false;
+  }
+
+  showBuildedRoute(ev:any){
+    this.showRoutes = ev;
   }
 
 

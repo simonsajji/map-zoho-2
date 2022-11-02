@@ -89,6 +89,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
   @Output('addClusters') addClusters = new EventEmitter();
   @Output('enableInitialLoader') enableInitialLoader = new EventEmitter();
   @Output('disableInitialLoader') disableInitialLoader = new EventEmitter();
+  @Output('showBuildRoute') showBuildRoute = new EventEmitter();
 
   constructor(private locationService: LocationService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) { }
 
@@ -98,6 +99,10 @@ export class RouteviewComponent implements OnInit, OnChanges {
     this.locationService.getSelectedPoints().subscribe((item: any) => {
       this.selectedLocations = item;
     });
+
+    this.locationService.getShowRoutes().subscribe((item:any)=>{
+      this.showRoutes = item;
+    })
     this.directionsRenderer = new google.maps.DirectionsRenderer({ map: this.map, suppressMarkers: true });
 
     this.currentDate = new Date();
@@ -137,6 +142,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (confirmed == true) {
         this.showRoutes = false;
+        this.showBuildRoute.emit(this.showRoutes);
         this.selectedLocations = [];
         this.locationService.setSelectedPoints([]);
         // this.selection.clear();
@@ -160,6 +166,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (confirmed == true) {
         this.showRoutes = false;
+        this.showBuildRoute.emit(this.showRoutes);
         this.selectedLocations = [];
         this.locationService.setSelectedPoints([]);
         // this.selection.clear();
@@ -186,6 +193,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
 
   editRoute() {
     this.showRoutes = !this.showRoutes;
+    this.showBuildRoute.emit(this.showRoutes);
   }
 
   downloadCSV() {
@@ -210,9 +218,9 @@ export class RouteviewComponent implements OnInit, OnChanges {
     });
       rows.unshift(keys);
       let csvContent = "data:text/csv;charset=utf-8,";
-      rows.map((item:any,idx:any)=>{
-        item.splice(item.length - 6,6)
-      })
+      // rows.map((item:any,idx:any)=>{
+      //   item.splice(item.length - 4,4)
+      // })
       rows[0].push("Amount");
       //
       let summaryData = this.findOcc(this.csvData,"Coin_Card_Location");
@@ -521,18 +529,32 @@ export class RouteviewComponent implements OnInit, OnChanges {
 
   }
 
+ omit(obj:any, arr:any){
+ return Object.keys(obj)
+      .filter(k => !arr.includes(k))
+      .reduce((acc:any, key:any) => ((acc[key] = obj[key]), acc), {});
+
+ }
+            
+
   buildRoute() {
-    this.clearWaypointMkrs();
-    this.clearOriginDestinationMkrs();
-    this.clearClusters.emit();
-    this.enableInitialLoader.emit();
+   
     if (this.selectedLocations.length > 0) {
+      this.clearWaypointMkrs();
+      this.clearOriginDestinationMkrs();
+      this.clearClusters.emit();
+      this.enableInitialLoader.emit();
       this.selectedPoints = [...this.selectedLocations]
       this.selectedPoints.unshift(this.origin);
       this.apiService.post(`${environment?.coreApiUrl}/build_route`, this.selectedPoints).subscribe(data => {
         if (data) {
           this.data = data;
+          this.computeTotalDistance(data);
           this.csvData = [...data?.Route];
+          this.csvData = this.csvData.map((item:any,idx:any)=>{
+            item = this.omit(item,['Route_ID','Location_ID']);
+            return item;
+          })
           // this.data.Route.splice(-1);
           this.data?.Route.map((item: any, idx: any) => {
             item["distance_text"] = this.data?.Route_Details[idx]?.Distance_Text;
@@ -553,6 +575,10 @@ export class RouteviewComponent implements OnInit, OnChanges {
         }
       });
     }
+    else{
+      this.disableInitialLoader.emit();
+      this.toastr.warning("Select Add atleast One Location from the Table")
+    }
   }
 
   displayRoute(locs: any) {
@@ -565,7 +591,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
       //   let obj = { lat: parseFloat(loc?.Latitude), lng: parseFloat(loc.Longitude) };
       //   this.wayPoints.push(obj)
       // }
-     if(loc?.Address) this.wayPoints.push(loc?.Address)
+     if(loc?.Address) this.wayPoints.push(loc?.Location_Name + ', ' +loc?.Address);
      else{
       let obj = {lat: parseFloat(loc?.Latitude), lng: parseFloat(loc.Longitude) };
         this.wayPoints.push(obj)
@@ -622,8 +648,9 @@ export class RouteviewComponent implements OnInit, OnChanges {
         var leg = this.result.routes[0].legs[0];
         var leg2 = this.result.routes[0].legs[legLength - 1];
         // this.makeMarker(leg2.end_location, "end", leg2.end_location, leg2);
-        this.computeTotalDistance(response);
+       
         this.showRoutes = true;
+        this.showBuildRoute.emit(this.showRoutes);
       }
       var renderer = new google.maps.DirectionsRenderer();
       renderer.setMap(map);
@@ -631,6 +658,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
       renderer.setDirections(response);
       this.rendererArray.push(renderer)
       this.showRoutes = true;
+      this.showBuildRoute.emit(this.showRoutes);
     };
 
     // Send requests to service to get route (for stations count <= 25 only one request will be sent)
@@ -642,8 +670,9 @@ export class RouteviewComponent implements OnInit, OnChanges {
         origin: parts[i][0],
         destination: parts[i][parts[i].length - 1],
         waypoints: waypoints,
-        optimizeWaypoints:false,
-        travelMode: google.maps.TravelMode.DRIVING
+        optimizeWaypoints:true,
+        provideRouteAlternatives:false,
+        travelMode: google.maps.TravelMode.DRIVING,
       };
       service.route(service_options, service_callback);
     }
@@ -663,17 +692,17 @@ export class RouteviewComponent implements OnInit, OnChanges {
   renderRoute() {
     this.directionsRenderer?.setDirections(this.shortestResult); // shortest or result
     this.showRoutes = true;
+    this.showBuildRoute.emit(this.showRoutes);
   }
 
   computeTotalDistance(result: any) {
     var totalDist = 0;
     var totalTime = 0;
-    var myroute = result.routes[0];
-    for (let i = 0; i < this.data?.Route.length-1; i++) {
-      totalDist += this.data?.Route[i].distance_value;
-      totalTime += this.data?.Route[i].duration_value;
-    }
-    totalDist = totalDist / 1000;
+    this.data?.Route_Details.map((item:any,idx:any)=>{
+      totalDist = totalDist + item.Distance_Value;
+      totalTime = totalTime + item.Duration_Value;
+    })
+    totalDist = totalDist*0.000621371;
     this.totalDistance = totalDist;
     this.totalDuration = this.secondsToDhms(totalTime.toFixed(2));
   }
@@ -704,6 +733,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
     }
     routeResults.routes = [this.shortestRte];
     this.showRoutes = true;
+    this.showBuildRoute.emit(this.showRoutes);
     return routeResults;
   }
 
