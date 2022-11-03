@@ -356,7 +356,11 @@ export class RouteviewComponent implements OnInit, OnChanges {
     this.currentTime = this.formatAMPM(new Date());
     if (date1 < date2 || month1 < month2 || year1 < year2) this.minTime = '0:00'
      else if (date1 > date2 || month1 > month2 || year1 > year2) this.minTime = '0:00'
-    else this.minTime = this.currentTime;
+    else{
+      this.displayTime = this.currentTime;
+      this.minTime = this.currentTime;
+      
+    } 
   };
 
   dateChange(event: any): void {
