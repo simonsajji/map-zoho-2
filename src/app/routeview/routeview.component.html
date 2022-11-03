@@ -150,7 +150,7 @@
         <div class="calendar-parent" style="position:relative">
             <input matInput [min]="currentDate" [matDatepicker]="picker1" (dateChange)="dateChange($event)">
             <mat-datepicker #picker1></mat-datepicker>
-            <input matInput [ngxTimepicker]="timepicker" [min]="minTime ">
+            <input matInput [ngxTimepicker]="timepicker" [min]="minTime" [(ngModel)]="displayTime">
             <ngx-material-timepicker #timepicker (timeSet)="onTimeset($event)"></ngx-material-timepicker>
         </div>
 
@@ -211,8 +211,9 @@
                 </div>
             </div>
         </div>
-        <div class="example-button-row j-center align-center d-flex w-100 m-t-10"><button mat-raised-button [disabled]="selectedLocations.length==0"
-                (click)="buildRoute()" class="w-80 m-b-20  f-s-14" color="primary">BUILD ROUTE</button>
+        <div class="example-button-row j-center align-center d-flex w-100 m-t-10 m-b-20 ">
+            <button mat-raised-button [disabled]="selectedLocations.length==0"
+                (click)="buildRoute()" class=" w-100  f-s-14 m-r-20 m-l-5" color="primary">BUILD ROUTE</button>
         </div>
     </div>
 </div>
