@@ -13,7 +13,13 @@ import { environment } from 'src/environments/environment';
 import { animate, animation, style, transition, trigger, useAnimation, state, keyframes } from '@angular/animations';
 import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, Input, Output, ViewChild, AfterViewInit, ChangeDetectorRef, EventEmitter } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
+import { DrawingService } from '../services/drawing.service';
 
+
+interface ViewObj {
+  value: string;
+  viewValue: string;
+}
 
 @Component({
   selector: 'app-routeview',
@@ -25,7 +31,14 @@ import { SelectionModel } from '@angular/cdk/collections';
       state('true', style({ right: '-20%' })),
       transition('0 => 1', animate('.24s')),
       transition('1 => 0', animate('.24s'))
+    ]),
+    trigger('drawingmode', [
+      state('false', style({ right: '0%' })),
+      state('true', style({ right: '-40%' })),
+      transition('0 => 1', animate('.24s')),
+      transition('1 => 0', animate('.24s'))
     ])
+
   ]
 })
 export class RouteviewComponent implements OnInit, OnChanges {
@@ -86,15 +99,27 @@ export class RouteviewComponent implements OnInit, OnChanges {
   @ViewChild('timepicker') timepicker: any;
   initialLoader: boolean = false;
   wypntMarkers: any;
+  routesModeView:boolean = true;
+  zonesModeView:boolean = false;
+  viewObjects: ViewObj[] = [
+    {value: 'routesview', viewValue: 'Route'},
+    {value: 'zonesview', viewValue: 'Territories'},
+  ];
+  selectedViewMode = this.viewObjects[0].value;
+  enableDrawingMode:boolean = false;
+
   @Output('clearClusters') clearClusters = new EventEmitter();
   @Output('addClusters') addClusters = new EventEmitter();
   @Output('enableInitialLoader') enableInitialLoader = new EventEmitter();
   @Output('disableInitialLoader') disableInitialLoader = new EventEmitter();
   @Output('showBuildRoute') showBuildRoute = new EventEmitter();
+  @Output('initZoneCreation') initZoneCreation = new EventEmitter();
 
-  constructor(private locationService: LocationService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) { }
+  constructor(private locationService: LocationService,private drawingService:DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) { }
 
   ngOnInit(): void {
+    this.routesModeView = true;
+    this.zonesModeView = false;
     this.directionsService = new google.maps.DirectionsService();
     this.infoWin = new google.maps.InfoWindow();
     this.locationService.getSelectedPoints().subscribe((item: any) => {
@@ -103,6 +128,9 @@ export class RouteviewComponent implements OnInit, OnChanges {
 
     this.locationService.getShowRoutes().subscribe((item:any)=>{
       this.showRoutes = item;
+    })
+    this.drawingService.getDrawMode().subscribe((item:any)=>{
+      this.enableDrawingMode = item;
     })
     this.directionsRenderer = new google.maps.DirectionsRenderer({ map: this.map, suppressMarkers: true });
 
@@ -123,6 +151,8 @@ export class RouteviewComponent implements OnInit, OnChanges {
     this.navigation = !this.navigation;
     this.showOverlay = !this.showOverlay;
   }
+
+
 
 
   deleteWaypoint(loc: any) {
@@ -759,6 +789,26 @@ export class RouteviewComponent implements OnInit, OnChanges {
     this.showRoutes = true;
     this.showBuildRoute.emit(this.showRoutes);
     return routeResults;
+  }
+
+  changeViewMode(ev:any){
+    console.log(ev);
+    console.log(this.selectedViewMode)
+    if(this.selectedViewMode == 'zonesview'){
+      this.zonesModeView = true;
+      this.routesModeView = false;
+    }
+    else{
+      this.routesModeView = true;
+      this.zonesModeView = false;
+    }
+  }
+
+  initDrawingZone(){
+    console.log("enabling drawing mode")
+    this.enableDrawingMode = true;
+    this.drawingService.setDrawMode(true)
+    this.initZoneCreation.emit();
   }
 
 }

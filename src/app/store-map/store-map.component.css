@@ -589,3 +589,27 @@
     overflow: hidden;
     text-overflow: ellipsis!important;
 }
+
+.btn-row{
+  background-color: rgba(255, 255, 255,0.8)!important;
+  border-radius: 5px!important;
+}
+
+.zone-edit-btns{
+  background: transparent;
+  opacity: 0.8!important;
+}
+
+.zone-edit-btns:hover{
+  background: white;
+  opacity: 1!important;
+
+}
+
+.zone-cancel-btn:hover{
+  color:rgb(206, 0, 0)!important;
+}
+.zone-save-btn:hover{
+  color:#0044cb!important;
+}
+

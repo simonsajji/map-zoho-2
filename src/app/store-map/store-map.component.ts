@@ -1,6 +1,5 @@
 import { LocationStrategy } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-// import { MapInfoWindow } from '@angular/google-maps';
 import MarkerClusterer from '@googlemaps/markerclustererplus';
 import { isThisSecond } from 'date-fns';
 import { environment } from 'src/environments/environment';
@@ -17,7 +16,8 @@ import { TooltipPosition } from '@angular/material/tooltip';
 import { ApiService } from 'src/app/services/api.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LocationService } from '../services/location.service';
-import { Loader } from "@googlemaps/js-api-loader"
+import { Loader } from "@googlemaps/js-api-loader";
+import { DrawingService } from '../services/drawing.service';
 
 interface TableObj {
   value: string;
@@ -147,9 +147,136 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
   fetched_locations: any;
   initialLoader: any;
   markerClusterer : any;
+  drawingManager:any;
+  listOfPolygons:any = [];
+  polygons = [
+    {
+        "gm_accessors_": {
+            "latLngs": null,
+            "strokeColor": null,
+            "strokeOpacity": null,
+            "strokeWeight": null,
+            "fillColor": null,
+            "fillOpacity": null,
+            "visible": null
+        },
+        "latLngs": {
+            "cd": [
+                {
+                    "cd": [
+                        {
+                            "lat": 45.449902902914836,
+                            "lng": -75.65056713347771
+                        },
+                        {
+                            "lat": 45.45929535326269,
+                            "lng": -75.62653454070427
+                        },
+                        {
+                            "lat": 45.43569083800319,
+                            "lng": -75.63237102752068
+                        }
+                    ],
+                    "gm_accessors_": {
+                        "length": null
+                    },
+                    "length": 3,
+                    "gm_bindings_": {
+                        "length": {}
+                    }
+                }
+            ],
+            "gm_accessors_": {
+                "length": null
+            },
+            "length": 1,
+            "gm_bindings_": {
+                "length": {}
+            }
+        },
+        "gm_bindings_": {
+            "latLngs": {},
+            "strokeColor": {},
+            "strokeOpacity": {},
+            "strokeWeight": {},
+            "fillColor": {},
+            "fillOpacity": {},
+            "visible": {}
+        },
+        "strokeColor": "#FF0000",
+        "strokeOpacity": 0.8,
+        "strokeWeight": 3,
+        "fillColor": "#FF0000",
+        "fillOpacity": 0.35,
+        "visible": true
+    },
+    {
+        "gm_accessors_": {
+            "latLngs": null,
+            "strokeColor": null,
+            "strokeOpacity": null,
+            "strokeWeight": null,
+            "fillColor": null,
+            "fillOpacity": null,
+            "visible": null
+        },
+        "latLngs": {
+            "cd": [
+                {
+                    "cd": [
+                        {
+                            "lat": 45.410871364269724,
+                            "lng": -75.69245250945427
+                        },
+                        {
+                            "lat": 45.41713750367575,
+                            "lng": -75.6667033029113
+                        },
+                        {
+                            "lat": 45.396890547837145,
+                            "lng": -75.67288311248161
+                        }
+                    ],
+                    "gm_accessors_": {
+                        "length": null
+                    },
+                    "length": 3,
+                    "gm_bindings_": {
+                        "length": {}
+                    }
+                }
+            ],
+            "gm_accessors_": {
+                "length": null
+            },
+            "length": 1,
+            "gm_bindings_": {
+                "length": {}
+            }
+        },
+        "gm_bindings_": {
+            "latLngs": {},
+            "strokeColor": {},
+            "strokeOpacity": {},
+            "strokeWeight": {},
+            "fillColor": {},
+            "fillOpacity": {},
+            "visible": {}
+        },
+        "strokeColor": "#FF0000",
+        "strokeOpacity": 0.8,
+        "strokeWeight": 3,
+        "fillColor": "#FF0000",
+        "fillOpacity": 0.35,
+        "visible": true
+    }
+  ];
+  fetchedPolygons:any = [];
+  shapeOverlay:any;
+  enableDrawMode:boolean = false;
 
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService,private drawingService:DrawingService) { }
 
   ngOnChanges() { }
 
@@ -174,6 +301,10 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
     
     this.locationService.getSelectedPoints().subscribe((item: any) => {
       this.selectedLocations = item;
+    });
+
+    this.drawingService.getDrawMode().subscribe((item:any)=>{
+      this.enableDrawMode = item;
     })
     this.initialLoader = true;
     loader.load().then(() => {
@@ -185,6 +316,8 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
         streetViewControl: false,
       });
     });
+
+   
    
     this.origin = this.org;
     this.destination = this.org;
@@ -211,10 +344,231 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
       if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_ID), location?.Route)
     });
     this.initialLoader = false;
+  
+
+    if(this.polygons.length>0){
+      this.polygons.map((item:any,idx:any)=>{
+        let poly =  new google.maps.Polygon({
+          paths: item?.latLngs?.cd?.[0]?.cd,
+          strokeColor: '#6476de',
+          strokeOpacity: 0.8,
+          strokeWeight: 3,
+          fillColor: '#6476de',
+          fillOpacity: 0.35
+        });
+         poly.setMap(this.map);
+         this.fetchedPolygons.push(poly)
+      })
+    }
+  //  this.polygons[0].latLngs?.cd?.[0]?.cd.forEach((item:any,idx:any)=>{
+  //   console.log(item)
+  //  })
+ 
+
+  this.fetchedPolygons.map((poly:any,idx:any)=>{
+    for (var i = 0; i < this.mkrs.length; i++) {
+      if (google.maps.geometry.poly.containsLocation(this.mkrs[i].getPosition(), poly)) {
+        console.log(this.mkrs[i])
+      }
+    }
+
+  })
+
+  
     
+
+    
+  }
+
+  polygonChanged(poly:any){
+    console.log(poly);
+    this.listOfPolygons.splice(0,this.listOfPolygons.length)
+    // console.log("polygon changed",poly.latLngs.cd?.[0]?.cd);
+    let polygn = new google.maps.Polygon({
+      paths: poly.getArray(),
+      draggable:true,
+      clickable:true,
+      editable:true,
+      strokeColor: '#FF0000',
+      strokeOpacity: 0.8,
+      strokeWeight: 3,
+      fillColor: '#FF0000',
+      fillOpacity: 0.35
+    });
+    
+  this.listOfPolygons.push(polygn)
+     
+  }
+
+  zoneCreation(){
+    this.setDrawingManager();
+    google.maps.event.addListener(this.drawingManager, 'overlaycomplete', (event:any)=> {
+      var poly = event.overlay.getPath();
+      if (event.type == 'polygon') {
+        // hide polygon from DrawingManager
+        // event.overlay.setMap(null);
+        this.drawingManager.setDrawingMode(null);
+        this.drawingManager.setOptions({
+          drawingMode: null,
+          drawingControlOptions: {
+            position: google.maps.ControlPosition.RIGHT_CENTER,
+            drawingModes: []
+          }
+        });
+        //console.log(event.overlay.getPath().getArray());
+        this.shapeOverlay = event?.overlay
+        let polygn = new google.maps.Polygon({
+          paths: event.overlay.getPath().getArray(),
+          draggable:true,
+          clickable:true,
+          editable:true,
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 3,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35
+        });
+        this.listOfPolygons?.push(polygn);
+        let paths = event?.overlay.getPaths();
+        for (let p = 0; p < paths.getLength(); p++) {
+
+          google.maps.event.addListener(paths.getAt(p), 'insert_at', () => {
+            console.log('We inserted a point');
+            this.polygonChanged(paths)
+          });
+    
+          google.maps.event.addListener(paths.getAt(p), 'remove_at', () => {
+            console.log('We removed a point');
+            this.polygonChanged(paths)
+          });
+    
+          google.maps.event.addListener(paths.getAt(p), 'set_at', () => {
+            console.log('We set a point');
+            this.polygonChanged(paths)
+          });
+        }
+
+        google.maps.event.addListener(this.shapeOverlay,'click',()=>{
+          this.setSelectedShape(event?.overlay)
+        })
+
+      }
+    });
+  }
+
+  saveTerritory(){
+    this.drawingService.setDrawMode(false);
+    console.log(this.listOfPolygons[this.listOfPolygons.length -1])
+    console.log(this.listOfPolygons);
+    for (var i = 0; i < this.mkrs.length; i++) {
+        if (google.maps.geometry.poly.containsLocation(this.mkrs[i].getPosition(), this.listOfPolygons[this.listOfPolygons.length -1])) {
+          console.log(this.mkrs[i])
+        }
+      }
+      this.listOfPolygons[this.listOfPolygons.length - 1]?.setEditable(false);
+      this.shapeOverlay.setEditable(false);
+      this.shapeOverlay.setOptions({
+        strokeColor: '#a094d1',
+        fillColor: '#6753b8'
+      })
+      // this.listOfPolygons[this.listOfPolygons.length - 1]?.setMap(this.map);
+      this.enableDrawMode = false;
+      this.drawingService.setDrawMode(false);
+      this.drawingManager.setMap(null);
+      
 
   }
 
+  setDrawingManager(){
+    if(this.drawingManager) this.resetDrawingManager();
+    else{
+      this.drawingManager = new google.maps.drawing.DrawingManager({
+        drawingControlOptions:{
+          position:google.maps.ControlPosition.RIGHT_CENTER,
+          drawingModes: [
+            google.maps.drawing.OverlayType.POLYLINE,
+            google.maps.drawing.OverlayType.POLYGON
+          ]
+        },
+        polygonOptions:{
+          clickable:true,
+          draggable:false,
+          editable:true,
+          fillColor:'#285ec9',
+          fillOpacity:0.3,
+          strokeColor:'#285ec9'
+  
+        },
+        polylineOptions:{
+          clickable:true,
+          draggable:true,
+          editable:true,
+        }
+      });
+      this.drawingManager.setMap(this.map);
+      console.log("the drawing manager is set new")
+    }
+   
+
+  }
+
+  resetDrawingManager(){
+    this.drawingManager.setOptions({
+      drawingControlOptions:{
+        position:google.maps.ControlPosition.RIGHT_CENTER,
+        drawingModes: [
+          google.maps.drawing.OverlayType.POLYLINE,
+          google.maps.drawing.OverlayType.POLYGON
+        ]
+      },
+      polygonOptions:{
+        clickable:true,
+        draggable:false,
+        editable:true,
+        fillColor:'#285ec9',
+        fillOpacity:0.3,
+        strokeColor:'#285ec9'
+
+      },
+      polylineOptions:{
+        clickable:true,
+        draggable:true,
+        editable:true,
+      }
+    })
+    
+    this.drawingManager.setMap(this.map);
+    
+  }
+
+  setSelectedShape(shapeoverlay:any){
+    this.stopDrawing();
+    this.shapeOverlay = shapeoverlay;
+  }
+
+  clearSelection(){
+    this.drawingManager.setDrawingMode(null);
+    if(this.shapeOverlay){
+      console.log("clearing the selected shap[e");
+      this.shapeOverlay.setEditable(false);
+      this.listOfPolygons[this.listOfPolygons.length-1] = null;
+      this.shapeOverlay.setMap(null);
+      
+
+    }
+    this.listOfPolygons.splice(0,this.listOfPolygons.length);
+    this.enableDrawMode = false;
+
+  }
+
+ stopDrawing() {
+    // this.drawingManager.setMap(null);
+    this.enableDrawMode = false;
+    this.clearSelection();
+    this.drawingService.setDrawMode(false);
+    this.drawingManager.setDrawingMode(null);
+    this.drawingManager.setMap(null)
+  }
   
 
   public AddressChange(address: any) {
