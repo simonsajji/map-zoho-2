@@ -16,6 +16,7 @@ import { LocationService } from '../services/location.service';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import {EditcolumnComponent} from '../editcolumn/editcolumn.component'
 import { isThisSecond } from 'date-fns';
+import { DrawingService } from '../services/drawing.service';
 
 interface TableObj {
   value: string;
@@ -35,6 +36,12 @@ interface TableMode {
     trigger('tableview', [
       state('false', style({ bottom: '-45%' })),
       state('true', style({ bottom: '-99%' })),
+      transition('0 => 1', animate('.24s')),
+      transition('1 => 0', animate('.24s'))
+    ]),
+    trigger('drawingmode', [
+      state('false', style({ bottom: '-99%' })),
+      state('true', style({ bottom: '-120%' })),
       transition('0 => 1', animate('.24s')),
       transition('1 => 0', animate('.24s'))
     ])
@@ -72,6 +79,7 @@ export class TableviewComponent implements OnInit,OnChanges {
   enabledRouteFilter:boolean = true;
   enabledOnRouteFilter:boolean = true;
   orderedColumns:any;
+  enableDrawingMode:boolean = false;
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
   @ViewChild("sarea") sarea: any;
   @ViewChild("mastercheck") mastercheck: any;
@@ -86,12 +94,15 @@ export class TableviewComponent implements OnInit,OnChanges {
   @Input('showRoutes')  showRoutes:boolean = false;
   
 
-  constructor(private http: HttpClient,private cdr:ChangeDetectorRef,private toastr:ToastrServices,private dialog:MatDialog,private apiService:ApiService,private locationService:LocationService) { }
+  constructor(private http: HttpClient,private cdr:ChangeDetectorRef,private toastr:ToastrServices,private dialog:MatDialog,private apiService:ApiService,private locationService:LocationService,private drawingService:DrawingService) { }
 
   ngOnInit(): void {
     this.locationService.getSelectedPoints().subscribe((item:any)=>{
       this.selectedLocations = item;
     });
+    this.drawingService.getDrawMode().subscribe((item:any)=>{
+      this.enableDrawingMode = item;
+    })
   }
 
   ngOnViewInit(){

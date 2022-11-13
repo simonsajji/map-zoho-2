@@ -5,9 +5,39 @@
         </mat-spinner>
     </div>
 
-    <div *ngIf="enableDrawMode" class="example-button-row f-s-14 btn-row" style="z-index:1000!important;position: absolute!important;top:2%;left:49%">
-        <button mat-flat-button class="zone-edit-btns zone-cancel-btn" (click)="stopDrawing()">CANCEL</button>
-        <button mat-flat-button class="primary-color zone-edit-btns zone-save-btn" (click)="saveTerritory()">SAVE TERRITORY</button>
+    <!-- <button mat-mini-fab color="basic" [ngClass]="enableDeleteMode ? 'glow-btn' : ''" class="custom-mat-mini-fab " style="z-index:1000!important;position: absolute!important;top:60%;left:2%" (click)="deleteModeToggle()">
+        <mat-icon class="custom-mat-icon " [ngClass]="enableDeleteMode ? 'glow-icon' : ''">delete</mat-icon>
+        <div *ngIf="enableDeleteMode" class="green-signal"></div>
+      </button>
+
+      <button mat-mini-fab color="basic" [ngClass]="enableEditMode ? 'glow-btn' : ''" class="custom-mat-mini-fab " style="z-index:1000!important;position: absolute!important;top:66%;left:2%" (click)="editModeToggle()">
+        <mat-icon class="custom-mat-icon" [ngClass]="enableEditMode ? 'glow-icon-edit' : ''">edit</mat-icon>
+        <div *ngIf="enableEditMode" class="green-signal"></div>
+    
+    </button> -->
+
+    <div  class="btn-group "  *ngIf="canvasMode" style="z-index:1000!important;position: absolute!important;top:50%;right:0.55%;opacity: 1!important;">
+
+        <button mat-mini-fab color="basic"  class="custom-mat-mini-fab " (click)="setPolygonDrawingMode()">
+            <i class="fa fa-draw-polygon f-s-18"></i>
+            <!-- <div *ngIf="enableDeleteMode" class="green-signal blink_me "></div> -->
+          </button>
+        <button mat-mini-fab color="basic" [ngClass]="enableDeleteMode ? 'glow-btn' : ''" class="custom-mat-mini-fab " (click)="deleteModeToggle()">
+            <mat-icon class="custom-mat-icon " [ngClass]="enableDeleteMode ? 'glow-icon' : ''">delete</mat-icon>
+            <div *ngIf="enableDeleteMode" class="green-signal blink_me "></div>
+          </button>
+          <button mat-mini-fab color="basic" [ngClass]="enableEditMode ? 'glow-btn' : ''" class="custom-mat-mini-fab "  (click)="editModeToggle()">
+            <mat-icon class="custom-mat-icon" [ngClass]="enableEditMode ? 'glow-icon-edit' : ''">edit</mat-icon>
+            <div *ngIf="enableEditMode" class="green-signal blink_me "></div>
+        
+        </button>
+    </div>
+
+    <!-- <div *ngIf="enableDeleteMode" id="tooltip" style="z-index:1000!important;position: absolute!important;" #deltip>Tooltip</div> -->
+
+    <div  *ngIf="canvasMode" class="example-button-row f-s-14 btn-row" style="z-index:1000!important;position: absolute!important;top:2%;left:49%">
+        <button mat-flat-button class="zone-edit-btns zone-cancel-btn" (click)="unSetCanvas()">CANCEL</button>
+        <button mat-flat-button class="primary-color zone-edit-btns zone-save-btn" (click)="saveZones()">SAVE TERRITORY</button>          
      </div>
 
     <div class="searchArea d-flex align-center p-5 ">
@@ -37,7 +67,7 @@
 
     <app-routeview (enableInitialLoader)="enableLoader()" (disableInitialLoader)="disableLoader()" [origin]="origin"
         [destination]="destination" [fetched_locations]="fetched_locations" [map]="map" (addClusters)="makeClusters()"
-        (clearClusters)="clearCluster()"  (initZoneCreation)="zoneCreation()" >
+        (clearClusters)="clearCluster()"  (initZoneCreation)="setCanvas()">
     </app-routeview>
 
     <app-tableview [fetched_locations]="fetched_locations" [origin]="origin" [destination]="destination"

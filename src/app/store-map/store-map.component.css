@@ -591,13 +591,13 @@
 }
 
 .btn-row{
-  background-color: rgba(255, 255, 255,0.8)!important;
+  background-color: rgba(255, 255, 255,1)!important;
   border-radius: 5px!important;
 }
 
 .zone-edit-btns{
   background: transparent;
-  opacity: 0.8!important;
+  opacity: 0.9!important;
 }
 
 .zone-edit-btns:hover{
@@ -613,3 +613,72 @@
   color:#0044cb!important;
 }
 
+
+.green-signal{
+  position: absolute;
+  top:2px;
+  right:1px;
+  width: 7px;
+  height: 7px;
+  background-color:#71e916;
+  border-radius: 50%;
+
+}
+
+.custom-mat-mini-fab {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 1px!important;
+ 
+}
+
+.custom-mat-icon {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.glow-btn{
+  border-bottom: 0.1rem solid rgba(174, 159, 154, 0.6)!important;
+  background-color: white;
+  transition: all 0.15s ease-in-out!important;
+}
+
+
+
+.glow-icon{
+  color:#ea0000;
+}
+.glow-icon-edit{
+  color:#981a5d;
+}
+
+
+.set-transition{
+  transition: all 0.15s ease-in-out!important;
+}
+
+.btn-group{
+  background-color: white!important;
+  border-color:white;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  padding: 2px!important;
+  
+}
+
+.blink_me {
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}

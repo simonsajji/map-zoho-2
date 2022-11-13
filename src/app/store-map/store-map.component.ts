@@ -1,5 +1,5 @@
 import { LocationStrategy } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef,Renderer2 } from '@angular/core';
 import MarkerClusterer from '@googlemaps/markerclustererplus';
 import { isThisSecond } from 'date-fns';
 import { environment } from 'src/environments/environment';
@@ -18,6 +18,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LocationService } from '../services/location.service';
 import { Loader } from "@googlemaps/js-api-loader";
 import { DrawingService } from '../services/drawing.service';
+
 
 interface TableObj {
   value: string;
@@ -273,22 +274,29 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
   ];
   fetchedPolygons:any = [];
   shapeOverlay:any;
-  enableDrawMode:boolean = false;
+  canvasMode:boolean = false;
+  allOverlays:any = [];
+  coordinates:any = [];
+  all_overlays:any = [];
+  selectedShape:any;
+  enableEditMode:boolean = false;
+  enableDeleteMode:boolean = false;
+  @ViewChild('deltip') deltip:any;
+  tipObj:any | null;
 
-
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService,private drawingService:DrawingService) { }
+  constructor(private renderer:Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService,private drawingService:DrawingService) { }
 
   ngOnChanges() { }
 
   callFnApi() {
-    var locations: any = [];
-    var selected_locations: any = [];
     this.apiService.get(`${environment?.coreApiUrl}/api/`).subscribe(
       (dat) => {
         this.fetched_locations = dat;
         this.initMap();
         this.initTable();
         this.makeClusters();
+        this.setDrawingManager();
+
       });
   }
 
@@ -304,7 +312,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
     });
 
     this.drawingService.getDrawMode().subscribe((item:any)=>{
-      this.enableDrawMode = item;
+      this.canvasMode = item;
     })
     this.initialLoader = true;
     loader.load().then(() => {
@@ -341,7 +349,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
 
   initMap() {
     this.fetched_locations?.data?.map((location: any) => {
-      if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_ID), location?.Route)
+      if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.ID), location?.Route)
     });
     this.initialLoader = false;
   
@@ -368,7 +376,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
   this.fetchedPolygons.map((poly:any,idx:any)=>{
     for (var i = 0; i < this.mkrs.length; i++) {
       if (google.maps.geometry.poly.containsLocation(this.mkrs[i].getPosition(), poly)) {
-        console.log(this.mkrs[i])
+        console.log(this.mkrs[i].location_id)
       }
     }
 
@@ -380,102 +388,152 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
     
   }
 
-  polygonChanged(poly:any){
+  polygonChanged(poly:any,newLatLngs:any){
     console.log(poly);
-    this.listOfPolygons.splice(0,this.listOfPolygons.length)
-    // console.log("polygon changed",poly.latLngs.cd?.[0]?.cd);
-    let polygn = new google.maps.Polygon({
-      paths: poly.getArray(),
-      draggable:true,
-      clickable:true,
-      editable:true,
-      strokeColor: '#FF0000',
-      strokeOpacity: 0.8,
-      strokeWeight: 3,
-      fillColor: '#FF0000',
-      fillOpacity: 0.35
-    });
+    console.log(this.listOfPolygons)
+    this.listOfPolygons.map((item:any,idx:any)=>{
+     if(poly?.id == this.listOfPolygons[idx].id){
+      this.listOfPolygons[idx]?.polygn?.setPath(newLatLngs);
+     }
+    })
+    console.log(this.listOfPolygons)
     
-  this.listOfPolygons.push(polygn)
+    // console.log("polygon changed",poly.latLngs.cd?.[0]?.cd);
+  //   console.log(this.listOfPolygons)
+  //   let polygn = new google.maps.Polygon({
+  //     paths: poly?.polygn?.getPaths().getArray(),
+  //     draggable:true,
+  //     clickable:true,
+  //     editable:true,
+  //     strokeColor: '#FF0000',
+  //     strokeOpacity: 0.8,
+  //     strokeWeight: 3,
+  //     fillColor: '#FF0000',
+  //     fillOpacity: 0.35
+  //   });
+  //   poly?.polygn?.setMap(null)
+  //  polygn.setMap(this.map);
+  // this.listOfPolygons.push({id : this.listOfPolygons.length,polygn: polygn})
+  // console.log(this.listOfPolygons)
      
   }
 
-  zoneCreation(){
-    this.setDrawingManager();
-    google.maps.event.addListener(this.drawingManager, 'overlaycomplete', (event:any)=> {
-      var poly = event.overlay.getPath();
-      if (event.type == 'polygon') {
-        // hide polygon from DrawingManager
-        // event.overlay.setMap(null);
-        this.drawingManager.setDrawingMode(null);
-        this.drawingManager.setOptions({
-          drawingMode: null,
-          drawingControlOptions: {
-            position: google.maps.ControlPosition.RIGHT_CENTER,
-            drawingModes: []
-          }
-        });
-        //console.log(event.overlay.getPath().getArray());
-        this.shapeOverlay = event?.overlay
-        let polygn = new google.maps.Polygon({
-          paths: event.overlay.getPath().getArray(),
-          draggable:true,
-          clickable:true,
-          editable:true,
-          strokeColor: '#FF0000',
-          strokeOpacity: 0.8,
-          strokeWeight: 3,
-          fillColor: '#FF0000',
-          fillOpacity: 0.35
-        });
-        this.listOfPolygons?.push(polygn);
-        let paths = event?.overlay.getPaths();
-        for (let p = 0; p < paths.getLength(); p++) {
+  // zoneCreation(){
+  //   this.setDrawingManager();
+  //   google.maps.event.addListener(this.drawingManager, 'overlaycomplete', (event:any)=> {
+  //     var poly = event.overlay.getPath();
+  //     if (event.type == 'polygon') {
+      
 
-          google.maps.event.addListener(paths.getAt(p), 'insert_at', () => {
-            console.log('We inserted a point');
-            this.polygonChanged(paths)
-          });
-    
-          google.maps.event.addListener(paths.getAt(p), 'remove_at', () => {
-            console.log('We removed a point');
-            this.polygonChanged(paths)
-          });
-    
-          google.maps.event.addListener(paths.getAt(p), 'set_at', () => {
-            console.log('We set a point');
-            this.polygonChanged(paths)
-          });
-        }
+  //       this.shapeOverlay = event?.overlay;
+  //       this.allOverlays.push(event?.overlay)
+  //       console.log(this.allOverlays)
+  //       console.log(event?.type)
+       
+  //       let polygn = new google.maps.Polygon({
+  //         paths: event.overlay.getPath().getArray(),
+  //         draggable:true,
+  //         clickable:true,
+  //         editable:true,
+  //         strokeColor: '#a094d1',
+  //         strokeOpacity: 0.8,
+  //         strokeWeight: 3,
+  //         fillColor: '#6753b8',
+  //         fillOpacity: 0.35
+  //       });
+  //       let paths = polygn?.getPaths();
+  //       for (let p = 0; p < paths.getLength(); p++) {
 
-        google.maps.event.addListener(this.shapeOverlay,'click',()=>{
-          this.setSelectedShape(event?.overlay)
-        })
+  //           google.maps.event.addListener(paths.getAt(p), 'insert_at', () => {
+  //             console.log('We inserted a point');
+  //             polygn?.setPath(paths.getAt(p));
+  //             this.listOfPolygons.push({id:this.listOfPolygons.length,polygn:polygn})
+  
+  //           });
+      
+  //           google.maps.event.addListener(paths.getAt(p), 'remove_at', () => {
+  //             console.log('We removed a point');
+     
+  //           });
+      
+  //           google.maps.event.addListener(paths.getAt(p), 'set_at', () => {
+  //             console.log('We set a point');
+         
+  //           });
+  //         }
 
-      }
+  //       this.listOfPolygons?.push({id:this.listOfPolygons.length,polygn: polygn});
+  //       this.listOfPolygons.map((poly:any,idx:any)=>{
+  //         let paths = poly?.polygn?.getPaths();
+  //         console.log(paths);
+  //         poly?.polygn.setMap(this.map)
+         
+  //       })
+      
+
+  //       google.maps.event.addListener(event?.overlay,'click',()=>{
+  //         this.setSelectedShape(event?.overlay)
+  //       });
+
+       
+
+  //     }
+  //   });
+  // }
+
+  enableEditingMode(){
+    this.listOfPolygons.map((shape:any,idx:any)=>{
+      shape?.polygn?.setEditable(true);
     });
+    this.fetchedPolygons.map((item:any,idx:any)=>{
+      item.setEditable(true)
+    })
+  }
+  disableEditingMode(){
+    this.listOfPolygons.map((shape:any,idx:any)=>{
+      shape.polygn?.setEditable(false);
+    });
+    this.fetchedPolygons.map((item:any,idx:any)=>{
+      item.setEditable(false)
+    })
   }
 
   saveTerritory(){
     this.drawingService.setDrawMode(false);
     console.log(this.listOfPolygons[this.listOfPolygons.length -1])
     console.log(this.listOfPolygons);
-    for (var i = 0; i < this.mkrs.length; i++) {
-        if (google.maps.geometry.poly.containsLocation(this.mkrs[i].getPosition(), this.listOfPolygons[this.listOfPolygons.length -1])) {
-          console.log(this.mkrs[i])
-        }
-      }
-      this.listOfPolygons[this.listOfPolygons.length - 1]?.setEditable(false);
-      this.shapeOverlay.setEditable(false);
+    // for (var i = 0; i < this.mkrs.length; i++) {
+    //     if (google.maps.geometry.poly.containsLocation(this.mkrs[i].getPosition(), this.listOfPolygons[this.listOfPolygons.length -1])) {
+    //       console.log(this.mkrs[i])
+    //     }
+    //   }
+      // this.listOfPolygons[this.listOfPolygons.length - 1]?.setEditable(false);
+      // this.shapeOverlay.setEditable(false);
       this.shapeOverlay.setOptions({
         strokeColor: '#a094d1',
         fillColor: '#6753b8'
       })
       // this.listOfPolygons[this.listOfPolygons.length - 1]?.setMap(this.map);
-      this.enableDrawMode = false;
+      this.canvasMode = false;
       this.drawingService.setDrawMode(false);
       this.drawingManager.setMap(null);
+      console.log(this.allOverlays);
+
+     
+
       
+
+  }
+
+  setCanvas(){
+    console.log(this.canvasMode);
+    this.canvasMode = true;
+
+  }
+
+  unSetCanvas(){
+    this.canvasMode = false;
+    this.drawingService.setDrawMode(false);
 
   }
 
@@ -484,11 +542,11 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
     else{
       this.drawingManager = new google.maps.drawing.DrawingManager({
         drawingControlOptions:{
-          position:google.maps.ControlPosition.RIGHT_CENTER,
           drawingModes: [
             google.maps.drawing.OverlayType.POLYLINE,
             google.maps.drawing.OverlayType.POLYGON
           ]
+         
         },
         polygonOptions:{
           clickable:true,
@@ -506,16 +564,155 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
         }
       });
       this.drawingManager.setMap(this.map);
-      console.log("the drawing manager is set new")
+     
+      console.log("the drawing manager is set new");
+      google.maps.event.addListener(this.drawingManager,'polygoncomplete',(event:any)=>{
+        event?.getPath().getLength();
+        console.log(event);
+        this.setFreehandMode();
+        this.listOfPolygons.push({id:this.listOfPolygons.length, polygon:event});
+        this.listOfPolygons.forEach((poly:any,idx:any)=>{
+          if(poly?.polygon){
+            google.maps.event.addListener(poly?.polygon, 'click',  ()=> {
+              if(this.enableDeleteMode){
+                poly?.polygon?.setMap(null);
+                if(poly?.polygon) poly.polygon = null;
+              }
+             else this.setSelection(event);
+            });
+            
+          }
+         
+            
+            console.log(this.listOfPolygons)
+  
+          
+        })
+        google.maps.event.addListener(event,'dragend',this.getPolygonCoords)
+        google.maps.event.addListener(event.getPath(),'insert_at',()=>{
+          this.coordinates.splice(0,this.coordinates?.length);
+          let len = event?.getPath().getLength();
+          for(let i=0;i<len;i++){
+            this.coordinates.push(event.getPath().getAt(i).toUrlValue(5))
+          }
+          console.log(this.coordinates);
+          console.log(this.listOfPolygons)
+        })
+        google.maps.event.addListener(event.getPath(),'set_at',()=>{
+          this.coordinates.splice(0,this.coordinates?.length);
+          let len = event?.getPath().getLength();
+          for(let i=0;i<len;i++){
+            this.coordinates.push(event.getPath().getAt(i).toUrlValue(5))
+          }
+        })
+        
+        console.log(this.coordinates);
+
+      })
+      google.maps.event.addListener(this.drawingManager, 'overlaycomplete',  (event:any)=> {
+        this.all_overlays.push(event);
+        if (event.type !== google.maps.drawing.OverlayType.MARKER) {
+            // this.drawingManager.setDrawingMode(null);
+
+            // var newShape = event.overlay;
+            // newShape.type = event.type;
+            // google.maps.event.addListener(newShape, 'click',  ()=> {
+            //     this.setSelection(newShape);
+            // });
+            // this.setSelection(newShape);
+        }
+    })
+
+    // fetchedPolygons 
+
+    this.fetchedPolygons.forEach((poly:any,idx:any)=>{
+      console.log(poly);
+      poly.setEditable(true)
+      google.maps.event.addListener(poly,'dragend',this.getPolygonCoords)
+        google.maps.event.addListener(poly.getPath(),'insert_at',()=>{
+          this.coordinates.splice(0,this.coordinates?.length);
+          let len = poly?.getPath().getLength();
+          for(let i=0;i<len;i++){
+            this.coordinates.push(poly.getPath().getAt(i).toUrlValue(5))
+          }
+          console.log(this.coordinates);
+          console.log(this.fetchedPolygons)
+        })
+        google.maps.event.addListener(poly.getPath(),'set_at',()=>{
+          this.coordinates.splice(0,this.coordinates?.length);
+          let len = poly?.getPath().getLength();
+          for(let i=0;i<len;i++){
+            this.coordinates.push(poly.getPath().getAt(i).toUrlValue(5))
+          }
+        })
+        console.log(this.fetchedPolygons)
+    })
+
     }
    
+  }
+
+  saveZones(){
+    this.listOfPolygons.forEach((poly:any,idx:any)=>{
+      poly?.polygon.setEditable(false);
+    });
+    this.unSetCanvas();
+  }
+
+  setPolygonDrawingMode(){
+   if(this.drawingManager) this.drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
+  }
+
+  setFreehandMode(){
+    if(this.drawingManager) this.drawingManager.setDrawingMode(null);
+
+  }
+
+  deleteModeToggle(){
+    this.enableDeleteMode = !this.enableDeleteMode;
+    if(this.enableDeleteMode) this.toastr.info('Delete Mode is ON');
+    else this.toastr.info('Delete Mode is OFF');
+ 
+  }
+
+
+  editModeToggle(){
+    this.enableEditMode = !this.enableEditMode;
+    this.listOfPolygons.forEach((poly:any,idx:any)=>{
+      if(this.enableEditMode)  poly?.polygon.setEditable(true);
+    })
+    if(this.enableEditMode){
+      this.toastr.info('Edit Mode is ON');
+     
+    } 
+    else this.toastr.info('Edit Mode is OFF')
+  }
+
+  getPolygonCoords(newShape:any){
+    this.coordinates.splice(0, this.coordinates.length)
+
+      var len = newShape.getPath().getLength();
+
+      for (var i = 0; i < len; i++) {
+          this.coordinates.push(newShape.getPath().getAt(i).toUrlValue(6))
+      }
+      return this.coordinates;
+
+  }
+
+  setSelection(newShape:any){
+    // this.clearSelection();
+    // this.stopDrawing()
+    this.selectedShape = newShape;
+    console.log(this.selectedShape)
+    newShape.setEditable(true);
 
   }
 
   resetDrawingManager(){
     this.drawingManager.setOptions({
       drawingControlOptions:{
-        position:google.maps.ControlPosition.RIGHT_CENTER,
+        position:google.maps.ControlPosition.LEFT_CENTER,
         drawingModes: [
           google.maps.drawing.OverlayType.POLYLINE,
           google.maps.drawing.OverlayType.POLYGON
@@ -542,7 +739,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
   }
 
   setSelectedShape(shapeoverlay:any){
-    this.stopDrawing();
+    this.drawingManager.setDrawingMode(null);
     this.shapeOverlay = shapeoverlay;
   }
 
@@ -550,20 +747,18 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
     this.drawingManager.setDrawingMode(null);
     if(this.shapeOverlay){
       console.log("clearing the selected shap[e");
-      this.shapeOverlay.setEditable(false);
       this.listOfPolygons[this.listOfPolygons.length-1] = null;
       this.shapeOverlay.setMap(null);
       
 
     }
     this.listOfPolygons.splice(0,this.listOfPolygons.length);
-    this.enableDrawMode = false;
 
   }
 
  stopDrawing() {
     // this.drawingManager.setMap(null);
-    this.enableDrawMode = false;
+    this.canvasMode = false;
     this.clearSelection();
     this.drawingService.setDrawMode(false);
     this.drawingManager.setDrawingMode(null);
@@ -674,13 +869,14 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
       labelOrigin: new google.maps.Point(-30, 10),
     };
     let obj = position;
-    let marker = new google.maps.Marker({
+    let marker:any = new google.maps.Marker({
       position: obj,
       map: this.map,
       icon: markerIcon,
-      label: { text: title, color: "#1440de", fontSize: "11px", fontWeight: '600', className: 'marker-position' },
+      label: { text: title, color: "#1440de", fontSize: "11px", fontWeight: '600', className: 'marker-position'},
 
     });
+    marker['location_id'] = loc_id;
     google.maps.event.addListener(marker, 'click', (evt: any) => {
       this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${loc_id}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${title} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route_name} </i> </p>
       <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>
