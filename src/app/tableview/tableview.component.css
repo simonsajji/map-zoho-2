@@ -447,7 +447,7 @@
 
   .mat-tbl{
     width: 100vw!important;
-    height: calc(50vh - 60px)!important;
+    height: calc(55vh - 50px)!important;
     overflow: auto!important;
     overflow-y: hidden!important;
     overflow-x: scroll;
@@ -616,6 +616,7 @@
     white-space: ellipsis;
     /* overflow: hidden; */
     text-overflow: ellipsis!important;
+    font-size: 13px!important;
     /* vertical-align: middle; */
     
   }

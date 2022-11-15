@@ -34,13 +34,13 @@ interface TableMode {
   animations: [
    
     trigger('tableview', [
-      state('false', style({ bottom: '-45%' })),
-      state('true', style({ bottom: '-99%' })),
+      state('false', style({ bottom: '-40%' })),
+      state('true', style({ bottom: '-99.5%' })),
       transition('0 => 1', animate('.24s')),
       transition('1 => 0', animate('.24s'))
     ]),
     trigger('drawingmode', [
-      state('false', style({ bottom: '-99%' })),
+      state('false', style({ bottom: '-99.5%' })),
       state('true', style({ bottom: '-120%' })),
       transition('0 => 1', animate('.24s')),
       transition('1 => 0', animate('.24s'))

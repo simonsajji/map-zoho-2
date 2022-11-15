@@ -1,5 +1,5 @@
 import { LocationStrategy } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef,Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef, Renderer2 } from '@angular/core';
 import MarkerClusterer from '@googlemaps/markerclustererplus';
 import { isThisSecond } from 'date-fns';
 import { environment } from 'src/environments/environment';
@@ -18,6 +18,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LocationService } from '../services/location.service';
 import { Loader } from "@googlemaps/js-api-loader";
 import { DrawingService } from '../services/drawing.service';
+import {RouteviewComponent} from '../routeview/routeview.component'
 
 
 interface TableObj {
@@ -32,16 +33,16 @@ interface TableMode {
 @Component({
   selector: 'store-map',
   templateUrl: './store-map.component.html',
-  styleUrls: ['./store-map.component.css']
+  styleUrls: ['./store-map.component.css'],
 })
-export class StoreMapComponent implements OnInit,AfterViewInit {
+export class StoreMapComponent implements OnInit, AfterViewInit {
 
   @ViewChild('map', { static: false }) info: ElementRef | undefined;
   labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   positionOptions: TooltipPosition[] = ['after', 'before', 'above', 'below', 'left', 'right'];
   position = new FormControl(this.positionOptions[4]);
   mkrs: any = [];
-  shortestRte:any;
+  shortestRte: any;
   map: any;
   // directionsService = new google.maps.DirectionsService();
   directionsRenderer: any;
@@ -51,7 +52,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
   result: any;
   totalDistance: any;
   totalDuration: any;
-  infoWin: any ;
+  infoWin: any;
   wayPoints: any = [];
   shortestResult: any;
   pinSideMenu: boolean = false;
@@ -59,7 +60,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
   currentDate: any;
   displayTime: any;
   currentTime: any;
-  minTime:any;
+  minTime: any;
   @ViewChild('timepicker') timepicker: any;
   isOpen: any;
   formattedaddress = "";
@@ -81,210 +82,31 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
   selectedLocations: any = [];
   initiatedRoute: boolean = false;
   @ViewChild("sarea") sarea: any;
-  @ViewChild('mapContainer', {static: false}) gmap: ElementRef | any;
-
-  org = {
-    "Account_ID": 4693269000024893259,
-    "Address_Line_1": "100 Courtland Ave",
-    "Address_Line_2": null,
-    "Billable": false,
-    "COD": false,
-    "City": "Vaughan",
-    "Coin_Card_Location": "Card-Mitech",
-    "Collection_Frequency": null,
-    "Collector_ID": null,
-    "Country": "Canada",
-    "Created_By_ID": 4693269000000297001,
-    "Created_Time": "Wed, 23 Mar 2022 19:24:47 GMT",
-    "Dryer_Coinage": "0.00",
-    "Dryer_Time": "0.00",
-    "Dryers": 3,
-    "Effective_Date": null,
-    "External_Key": null,
-    "ID": 4693269000019033330,
-    "Last_Activity_Time": "Wed, 24 Aug 2022 17:05:51 GMT",
-    "Last_Collection_Date": "Tue, 14 Jul 2015 00:00:00 GMT",
-    "Latitude": "43.814206386",
-    "Location_ID": 1111111,
-    "Location_Name": "Sparkle Solutions",
-    "Location_Number": "1111111",
-    "Location_Quotes_ID": 4693269000026883296,
-    "Location_Status": "Active",
-    "Location_Super": null,
-    "Location_Super_Email": null,
-    "Location_Super_Phone": null,
-    "Location_Type": "Single Unit Building",
-    "Longitude": "-79.532818106",
-    "Modified_By_ID": 4693269000000297001,
-    "Modified_Time": "Wed, 24 Aug 2022 17:05:51 GMT",
-    "Next_Collection_Date": null,
-    "Notes": null,
-    "On_Hold": false,
-    "On_Route": false,
-    "Owner_ID": 4693269000000297001,
-    "PO_Needed": false,
-    "PO_Number": null,
-    "Parent_Account_ID": null,
-    "Phone_Number": null,
-    "Postal_Code": "L4K 3T6",
-    "Province": "Ontario",
-    "Refund": false,
-    "Refund_Amount": null,
-    "Rental": true,
-    "Route": null,
-    "Route_ID": null,
-    "Super_Address": null,
-    "Super_Amount": "0.00",
-    "Super_City": null,
-    "Super_Province": null,
-    "Super_Zip": null,
-    "Tag": "[{\"name\":\"Original\",\"id\":\"4693269000036006126\"}]",
-    "Unsubscribed_Mode": null,
-    "Unsubscribed_Time": null,
-    "Washer_Coinage": "0.00",
-    "Washers": 3,
-    "Zones": null
-}
+  @ViewChild('mapContainer', { static: false }) gmap: ElementRef | any;
   fetched_locations: any;
   initialLoader: any;
-  markerClusterer : any;
-  drawingManager:any;
-  listOfPolygons:any = [];
-  polygons = [
-    {
-        "gm_accessors_": {
-            "latLngs": null,
-            "strokeColor": null,
-            "strokeOpacity": null,
-            "strokeWeight": null,
-            "fillColor": null,
-            "fillOpacity": null,
-            "visible": null
-        },
-        "latLngs": {
-            "cd": [
-                {
-                    "cd": [
-                        {
-                            "lat": 45.449902902914836,
-                            "lng": -75.65056713347771
-                        },
-                        {
-                            "lat": 45.45929535326269,
-                            "lng": -75.62653454070427
-                        },
-                        {
-                            "lat": 45.43569083800319,
-                            "lng": -75.63237102752068
-                        }
-                    ],
-                    "gm_accessors_": {
-                        "length": null
-                    },
-                    "length": 3,
-                    "gm_bindings_": {
-                        "length": {}
-                    }
-                }
-            ],
-            "gm_accessors_": {
-                "length": null
-            },
-            "length": 1,
-            "gm_bindings_": {
-                "length": {}
-            }
-        },
-        "gm_bindings_": {
-            "latLngs": {},
-            "strokeColor": {},
-            "strokeOpacity": {},
-            "strokeWeight": {},
-            "fillColor": {},
-            "fillOpacity": {},
-            "visible": {}
-        },
-        "strokeColor": "#FF0000",
-        "strokeOpacity": 0.8,
-        "strokeWeight": 3,
-        "fillColor": "#FF0000",
-        "fillOpacity": 0.35,
-        "visible": true
-    },
-    {
-        "gm_accessors_": {
-            "latLngs": null,
-            "strokeColor": null,
-            "strokeOpacity": null,
-            "strokeWeight": null,
-            "fillColor": null,
-            "fillOpacity": null,
-            "visible": null
-        },
-        "latLngs": {
-            "cd": [
-                {
-                    "cd": [
-                        {
-                            "lat": 45.410871364269724,
-                            "lng": -75.69245250945427
-                        },
-                        {
-                            "lat": 45.41713750367575,
-                            "lng": -75.6667033029113
-                        },
-                        {
-                            "lat": 45.396890547837145,
-                            "lng": -75.67288311248161
-                        }
-                    ],
-                    "gm_accessors_": {
-                        "length": null
-                    },
-                    "length": 3,
-                    "gm_bindings_": {
-                        "length": {}
-                    }
-                }
-            ],
-            "gm_accessors_": {
-                "length": null
-            },
-            "length": 1,
-            "gm_bindings_": {
-                "length": {}
-            }
-        },
-        "gm_bindings_": {
-            "latLngs": {},
-            "strokeColor": {},
-            "strokeOpacity": {},
-            "strokeWeight": {},
-            "fillColor": {},
-            "fillOpacity": {},
-            "visible": {}
-        },
-        "strokeColor": "#FF0000",
-        "strokeOpacity": 0.8,
-        "strokeWeight": 3,
-        "fillColor": "#FF0000",
-        "fillOpacity": 0.35,
-        "visible": true
-    }
-  ];
-  fetchedPolygons:any = [];
-  shapeOverlay:any;
-  canvasMode:boolean = false;
-  allOverlays:any = [];
-  coordinates:any = [];
-  all_overlays:any = [];
-  selectedShape:any;
-  enableEditMode:boolean = false;
-  enableDeleteMode:boolean = false;
-  @ViewChild('deltip') deltip:any;
-  tipObj:any | null;
+  markerClusterer: any;
+  drawingManager: any;
+  listOfPolygons: any = [];
+  fetchedPolygons: any = [];
+  fetchedCoordinates: any = [];
+  shapeOverlay: any;
+  canvasMode: boolean = false;
+  allOverlays: any = [];
+  coordinates: any = [];
+  all_overlays: any = [];
+  selectedShape: any;
+  enableEditMode: boolean = false;
+  enableDeleteMode: boolean = false;
+  @ViewChild('deltip') deltip: any;
+  @ViewChild('menuchild') menuchild: any;
+  tipObj: any | null;
+  fetchedZones: any;
+  allTerritoriesLoaded:boolean = false;
+ 
 
-  constructor(private renderer:Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService,private drawingService:DrawingService) { }
+
+  constructor(private renderer: Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService) { }
 
   ngOnChanges() { }
 
@@ -295,23 +117,39 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
         this.initMap();
         this.initTable();
         this.makeClusters();
-        this.setDrawingManager();
+        this.callZonesApi();
+        
+
 
       });
   }
 
+  callZonesApi() {
+    this.apiService.get(`${environment?.coreApiUrl}/zones`).subscribe(
+      (res: any) => {
+        console.log(res[0].data);
+        this.fetchedZones = res[0].data;
+        this.setDrawingManager();
+
+
+      }
+    )
+
+  }
+
   ngOnInit() {
+    this.allTerritoriesLoaded = false;
     const loader = new Loader({
       apiKey: "AIzaSyDHDZE9BzqQu0UUT_TuaS0pBzTbCoHEPJs",
-      libraries: ['drawing','places','geometry','visualization'],
-      language:"en"
+      libraries: ['drawing', 'places', 'geometry', 'visualization'],
+      language: "en"
     });
-    
+
     this.locationService.getSelectedPoints().subscribe((item: any) => {
       this.selectedLocations = item;
     });
 
-    this.drawingService.getDrawMode().subscribe((item:any)=>{
+    this.drawingService.getDrawMode().subscribe((item: any) => {
       this.canvasMode = item;
     })
     this.initialLoader = true;
@@ -322,13 +160,14 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
         center: { lat: 43.651070, lng: -79.347015 },
         gestureHandling: 'greedy',
         streetViewControl: false,
+        fullscreenControl: false
       });
     });
 
-   
-   
-    this.origin = this.org;
-    this.destination = this.org;
+
+
+    this.origin = environment?.org;
+    this.destination = environment?.org;
     this.currentDate = new Date();
     this.currentTime = this.formatAMPM(new Date());
     this.displayTime = this.formatAMPM(new Date());
@@ -337,370 +176,352 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
     this.callFnApi();
   }
 
-  ngAfterViewInit(): void {}
+  ngAfterViewInit(): void { }
 
   initTable() {
     this.dataSource = new MatTableDataSource<any>(this.fetched_locations?.data);
-    this.displayedColumns = ['Location_Name', 'Route','On_Route', 'Billable', 'Location_Type', 'On_Hold' ,'Rental', 'Washers', 'Dryers' , 'Coin_Card_Location', 'Address_Line_1',
-    'Address_Line_2','City', 'Distance'];
+    this.displayedColumns = ['Location_Name', 'Route', 'On_Route', 'Billable', 'Location_Type', 'On_Hold', 'Rental', 'Washers', 'Dryers', 'Coin_Card_Location', 'Address_Line_1',
+      'Address_Line_2', 'City', 'Distance'];
     // this.displayedColumns.unshift('op','select');
     this.displayedColumns.unshift('select');
   }
 
   initMap() {
     this.fetched_locations?.data?.map((location: any) => {
-      if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.ID), location?.Route)
+      if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_ID), location?.Route)
     });
     this.initialLoader = false;
-  
-
-    if(this.polygons.length>0){
-      this.polygons.map((item:any,idx:any)=>{
-        let poly =  new google.maps.Polygon({
-          paths: item?.latLngs?.cd?.[0]?.cd,
-          strokeColor: '#6476de',
-          strokeOpacity: 0.8,
-          strokeWeight: 3,
-          fillColor: '#6476de',
-          fillOpacity: 0.35
-        });
-         poly.setMap(this.map);
-         this.fetchedPolygons.push(poly)
-      })
-    }
-  //  this.polygons[0].latLngs?.cd?.[0]?.cd.forEach((item:any,idx:any)=>{
-  //   console.log(item)
-  //  })
- 
-
-  this.fetchedPolygons.map((poly:any,idx:any)=>{
-    for (var i = 0; i < this.mkrs.length; i++) {
-      if (google.maps.geometry.poly.containsLocation(this.mkrs[i].getPosition(), poly)) {
-        console.log(this.mkrs[i].location_id)
-      }
-    }
-
-  })
-
-  
-    
-
-    
   }
 
-  polygonChanged(poly:any,newLatLngs:any){
-    console.log(poly);
-    console.log(this.listOfPolygons)
-    this.listOfPolygons.map((item:any,idx:any)=>{
-     if(poly?.id == this.listOfPolygons[idx].id){
-      this.listOfPolygons[idx]?.polygn?.setPath(newLatLngs);
-     }
-    })
-    console.log(this.listOfPolygons)
-    
-    // console.log("polygon changed",poly.latLngs.cd?.[0]?.cd);
-  //   console.log(this.listOfPolygons)
-  //   let polygn = new google.maps.Polygon({
-  //     paths: poly?.polygn?.getPaths().getArray(),
-  //     draggable:true,
-  //     clickable:true,
-  //     editable:true,
-  //     strokeColor: '#FF0000',
-  //     strokeOpacity: 0.8,
-  //     strokeWeight: 3,
-  //     fillColor: '#FF0000',
-  //     fillOpacity: 0.35
-  //   });
-  //   poly?.polygn?.setMap(null)
-  //  polygn.setMap(this.map);
-  // this.listOfPolygons.push({id : this.listOfPolygons.length,polygn: polygn})
-  // console.log(this.listOfPolygons)
-     
-  }
-
-  // zoneCreation(){
-  //   this.setDrawingManager();
-  //   google.maps.event.addListener(this.drawingManager, 'overlaycomplete', (event:any)=> {
-  //     var poly = event.overlay.getPath();
-  //     if (event.type == 'polygon') {
-      
-
-  //       this.shapeOverlay = event?.overlay;
-  //       this.allOverlays.push(event?.overlay)
-  //       console.log(this.allOverlays)
-  //       console.log(event?.type)
-       
-  //       let polygn = new google.maps.Polygon({
-  //         paths: event.overlay.getPath().getArray(),
-  //         draggable:true,
-  //         clickable:true,
-  //         editable:true,
-  //         strokeColor: '#a094d1',
-  //         strokeOpacity: 0.8,
-  //         strokeWeight: 3,
-  //         fillColor: '#6753b8',
-  //         fillOpacity: 0.35
-  //       });
-  //       let paths = polygn?.getPaths();
-  //       for (let p = 0; p < paths.getLength(); p++) {
-
-  //           google.maps.event.addListener(paths.getAt(p), 'insert_at', () => {
-  //             console.log('We inserted a point');
-  //             polygn?.setPath(paths.getAt(p));
-  //             this.listOfPolygons.push({id:this.listOfPolygons.length,polygn:polygn})
-  
-  //           });
-      
-  //           google.maps.event.addListener(paths.getAt(p), 'remove_at', () => {
-  //             console.log('We removed a point');
-     
-  //           });
-      
-  //           google.maps.event.addListener(paths.getAt(p), 'set_at', () => {
-  //             console.log('We set a point');
-         
-  //           });
-  //         }
-
-  //       this.listOfPolygons?.push({id:this.listOfPolygons.length,polygn: polygn});
-  //       this.listOfPolygons.map((poly:any,idx:any)=>{
-  //         let paths = poly?.polygn?.getPaths();
-  //         console.log(paths);
-  //         poly?.polygn.setMap(this.map)
-         
-  //       })
-      
-
-  //       google.maps.event.addListener(event?.overlay,'click',()=>{
-  //         this.setSelectedShape(event?.overlay)
-  //       });
-
-       
-
-  //     }
-  //   });
-  // }
-
-  enableEditingMode(){
-    this.listOfPolygons.map((shape:any,idx:any)=>{
+  enableEditingMode() {
+    this.listOfPolygons.map((shape: any, idx: any) => {
       shape?.polygn?.setEditable(true);
     });
-    this.fetchedPolygons.map((item:any,idx:any)=>{
+    this.fetchedPolygons.map((item: any, idx: any) => {
       item.setEditable(true)
     })
   }
-  disableEditingMode(){
-    this.listOfPolygons.map((shape:any,idx:any)=>{
+  disableEditingMode() {
+    this.listOfPolygons.map((shape: any, idx: any) => {
       shape.polygn?.setEditable(false);
     });
-    this.fetchedPolygons.map((item:any,idx:any)=>{
+    this.fetchedPolygons.map((item: any, idx: any) => {
       item.setEditable(false)
     })
   }
 
-  saveTerritory(){
-    this.drawingService.setDrawMode(false);
-    console.log(this.listOfPolygons[this.listOfPolygons.length -1])
-    console.log(this.listOfPolygons);
-    // for (var i = 0; i < this.mkrs.length; i++) {
-    //     if (google.maps.geometry.poly.containsLocation(this.mkrs[i].getPosition(), this.listOfPolygons[this.listOfPolygons.length -1])) {
-    //       console.log(this.mkrs[i])
-    //     }
-    //   }
-      // this.listOfPolygons[this.listOfPolygons.length - 1]?.setEditable(false);
-      // this.shapeOverlay.setEditable(false);
-      this.shapeOverlay.setOptions({
-        strokeColor: '#a094d1',
-        fillColor: '#6753b8'
-      })
-      // this.listOfPolygons[this.listOfPolygons.length - 1]?.setMap(this.map);
-      this.canvasMode = false;
-      this.drawingService.setDrawMode(false);
-      this.drawingManager.setMap(null);
-      console.log(this.allOverlays);
-
-     
-
-      
-
-  }
-
-  setCanvas(){
+  setCanvas() {
     console.log(this.canvasMode);
     this.canvasMode = true;
 
   }
 
-  unSetCanvas(){
+  unSetCanvas() {
     this.canvasMode = false;
     this.drawingService.setDrawMode(false);
 
+    // Need to delete the unsaved territories also.
+
+
   }
 
-  setDrawingManager(){
-    if(this.drawingManager) this.resetDrawingManager();
-    else{
+  setDrawingManager() {
+    if (this.drawingManager) this.resetDrawingManager();
+    else {
       this.drawingManager = new google.maps.drawing.DrawingManager({
-        drawingControlOptions:{
+        drawingControlOptions: {
           drawingModes: [
             google.maps.drawing.OverlayType.POLYLINE,
             google.maps.drawing.OverlayType.POLYGON
           ]
-         
+
         },
-        polygonOptions:{
-          clickable:true,
-          draggable:false,
-          editable:true,
-          fillColor:'#285ec9',
-          fillOpacity:0.3,
-          strokeColor:'#285ec9'
-  
+        polygonOptions: {
+          clickable: true,
+          draggable: false,
+          editable: true,
+          fillColor: '#285ec9',
+          fillOpacity: 0.3,
+          strokeColor: '#285ec9'
+
         },
-        polylineOptions:{
-          clickable:true,
-          draggable:true,
-          editable:true,
+        polylineOptions: {
+          clickable: true,
+          draggable: true,
+          editable: true,
         }
       });
       this.drawingManager.setMap(this.map);
-     
+      this.fetchedZones.map((item: any, idx: any) => {
+        if (item?.Geocord) {
+          var latlngs = item.Geocord.split('\r\n');
+          latlngs = latlngs.map((item: any, id: any) => {
+            let latLng = item.split(',');
+            latLng = latLng.map((point: any) => { return parseFloat(point) });
+            return latLng;
+          })
+          item.geocoords = latlngs;
+        }
+      });
+      console.log(this.fetchedZones)
       console.log("the drawing manager is set new");
-      google.maps.event.addListener(this.drawingManager,'polygoncomplete',(event:any)=>{
+      google.maps.event.addListener(this.drawingManager, 'polygoncomplete', (event: any) => {
         event?.getPath().getLength();
         console.log(event);
         this.setFreehandMode();
-        this.listOfPolygons.push({id:this.listOfPolygons.length, polygon:event});
-        this.listOfPolygons.forEach((poly:any,idx:any)=>{
-          if(poly?.polygon){
-            google.maps.event.addListener(poly?.polygon, 'click',  ()=> {
-              if(this.enableDeleteMode){
+        this.listOfPolygons.push({ id: this.listOfPolygons.length, polygon: event });
+        this.listOfPolygons.forEach((poly: any, idx: any) => {
+          if (poly?.polygon) {
+            google.maps.event.addListener(poly?.polygon, 'click', () => {
+              if (this.enableDeleteMode) {
                 poly?.polygon?.setMap(null);
-                if(poly?.polygon) poly.polygon = null;
+                if (poly?.polygon) poly.polygon = null;
               }
-             else this.setSelection(event);
+              else this.setSelection(event);
             });
-            
+
           }
-         
-            
-            console.log(this.listOfPolygons)
-  
-          
+          console.log(this.listOfPolygons)
         })
-        google.maps.event.addListener(event,'dragend',this.getPolygonCoords)
-        google.maps.event.addListener(event.getPath(),'insert_at',()=>{
-          this.coordinates.splice(0,this.coordinates?.length);
+        google.maps.event.addListener(event, 'dragend', this.getPolygonCoords)
+        google.maps.event.addListener(event.getPath(), 'insert_at', () => {
+          this.coordinates.splice(0, this.coordinates?.length);
           let len = event?.getPath().getLength();
-          for(let i=0;i<len;i++){
+          for (let i = 0; i < len; i++) {
             this.coordinates.push(event.getPath().getAt(i).toUrlValue(5))
           }
           console.log(this.coordinates);
           console.log(this.listOfPolygons)
         })
-        google.maps.event.addListener(event.getPath(),'set_at',()=>{
-          this.coordinates.splice(0,this.coordinates?.length);
+        google.maps.event.addListener(event.getPath(), 'set_at', () => {
+          this.coordinates.splice(0, this.coordinates?.length);
           let len = event?.getPath().getLength();
-          for(let i=0;i<len;i++){
+          for (let i = 0; i < len; i++) {
             this.coordinates.push(event.getPath().getAt(i).toUrlValue(5))
           }
         })
-        
         console.log(this.coordinates);
-
       })
-      google.maps.event.addListener(this.drawingManager, 'overlaycomplete',  (event:any)=> {
+      google.maps.event.addListener(this.drawingManager, 'overlaycomplete', (event: any) => {
         this.all_overlays.push(event);
         if (event.type !== google.maps.drawing.OverlayType.MARKER) {
-            // this.drawingManager.setDrawingMode(null);
+          // this.drawingManager.setDrawingMode(null);
 
-            // var newShape = event.overlay;
-            // newShape.type = event.type;
-            // google.maps.event.addListener(newShape, 'click',  ()=> {
-            //     this.setSelection(newShape);
-            // });
-            // this.setSelection(newShape);
+          // var newShape = event.overlay;
+          // newShape.type = event.type;
+          // google.maps.event.addListener(newShape, 'click',  ()=> {
+          //     this.setSelection(newShape);
+          // });
+          // this.setSelection(newShape);
         }
-    })
-
-    // fetchedPolygons 
-
-    this.fetchedPolygons.forEach((poly:any,idx:any)=>{
-      console.log(poly);
-      poly.setEditable(true)
-      google.maps.event.addListener(poly,'dragend',this.getPolygonCoords)
-        google.maps.event.addListener(poly.getPath(),'insert_at',()=>{
-          this.coordinates.splice(0,this.coordinates?.length);
-          let len = poly?.getPath().getLength();
-          for(let i=0;i<len;i++){
-            this.coordinates.push(poly.getPath().getAt(i).toUrlValue(5))
-          }
-          console.log(this.coordinates);
-          console.log(this.fetchedPolygons)
-        })
-        google.maps.event.addListener(poly.getPath(),'set_at',()=>{
-          this.coordinates.splice(0,this.coordinates?.length);
-          let len = poly?.getPath().getLength();
-          for(let i=0;i<len;i++){
-            this.coordinates.push(poly.getPath().getAt(i).toUrlValue(5))
-          }
-        })
-        console.log(this.fetchedPolygons)
-    })
-
+      });
+      this.setPolygonsfromDB();
+      this.allTerritoriesLoaded = true;
     }
-   
+    this.hideAllZonesinCanvas();
   }
 
-  saveZones(){
-    this.listOfPolygons.forEach((poly:any,idx:any)=>{
+  setPolygonsfromDB() {
+    this.fetchedZones.map((zone: any, idx: any) => {
+      if (zone?.geocoords?.length > 0 && zone?.geocoords) {
+        let geo = zone?.geocoords;
+        let zoneColor;
+        (zone?.Color) ? zoneColor = zone?.Color : zoneColor = 'gray';
+        console.log(zone?.Color)
+        let points = [];
+        for (let i = 0; i < zone?.geocoords.length; i++) {
+          if (zone?.geocoords[i][0] && zone?.geocoords[i][1]) points.push({ lat: zone?.geocoords[i][0], lng: zone?.geocoords[i][1] });
+        }
+        console.log(points);
+        if (points.length > 0) {
+          let polygon = new google.maps.Polygon({
+            paths: points,
+            draggable: false,
+            clickable: true,
+            editable: false,
+            strokeColor: zoneColor,
+            strokeOpacity: 0.6,
+            strokeWeight: 3,
+            fillColor: zoneColor,
+            fillOpacity: 0.4,
+          });
+          let bounds = new google.maps.LatLngBounds();
+          for (let i = 0; i < points.length; i++) {
+            bounds.extend(points[i]);
+          }
+          let  infoWindow = new google.maps.InfoWindow();
+          infoWindow.setContent(zone?.Name);
+          infoWindow.setPosition(bounds.getCenter());
+          let posobj = bounds.getCenter();
+          let marker: any = new google.maps.Marker({
+            position: posobj,
+            map: this.map,
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 0
+          },
+            label: { text: zone?.Name, color: zone.Color, fontSize: "18px", fontWeight: '600', className: 'marker-position-zones',fontFamily:'Trebuchet' },
+            opacity:0.65
+      
+          });
+          marker.setMap(null);
+          this.fetchedPolygons.push({ id: idx, polygon: polygon ,name:zone?.Name,info:infoWindow,centerPosition:bounds.getCenter(),marker:marker});
+          
+        }
+      }
+    })
+    console.log(this.fetchedPolygons)
+    // fetchedPolygons need to be added to listener events
+
+    if (this.fetchedPolygons.length > 0) {
+      this.fetchedPolygons.forEach((poly: any, idx: any) => {
+        console.log(poly);
+
+        if (poly?.polygon) {
+          poly?.polygon.setMap(this.map)
+          poly.polygon?.setEditable(true);
+          google.maps.event.addListener(poly?.polygon, 'dragend', this.getPolygonCoords)
+          google.maps.event.addListener(poly?.polygon?.getPath(), 'insert_at', () => {
+            // this.coordinates.splice(0,this.coordinates?.length);
+            let len = poly?.polygon?.getPath().getLength();
+            // for(let i=0;i<len;i++){
+            //   this.coordinates.push(poly.polygon.getPath().getAt(i).toUrlValue(5))
+            // }
+            console.log(this.coordinates);
+            console.log(this.fetchedPolygons)
+          })
+          google.maps.event.addListener(poly?.polygon.getPath(), 'set_at', () => {
+            // this.coordinates.splice(0,this.coordinates?.length);
+            let len = poly?.polygon.getPath().getLength();
+            // for(let i=0;i<len;i++){
+            //   this.coordinates.push(poly?.polygon.getPath().getAt(i).toUrlValue(5))
+            // }
+            console.log(this.fetchedPolygons)
+          });
+          
+          google.maps.event.addListener(poly?.polygon, 'click',  (e:any)=> {
+              // poly?.info.open(this.map);
+              poly?.marker.setMap(this.map)
+              var bounds = new google.maps.LatLngBounds();
+              poly?.polygon.getPath().forEach( (element:any, index:any) =>{ bounds.extend(element); })
+              this.map.fitBounds(bounds);
+          });
+          for (var i = 0; i < this.mkrs.length; i++) {
+            if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), poly?.polygon)) {
+              console.log(this.mkrs[i].location_id)
+            }
+          }
+        }
+        console.log(this.fetchedPolygons);
+      });
+    }
+  }
+
+  jumptoPolygon(zone:any){
+    this.fetchedPolygons.map((poly:any,idx:any)=>{
+      if(zone?.id == poly?.id){
+        // poly?.marker.setMap(this.map)
+        var bounds = new google.maps.LatLngBounds();
+        poly?.polygon.getPath().forEach( (element:any, index:any) =>{ bounds.extend(element); })
+        this.map.fitBounds(bounds);
+      }
+    })
+  }
+
+  showPolygon(zone:any){
+    this.fetchedPolygons.map((poly:any,idx:any)=>{
+      if(zone?.id == poly?.id && zone?.polygon){
+        poly?.polygon.setMap(this.map)
+        poly?.marker.setMap(this.map)
+        var bounds = new google.maps.LatLngBounds();
+        poly?.polygon.getPath().forEach( (element:any, index:any) =>{ bounds.extend(element); })
+        this.map.fitBounds(bounds);
+      }
+    })
+
+  }
+  hidePolygon(zone:any){
+    this.fetchedPolygons.map((poly:any,idx:any)=>{
+      if(zone?.id == poly?.id){
+        if (zone?.polygon) zone?.polygon.setMap(null);
+        if (zone?.polygon) zone?.marker.setMap(null);
+      }
+    })
+
+  }
+
+  viewAllZonesinCanvas() {
+    this.listOfPolygons.map((shape: any, idx: any) => {
+      if (shape?.polygon) shape?.polygon?.setEditable(true);
+      if (shape?.polygon) shape?.polygon?.setMap(this.map);
+    });
+    this.fetchedPolygons.map((item: any, idx: any) => {
+      item.polygon.setEditable(false);
+      if (item?.polygon) item?.polygon.setMap(this.map);
+      // if (item?.polygon) item?.marker.setMap(this.map);
+    })
+  }
+  hideAllZonesinCanvas() {
+    this.listOfPolygons.map((shape: any, idx: any) => {
+      if (shape?.polygon) shape?.polygon?.setEditable(false);
+      if (shape?.polygon) shape?.polygon?.setMap(null);
+    });
+    this.fetchedPolygons.map((item: any, idx: any) => {
+      item.polygon.setEditable(false);
+      if (item?.polygon) item?.polygon.setMap(null);
+      if (item?.polygon) item?.marker.setMap(null);
+    })
+  }
+
+  saveZones() {
+    this.listOfPolygons.forEach((poly: any, idx: any) => {
       poly?.polygon.setEditable(false);
     });
     this.unSetCanvas();
   }
 
-  setPolygonDrawingMode(){
-   if(this.drawingManager) this.drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
+  setPolygonDrawingMode() {
+    if (this.drawingManager) this.drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
   }
 
-  setFreehandMode(){
-    if(this.drawingManager) this.drawingManager.setDrawingMode(null);
+  setFreehandMode() {
+    if (this.drawingManager) this.drawingManager.setDrawingMode(null);
 
   }
 
-  deleteModeToggle(){
+  deleteModeToggle() {
     this.enableDeleteMode = !this.enableDeleteMode;
-    if(this.enableDeleteMode) this.toastr.info('Delete Mode is ON');
+    if (this.enableDeleteMode) this.toastr.info('Delete Mode is ON');
     else this.toastr.info('Delete Mode is OFF');
- 
+
   }
 
 
-  editModeToggle(){
+  editModeToggle() {
     this.enableEditMode = !this.enableEditMode;
-    this.listOfPolygons.forEach((poly:any,idx:any)=>{
-      if(this.enableEditMode)  poly?.polygon.setEditable(true);
+    this.listOfPolygons.forEach((poly: any, idx: any) => {
+      if (this.enableEditMode) poly?.polygon.setEditable(true);
     })
-    if(this.enableEditMode){
+    if (this.enableEditMode) {
       this.toastr.info('Edit Mode is ON');
-     
-    } 
+
+    }
     else this.toastr.info('Edit Mode is OFF')
   }
 
-  getPolygonCoords(newShape:any){
+  getPolygonCoords(newShape: any) {
     this.coordinates.splice(0, this.coordinates.length)
 
-      var len = newShape.getPath().getLength();
+    var len = newShape.getPath().getLength();
 
-      for (var i = 0; i < len; i++) {
-          this.coordinates.push(newShape.getPath().getAt(i).toUrlValue(6))
-      }
-      return this.coordinates;
+    for (var i = 0; i < len; i++) {
+      this.coordinates.push(newShape.getPath().getAt(i).toUrlValue(6))
+    }
+    return this.coordinates;
 
   }
 
-  setSelection(newShape:any){
+  setSelection(newShape: any) {
     // this.clearSelection();
     // this.stopDrawing()
     this.selectedShape = newShape;
@@ -709,54 +530,53 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
 
   }
 
-  resetDrawingManager(){
+  resetDrawingManager() {
     this.drawingManager.setOptions({
-      drawingControlOptions:{
-        position:google.maps.ControlPosition.LEFT_CENTER,
+      drawingControlOptions: {
         drawingModes: [
           google.maps.drawing.OverlayType.POLYLINE,
           google.maps.drawing.OverlayType.POLYGON
         ]
       },
-      polygonOptions:{
-        clickable:true,
-        draggable:false,
-        editable:true,
-        fillColor:'#285ec9',
-        fillOpacity:0.3,
-        strokeColor:'#285ec9'
+      polygonOptions: {
+        clickable: true,
+        draggable: false,
+        editable: true,
+        fillColor: '#285ec9',
+        fillOpacity: 0.3,
+        strokeColor: '#285ec9'
 
       },
-      polylineOptions:{
-        clickable:true,
-        draggable:true,
-        editable:true,
+      polylineOptions: {
+        clickable: true,
+        draggable: true,
+        editable: true,
       }
     })
-    
+
     this.drawingManager.setMap(this.map);
-    
+
   }
 
-  setSelectedShape(shapeoverlay:any){
+  setSelectedShape(shapeoverlay: any) {
     this.drawingManager.setDrawingMode(null);
     this.shapeOverlay = shapeoverlay;
   }
 
-  clearSelection(){
+  clearSelection() {
     this.drawingManager.setDrawingMode(null);
-    if(this.shapeOverlay){
+    if (this.shapeOverlay) {
       console.log("clearing the selected shap[e");
-      this.listOfPolygons[this.listOfPolygons.length-1] = null;
+      this.listOfPolygons[this.listOfPolygons.length - 1] = null;
       this.shapeOverlay.setMap(null);
-      
+
 
     }
-    this.listOfPolygons.splice(0,this.listOfPolygons.length);
+    this.listOfPolygons.splice(0, this.listOfPolygons.length);
 
   }
 
- stopDrawing() {
+  stopDrawing() {
     // this.drawingManager.setMap(null);
     this.canvasMode = false;
     this.clearSelection();
@@ -764,7 +584,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
     this.drawingManager.setDrawingMode(null);
     this.drawingManager.setMap(null)
   }
-  
+
 
   public AddressChange(address: any) {
     this.formattedaddress = address.formatted_address;
@@ -833,7 +653,7 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
     // this.initialLoader = true;
     let date = event.value || event;
     this.displayDate = date;
-   
+
     const yyyy = date.getFullYear();
     let mm: any = date.getMonth() + 1; // Months start at 0!
     let dd: any = date.getDate();
@@ -869,11 +689,11 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
       labelOrigin: new google.maps.Point(-30, 10),
     };
     let obj = position;
-    let marker:any = new google.maps.Marker({
+    let marker: any = new google.maps.Marker({
       position: obj,
       map: this.map,
       icon: markerIcon,
-      label: { text: title, color: "#1440de", fontSize: "11px", fontWeight: '600', className: 'marker-position'},
+      label: { text: title, color: "#1440de", fontSize: "11px", fontWeight: '600', className: 'marker-position' },
 
     });
     marker['location_id'] = loc_id;
@@ -908,27 +728,27 @@ export class StoreMapComponent implements OnInit,AfterViewInit {
 
     });
     this.alignMaptoCenter();
-   
+
   }
 
-  alignMaptoCenter(){
-    this.map.setCenter( { lat: 43.651070, lng: -79.347015 });
+  alignMaptoCenter() {
+    this.map.setCenter({ lat: 43.651070, lng: -79.347015 });
     // this.map.setZoom(13)
   }
 
-  clearCluster(){
+  clearCluster() {
     this.markerClusterer.setMap(null);
     this.markerClusterer.clearMarkers();
   }
 
-  enableLoader(){
+  enableLoader() {
     this.initialLoader = true;
   }
-  disableLoader(){
+  disableLoader() {
     this.initialLoader = false;
   }
 
-  showBuildedRoute(ev:any){
+  showBuildedRoute(ev: any) {
     this.showRoutes = ev;
   }
 

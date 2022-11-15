@@ -116,3 +116,9 @@ html, body {
   padding: 10px!important;
 }
 
+::placeholder {
+  color: rgb(179, 179, 179);
+  opacity: 1; /* Firefox */
+}
+
+

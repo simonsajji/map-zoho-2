@@ -332,14 +332,14 @@
     top:6px;
     left:6px;
     width: 40vw;
-    height: 45px;
+    height: 50px;
     z-index: 1000!important;
-    background-color: rgb(251, 251, 251);
-    border: 0.01rem solid rgb(152, 152, 152);
-    border-radius: 10px;
-    box-shadow: rgba(0, 0, 0, 0.44) 0px 3px 8px;
-    box-shadow: rgba(0, 0, 0, 0.55) 0px 5px 15px;
-    box-shadow: rgba(14, 30, 37, 0.22) 0px 2px 4px 2px, rgba(14, 30, 37, 0.32) 0px 2px 16px 1px;
+    border: 0.02rem solid rgb(204, 204, 204);
+    border-radius: 10px!important;
+    border-top-left-radius: 10px!important;
+    background-color: white;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.25) 0px 2px 2px 1px;
+
 
  }
 
@@ -350,10 +350,13 @@
     border: 0;
     outline: 0!important;
     z-index: 1000!important;
-    background-color: rgb(251, 251, 251);
     padding-left: 10px;
     font-weight: 500;
     
+ }
+
+ .searchArea > i{
+  background-color: white!important;
  }
 
  .hor-line{
@@ -589,6 +592,21 @@
     overflow: hidden;
     text-overflow: ellipsis!important;
 }
+  .marker-position-zones {
+    bottom: 6px;
+    left: -20%;
+    position: relative;
+    width: 60px!important;
+    word-wrap: initial;
+    display: flex;
+    padding-left:10px;
+    padding-right:10px;
+    line-break: unset;
+    white-space: wrap!important;
+    overflow: hidden;
+    text-overflow: ellipsis!important;
+    opacity: 0.7;
+}
 
 .btn-row{
   background-color: rgba(255, 255, 255,1)!important;
@@ -606,12 +624,37 @@
 
 }
 
-.zone-cancel-btn:hover{
+.zone-cancel-btn{
+  background-color: #c82a2a;
+  color:rgb(230, 230, 230);
+  border: none;
+  outline: none;
+  width: 50px!important;
+  height: 50px!important;
+  border-radius: 50%;
+  opacity:0.95;
+
+
+}
+.zone-save-btn{
+  background-color:#285bc9;
+  color:rgb(246, 246, 246);
+  border: none;
+  outline: none;
+  width: 55px!important;
+  height: 50px!important;
+  border-radius: 50%;
+  opacity:0.95;
+
+
+}
+
+/* .zone-cancel-btn:hover{
   color:rgb(206, 0, 0)!important;
 }
 .zone-save-btn:hover{
   color:#0044cb!important;
-}
+} */
 
 
 .green-signal{
@@ -624,6 +667,7 @@
   border-radius: 50%;
 
 }
+
 
 .custom-mat-mini-fab {
   width: 38px;
@@ -681,4 +725,43 @@
   50% {
     opacity: 0;
   }
+}
+
+.popout-menu{
+  width: 100px;
+  position: absolute;
+  z-index: 1000;
+  left: -270%;
+  top:20%;
+}
+
+.popout-menu > button{
+  background-color: rgba(54, 54, 54, 0.6);
+  color:rgb(236, 235, 235);
+  outline: none;
+  border: none;
+}
+
+.popout-menu :first-child{
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+.popout-menu :last-child{
+  border-right:0;
+}
+
+.cancel-drawing-btn{
+  color:rgb(221, 20, 20);
+
+}
+.save-drawing-btn{
+  color:rgb(2, 89, 219);
+
+}
+
+.zone-btn-grp{
+  background-color: rgba(255, 255, 255, 0.597);
+  padding: 15px;
+  border-bottom-left-radius:30px;
+  border-bottom-right-radius: 30px;
 }

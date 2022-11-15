@@ -28,13 +28,13 @@ interface ViewObj {
   animations: [
     trigger('navigation', [
       state('false', style({ right: '0%' })),
-      state('true', style({ right: '-20%' })),
+      state('true', style({ right: '-22%' })),
       transition('0 => 1', animate('.24s')),
       transition('1 => 0', animate('.24s'))
     ]),
     trigger('drawingmode', [
       state('false', style({ right: '0%' })),
-      state('true', style({ right: '-40%' })),
+      state('true', style({ right: '-44%' })),
       transition('0 => 1', animate('.24s')),
       transition('1 => 0', animate('.24s'))
     ])
@@ -96,6 +96,9 @@ export class RouteviewComponent implements OnInit, OnChanges {
   @Input('origin') origin: any;
   @Input('destination') destination: any;
   @Input('map') map: any;
+  @Input('allTerritoriesLoaded') allTerritoriesLoaded: any;
+  @Input('polygonsatDb') polygonsatDb: any;
+  @Input('fetchedZones')  fetchedZones: any;
   @ViewChild('timepicker') timepicker: any;
   initialLoader: boolean = false;
   wypntMarkers: any;
@@ -107,6 +110,15 @@ export class RouteviewComponent implements OnInit, OnChanges {
   ];
   selectedViewMode = this.viewObjects[0].value;
   enableDrawingMode:boolean = false;
+  selectedTerritories:any = [];
+  zone_list:any = ['Territory-1'];
+  pagedList: []= [];
+  // MatPaginator Inputs
+  length: number = 0;
+  pageSize: number = 3;  //displaying three cards each row
+  pageSizeOptions: number[] = [3, 6, 9, 12];
+  start:any;
+  end:any;
 
   @Output('clearClusters') clearClusters = new EventEmitter();
   @Output('addClusters') addClusters = new EventEmitter();
@@ -114,12 +126,21 @@ export class RouteviewComponent implements OnInit, OnChanges {
   @Output('disableInitialLoader') disableInitialLoader = new EventEmitter();
   @Output('showBuildRoute') showBuildRoute = new EventEmitter();
   @Output('initZoneCreation') initZoneCreation = new EventEmitter();
+  @Output('showZones') showZones = new EventEmitter();
+  @Output('hideZones') hideZones = new EventEmitter();
+  @Output('jumpPolygonEvent') jumpPolygonEvent = new EventEmitter();
+  @Output('viewSinglePolygon') viewSinglePolygon = new EventEmitter();
+  @Output('hideSinglePolygon') hideSinglePolygon = new EventEmitter();
+
 
   constructor(private locationService: LocationService,private drawingService:DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) { }
 
   ngOnInit(): void {
     this.routesModeView = true;
     this.zonesModeView = false;
+    this.start = 0;
+    this.end = 3;
+    
     this.directionsService = new google.maps.DirectionsService();
     this.infoWin = new google.maps.InfoWindow();
     this.locationService.getSelectedPoints().subscribe((item: any) => {
@@ -151,9 +172,6 @@ export class RouteviewComponent implements OnInit, OnChanges {
     this.navigation = !this.navigation;
     this.showOverlay = !this.showOverlay;
   }
-
-
-
 
   deleteWaypoint(loc: any) {
     this.selectedLocations.map((item: any, idx: any) => {
@@ -797,10 +815,12 @@ export class RouteviewComponent implements OnInit, OnChanges {
     if(this.selectedViewMode == 'zonesview'){
       this.zonesModeView = true;
       this.routesModeView = false;
+      // this.showZones.emit();
     }
     else{
       this.routesModeView = true;
       this.zonesModeView = false;
+      this.hideZones.emit();
     }
   }
 
@@ -809,6 +829,56 @@ export class RouteviewComponent implements OnInit, OnChanges {
     this.enableDrawingMode = true;
     this.drawingService.setDrawMode(true)
     this.initZoneCreation.emit();
+  }
+
+  OnPageChange(event: any){
+    let startIndex = event.pageIndex * event.pageSize;
+    let endIndex = startIndex + event.pageSize;
+    if(endIndex > this.polygonsatDb.length){
+      endIndex = this.polygonsatDb.length;
+    }
+   this.start = startIndex;
+   this.end = endIndex;
+  }
+
+  territorylistChange(ev:any,zone:any){
+    console.log(ev,zone);
+    if(ev){
+      this.viewSinglePolygon.emit(zone);
+      this.polygonsatDb.map((item:any,idx:any)=>{
+        if(zone?.id == item?.id) item.checked = true;
+      })
+    }
+    else{
+      this.hideSinglePolygon.emit(zone);
+      this.polygonsatDb.map((item:any,idx:any)=>{
+        if(zone?.id == item?.id) item.checked = false;
+      })
+    }
+
+  
+    console.log(this.selectedTerritories)
+  }
+
+  polygonClicktoJump(ev:any,poly:any){
+    console.log(event);
+    this.jumpPolygonEvent.emit(poly);
+
+  }
+
+  showAllZones(){
+    this.polygonsatDb.map((item:any,idx:any)=>{
+      if(item) item.checked = true;
+    });
+    this.showZones.emit();
+
+  }
+
+  hideAllZones(){
+    this.polygonsatDb.map((item:any,idx:any)=>{
+      if(item) item.checked = false;
+    });
+    this.hideZones.emit();
   }
 
 }

@@ -25,49 +25,46 @@
         <button mat-mini-fab color="basic" [ngClass]="enableDeleteMode ? 'glow-btn' : ''" class="custom-mat-mini-fab " (click)="deleteModeToggle()">
             <mat-icon class="custom-mat-icon " [ngClass]="enableDeleteMode ? 'glow-icon' : ''">delete</mat-icon>
             <div *ngIf="enableDeleteMode" class="green-signal blink_me "></div>
+            <div class="popout-menu d-flex j-end">
+                <button class="f-s-12 p-5 p-l-8 p-r-8">cancel</button>
+    
+            </div>
           </button>
           <button mat-mini-fab color="basic" [ngClass]="enableEditMode ? 'glow-btn' : ''" class="custom-mat-mini-fab "  (click)="editModeToggle()">
             <mat-icon class="custom-mat-icon" [ngClass]="enableEditMode ? 'glow-icon-edit' : ''">edit</mat-icon>
             <div *ngIf="enableEditMode" class="green-signal blink_me "></div>
         
         </button>
+          <button mat-mini-fab color="basic"  class="custom-mat-mini-fab "  >
+            <mat-icon class="custom-mat-icon  cancel-drawing-btn" >cancel</mat-icon>
+        </button>
+          <button mat-mini-fab color="basic"  class="custom-mat-mini-fab "  >
+            <mat-icon class="custom-mat-icon  save-drawing-btn" >save</mat-icon>
+        </button>
+
+        
     </div>
 
     <!-- <div *ngIf="enableDeleteMode" id="tooltip" style="z-index:1000!important;position: absolute!important;" #deltip>Tooltip</div> -->
 
-    <div  *ngIf="canvasMode" class="example-button-row f-s-14 btn-row" style="z-index:1000!important;position: absolute!important;top:2%;left:49%">
-        <button mat-flat-button class="zone-edit-btns zone-cancel-btn" (click)="unSetCanvas()">CANCEL</button>
-        <button mat-flat-button class="primary-color zone-edit-btns zone-save-btn" (click)="saveZones()">SAVE TERRITORY</button>          
+    <div  *ngIf="canvasMode" class="d-flex align-center j-center gap-10 p-t-10" style="z-index:1000!important;position: absolute!important;top:0%;left:49%">
+        <button matTooltip="CANCEL"  class="c-pointer zone-cancel-btn f-s-18 f-w-400 "  (click)="unSetCanvas()">X</button>
+        <button *ngIf="listOfPolygons.length>0" matTooltip="SAVE TERRITORY"  class="c-pointer zone-save-btn f-s-16 f-w-600 p-5 d-flex align-center j-center" (click)="saveZones()"><mat-icon >check</mat-icon></button>          
      </div>
 
-    <div class="searchArea d-flex align-center p-5 ">
-        <!-- <i class="fa fa-bars f-s-22 m-l-10 " aria-hidden="true"></i> -->
+    <div class="searchArea d-flex align-center ">
+        <!-- <i class="fa fa-bars f-s-22 m-l-10 " aria-hidden="true" ></i> -->
         <input type="text" ngx-google-places-autocomplete [options]="options" (onAddressChange)="AddressChange($event)"
-            placeholder="Search for Name or Address" class="f-s-16 w-100" #sarea>
-        <!-- <img class="p-6 c-pointer" width="24px" height="24px" src="assets/current_loc.png" alt=""
-            title="Set Current Location as Start Location">
-
-        <div class="d-flex align-center " title="Map properties">
-            <img src="assets/map-prop1.png" class="p-6 c-pointer m-l-10" width="30px" height="26px" alt="" srcset="">
-            <i class="fa fa-angle-down  f-s-18 c-gr m-t-4 p-4"></i>
-        </div>
-        <div class="d-flex align-center " title="Isochrone">
-            <img src="assets/hexagon.png" class="p-6 m-t-3 c-pointer m-l-10" width="29px" height="28px" alt=""
-                srcset="">
-            <i class="fa fa-angle-down  f-s-18 c-gr m-t-4 p-4"></i>
-        </div>
-        <div class="d-flex align-center " title="Locations History">
-            <img src="assets/svgs/route.svg" class="p-6 m-t-3 c-pointer m-l-10" width="29px" height="28px" alt=""
-                srcset="">
-            <i class="fa fa-angle-down  f-s-18 c-gr m-t-4 p-4"></i>
-        </div> -->       
-        <i *ngIf="sarea.value!=''" class="fa fa-times f-s-15 c-gr-light m-r-10 c-pointer"
+            placeholder="Search for Name or Address" class="f-s-15 w-100 p-l-10" #sarea>      
+        <i *ngIf="sarea.value!=''" class="fa fa-times f-s-14 c-gr-light m-r-10 c-pointer"
             (click)="clearSearchArea()"></i>
     </div>
 
-    <app-routeview (enableInitialLoader)="enableLoader()" (disableInitialLoader)="disableLoader()" [origin]="origin"
-        [destination]="destination" [fetched_locations]="fetched_locations" [map]="map" (addClusters)="makeClusters()"
-        (clearClusters)="clearCluster()"  (initZoneCreation)="setCanvas()">
+    <app-routeview (enableInitialLoader)="enableLoader()"  (disableInitialLoader)="disableLoader()" [origin]="origin"
+        [destination]="destination" [fetched_locations]="fetched_locations" [map]="map" (addClusters)="makeClusters()" [fetchedZones]="fetchedZones" [polygonsatDb]="fetchedPolygons" (viewSinglePolygon)="showPolygon($event)"
+        (hideSinglePolygon)="hidePolygon($event)" 
+        (clearClusters)="clearCluster()"  (initZoneCreation)="setCanvas()" (showZones)=" viewAllZonesinCanvas()" (hideZones)=" hideAllZonesinCanvas()" (jumpPolygonEvent)="jumptoPolygon($event)"
+        [allTerritoriesLoaded]="allTerritoriesLoaded" #menuchild>
     </app-routeview>
 
     <app-tableview [fetched_locations]="fetched_locations" [origin]="origin" [destination]="destination"
