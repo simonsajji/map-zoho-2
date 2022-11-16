@@ -14,6 +14,7 @@ import { animate, animation, style, transition, trigger, useAnimation, state, ke
 import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, Input, Output, ViewChild, AfterViewInit, ChangeDetectorRef, EventEmitter } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { DrawingService } from '../services/drawing.service';
+import {NewterritoryformComponent} from '../newterritoryform/newterritoryform.component'
 
 
 interface ViewObj {
@@ -119,6 +120,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
   pageSizeOptions: number[] = [3, 6, 9, 12];
   start:any;
   end:any;
+  newTerritoryData:any;
 
   @Output('clearClusters') clearClusters = new EventEmitter();
   @Output('addClusters') addClusters = new EventEmitter();
@@ -825,10 +827,22 @@ export class RouteviewComponent implements OnInit, OnChanges {
   }
 
   initDrawingZone(){
-    console.log("enabling drawing mode")
-    this.enableDrawingMode = true;
-    this.drawingService.setDrawMode(true)
-    this.initZoneCreation.emit();
+    const dialogRef = this.dialog.open(NewterritoryformComponent, {
+      data: {
+        zones: this.polygonsatDb,
+      }
+    });
+    dialogRef.afterClosed().subscribe((data: {}) => {
+      if (data){
+        this.newTerritoryData = data;
+        console.log(this.newTerritoryData)
+        console.log("enabling drawing mode")
+        this.enableDrawingMode = true;
+        this.drawingService.setDrawMode(true)
+        this.initZoneCreation.emit(this.newTerritoryData);
+      } 
+    });
+   
   }
 
   OnPageChange(event: any){

@@ -121,4 +121,15 @@ html, body {
   opacity: 1; /* Firefox */
 }
 
-
+#toast-container > .toast-success {
+  font-size: 14px!important;
+}
+#toast-container > .toast-error {
+  font-size: 14px!important;
+}
+#toast-container > .toast-warning{
+ font-size: 14px!important;
+}
+#toast-container > .toast-info {
+ font-size: 14px!important;
+}

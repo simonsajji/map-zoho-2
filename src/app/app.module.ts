@@ -19,6 +19,9 @@ import { TableviewComponent } from './tableview/tableview.component';
 import { RouteviewComponent } from './routeview/routeview.component';
 import { EditcolumnComponent } from './editcolumn/editcolumn.component';
 import { LocationService } from './services/location.service';
+import { NewterritoryformComponent } from './newterritoryform/newterritoryform.component';
+import { RemovespacePipe } from './pipes/removespace.pipe';
+import { RemovespecialPipe } from './pipes/removespecial.pipe';
 
 @NgModule({
   declarations: [
@@ -30,7 +33,10 @@ import { LocationService } from './services/location.service';
     ConfirmBoxComponent,
     TableviewComponent,
     RouteviewComponent,
-    EditcolumnComponent
+    EditcolumnComponent,
+    NewterritoryformComponent,
+    RemovespacePipe,
+    RemovespecialPipe
   ],
   imports: [
     BrowserModule,

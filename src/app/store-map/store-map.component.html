@@ -63,7 +63,7 @@
     <app-routeview (enableInitialLoader)="enableLoader()"  (disableInitialLoader)="disableLoader()" [origin]="origin"
         [destination]="destination" [fetched_locations]="fetched_locations" [map]="map" (addClusters)="makeClusters()" [fetchedZones]="fetchedZones" [polygonsatDb]="fetchedPolygons" (viewSinglePolygon)="showPolygon($event)"
         (hideSinglePolygon)="hidePolygon($event)" 
-        (clearClusters)="clearCluster()"  (initZoneCreation)="setCanvas()" (showZones)=" viewAllZonesinCanvas()" (hideZones)=" hideAllZonesinCanvas()" (jumpPolygonEvent)="jumptoPolygon($event)"
+        (clearClusters)="clearCluster()"  (initZoneCreation)="setCanvas($event)" (showZones)=" viewAllZonesinCanvas()" (hideZones)=" hideAllZonesinCanvas()" (jumpPolygonEvent)="jumptoPolygon($event)"
         [allTerritoriesLoaded]="allTerritoriesLoaded" #menuchild>
     </app-routeview>
 
