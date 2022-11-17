@@ -140,15 +140,20 @@
         </div>
 
         <div *ngIf="!showRoutes" class="m-t-10 m-b-20">
-            <div class="d-flex align-baseline gap-2 w-100 j-center">
-                <i class="fa fa-chevron-left f-s-11 p-2 m-r-5   c-pointer primary-color" aria-hidden="true"
-                    (click)="leftDateClick()"></i>
-                <span class="f-w-500 c-pointer primary-color f-s-14" (click)="picker1.open()">{{displayDate | date:
-                    'dd/MM/YY'}}</span>
-                <span class="c-gr f-w-500 f-s-14 ">Departing</span>
-                <span class="f-w-500 c-pointer primary-color f-s-14" (click)="timepicker.open()">{{displayTime }}</span>
-                <i class="fa fa-chevron-right f-s-11 p-2 m-l-5  c-pointer primary-color" aria-hidden="true"
-                    (click)="rightDateClick()"></i>
+            <div class="d-flex align-baseline j-center gap-2 w-100 ">
+                <div [style.width]="20 + 'px'" class="date-arrow-btns"><i [style.width]="50 + '%'" class="fa fa-chevron-left f-s-14  m-l-5 c-pointer " aria-hidden="true"
+                    (click)="leftDateClick()"></i></div>
+                
+                    <div class="d-flex gap-2 j-center flex-wrap flex-1" >
+                        <span class="f-w-600 c-pointer primary-color f-s-14" (click)="picker1.open()">{{displayDate | date:
+                            'dd/MM/YY'}}</span>
+                        <span class="c-gr f-w-500 f-s-14 ">Departing</span>
+                        <span class="f-w-600 c-pointer primary-color f-s-14" (click)="timepicker.open()">{{displayTime }}</span>
+
+                    </div>
+               <div [style.width]="20 + 'px'" class="date-arrow-btns"> <i [style.width]="50 + '%'" class="fa fa-chevron-right f-s-14  f-s-600  c-pointer " aria-hidden="true"
+                (click)="rightDateClick()"></i></div>
+               
             </div>
 
             <div class="calendar-parent" style="position:relative">
@@ -160,7 +165,7 @@
         </div>
 
         <div *ngIf="!showRoutes" class="right-content flex-column  ">
-            <div class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5 bg-gr border-light p-t-15 p-b-15">
+            <div class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5 bg-gr  p-t-20 p-b-20">
                 <div class="d-flex align-center p-l-10">
                     <i class="fa fa-home f-s-20 m-r-10 flex-1"></i>
                     <div [style.width]="'calc(100% - ' + 18 + 'px)'" class="flex-column">
@@ -170,12 +175,12 @@
                         <img class="p-6 c-pointer" [ngClass]="isHomesetasFavourite ? 'selected': ''" width="20px" height="20px"  src="assets/star.png" alt="" title="Favourite Locations">
                         <img class="p-6 c-pointer" [ngClass]="isHomesetasEditedLocation ? 'selected': ''"  width="20px" height="20px"  src="assets/edit.png" alt="" title="Enter Home Location Manually">
                     </div> -->
-                        <div class="p-t-5 p-b-5 f-s-14 " *ngIf="origin">{{this.origin?.Address_Line_1}}</div>
+                        <div class="p-t-5 p-b-5 f-s-14 c-gr flex-wrap" *ngIf="origin">{{this.origin?.Address_Line_1}}, {{this.origin?.City}}, {{this.origin?.Province}}, {{this.origin?.Postal_Code}}, {{this.origin?.Country}}</div>
                     </div>
                 </div>
             </div>
 
-            <p *ngIf="selectedLocations?.length<=0" class="c-gr d-flex j-center m-t-30 m-b-30 f-s-14">No Points in the
+            <p *ngIf="selectedLocations?.length<=0" class="c-gr d-flex j-center m-t-30 m-b-30 f-s-13">No Points in the
                 Route
             </p>
 
@@ -202,8 +207,7 @@
                 </div>
             </div>
 
-            <div
-                class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5 p-10 p-l-10 bg-gr  p-t-15 p-b-15">
+            <div class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5 bg-gr  p-t-20 p-b-20">
                 <div class="d-flex align-center p-l-10">
                     <i class="fa fa-flag-checkered m-r-10 f-s-20"></i>
                     <div [style.width]="'calc(100% - ' + 18 + 'px)'" class="flex-column">
@@ -213,13 +217,20 @@
                         <img class="p-6 c-pointer" [ngClass]="isEndsetasFavourite ? 'selected': ''" width="20px" height="20px"  src="assets/star.png" alt="" title="Favourite Locations">
                         <img class="p-6 c-pointer" [ngClass]="isEndsetasEditedLocation ? 'selected': ''"  width="20px" height="20px"  src="assets/edit.png" alt="" title="Enter End Location Manually">
                     </div> -->
-                        <div class="p-t-5 p-b-5 f-s-14">{{this.destination?.Address_Line_1}}</div>
+                        <div class="p-t-5 p-b-5 p-r-10 f-s-14 c-gr flex-wrap word-wrap">{{this.destination?.Address_Line_1}}, {{this.destination?.City}}, {{this.destination.Province}}, {{this.destination?.Postal_Code}}, {{this.destination?.Country}}</div>
                     </div>
                 </div>
             </div>
+            <div class="flex-1 align-end j-center t-a-center d-flex ">
+                <div class="w-100 t-a-center c-gr-light f-s-13 d-flex p-r-20 j-center"><mat-icon matTooltip="Add Location from Locations Table found at the bottom." class="f-s-14 c-gr">info</mat-icon> Add locations from table to build route</div>
+
+            </div>
+         
 
         </div>
+        
         <div *ngIf="!showRoutes" class="j-center align-center d-flex w-100 m-t-10 m-b-20 m-l-5 m-r-10">
+            
             <button mat-raised-button [disabled]="selectedLocations.length==0" (click)="buildRoute()"
                 class=" w-100  f-s-14 m-r-20 m-l-10 m-b-30" color="primary">BUILD ROUTE</button>
         </div>
@@ -235,15 +246,18 @@
                 </div>
                 <p class="t-a-center f-s-12 flex-wrap c-gr p-l-15 p-r-15 p-10">Click territory name to jump to the
                     territory region. To edit territory, point at the territory and select action on the right.</p>
-                <div class="p-l-15 p-r-15">
+                <div class="p-l-15 p-r-15 " [ngClass]="end<=5 ? 'list-zones-min' : 'list-zones-min'" >
                     <mat-selection-list #list [ngModel]="selectedTerritories" [disableRipple]="true"  >
                         <div *ngFor="let zone of polygonsatDb?.slice(start,end);let i = index" 
-                            class="f-s-14 primary-color d-flex align-center gap-5 p-5"    >
-                            <mat-checkbox [(ngModel)]="zone.checked"
+                            class="f-s-14 primary-color d-flex align-center j-space p-4 zone-item"   >
+                            <div class="d-flex gap-5 flex-1">
+                                <mat-checkbox [(ngModel)]="zone.checked"
                             (ngModelChange)="territorylistChange($event,zone)">
-                           
-                        </mat-checkbox>
-                        <div (click)="polygonClicktoJump($event,zone)" class="d-flex align-center m-t-2 c-pointer" >{{zone?.name }}</div> 
+                                </mat-checkbox>
+                                <div (click)="polygonClicktoJump($event,zone)" class="d-flex align-center m-t-2 c-pointer" >{{zone?.name }}</div> 
+                            </div>
+                            
+                        <div class="d-flex j-end  c-gr "><mat-icon class="delete-icon c-pointer" (click)="deleteTerritory(zone)" >delete</mat-icon></div>
                            
                     </div>
                     </mat-selection-list>

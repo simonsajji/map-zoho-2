@@ -11,7 +11,7 @@ import { LocationService } from '../services/location.service';
 import { isThisSecond } from 'date-fns';
 import { environment } from 'src/environments/environment';
 import { animate, animation, style, transition, trigger, useAnimation, state, keyframes } from '@angular/animations';
-import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, Input, Output, ViewChild, AfterViewInit, ChangeDetectorRef, EventEmitter } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, Input, Output, ViewChild, AfterViewInit, ChangeDetectorRef, EventEmitter,ViewEncapsulation } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { DrawingService } from '../services/drawing.service';
 import {NewterritoryformComponent} from '../newterritoryform/newterritoryform.component'
@@ -116,8 +116,8 @@ export class RouteviewComponent implements OnInit, OnChanges {
   pagedList: []= [];
   // MatPaginator Inputs
   length: number = 0;
-  pageSize: number = 3;  //displaying three cards each row
-  pageSizeOptions: number[] = [3, 6, 9, 12];
+  pageSize: number = 5;  //displaying three cards each row
+  pageSizeOptions: number[] = [3, 6,5, 9,10, 12,26];
   start:any;
   end:any;
   newTerritoryData:any;
@@ -133,6 +133,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
   @Output('jumpPolygonEvent') jumpPolygonEvent = new EventEmitter();
   @Output('viewSinglePolygon') viewSinglePolygon = new EventEmitter();
   @Output('hideSinglePolygon') hideSinglePolygon = new EventEmitter();
+  @Output('deleteZoneEvent') deleteZoneEvent = new EventEmitter();
 
 
   constructor(private locationService: LocationService,private drawingService:DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) { }
@@ -141,7 +142,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
     this.routesModeView = true;
     this.zonesModeView = false;
     this.start = 0;
-    this.end = 3;
+    this.end = 5;
     
     this.directionsService = new google.maps.DirectionsService();
     this.infoWin = new google.maps.InfoWindow();
@@ -154,6 +155,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
     })
     this.drawingService.getDrawMode().subscribe((item:any)=>{
       this.enableDrawingMode = item;
+     
     })
     this.directionsRenderer = new google.maps.DirectionsRenderer({ map: this.map, suppressMarkers: true });
 
@@ -893,6 +895,11 @@ export class RouteviewComponent implements OnInit, OnChanges {
       if(item) item.checked = false;
     });
     this.hideZones.emit();
+  }
+
+  deleteTerritory(zone:any){
+    console.log(zone);
+    this.deleteZoneEvent.emit(zone);
   }
 
 }

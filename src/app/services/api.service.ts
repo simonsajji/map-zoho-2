@@ -32,6 +32,10 @@ export class ApiService {
   post(url:any, data:any): Observable<any> {
     return this.http.post(url, data, { headers: this.setHeaders() });
   }
+  delete(url:any, data:any): Observable<any> {
+    // options = {...options, ...{ headers: this.setHeaders()}}
+    return this.http.request('delete', url, { body: data})
+  }
 
   get(url:any): Observable<any> {
     return this.http.get(url);

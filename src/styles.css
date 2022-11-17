@@ -32,6 +32,9 @@ html, body {
   .flex-3{
     flex:3 !important;
   }
+  .flex-5{
+    flex:5 !important;
+  }
 
   .w-80{
     width: 80%!important;
@@ -132,4 +135,13 @@ html, body {
 }
 #toast-container > .toast-info {
  font-size: 14px!important;
+}
+
+
+.text-wrap{
+  word-wrap: break-word!important;
+}
+
+.flex-wrap{
+  flex-wrap: wrap!important;
 }

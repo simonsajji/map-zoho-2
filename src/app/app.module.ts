@@ -22,6 +22,7 @@ import { LocationService } from './services/location.service';
 import { NewterritoryformComponent } from './newterritoryform/newterritoryform.component';
 import { RemovespacePipe } from './pipes/removespace.pipe';
 import { RemovespecialPipe } from './pipes/removespecial.pipe';
+import { DeletezoneconfirmComponent } from './deletezoneconfirm/deletezoneconfirm.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { RemovespecialPipe } from './pipes/removespecial.pipe';
     EditcolumnComponent,
     NewterritoryformComponent,
     RemovespacePipe,
-    RemovespecialPipe
+    RemovespecialPipe,
+    DeletezoneconfirmComponent
   ],
   imports: [
     BrowserModule,

@@ -21,6 +21,8 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatListModule} from '@angular/material/list';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatRadioModule} from '@angular/material/radio';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatSliderModule} from '@angular/material/slider';
 
 @NgModule({
   declarations: [],
@@ -50,7 +52,9 @@ import {MatRadioModule} from '@angular/material/radio';
     MatProgressSpinnerModule,
     MatListModule,
     MatButtonToggleModule,
-    MatRadioModule
+    MatRadioModule,
+    MatProgressBarModule,
+    MatSliderModule
     
 
   ]
