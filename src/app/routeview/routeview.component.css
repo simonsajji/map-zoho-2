@@ -786,8 +786,22 @@ table {
 .zone-item:hover .delete-icon {
   opacity: 0.96 !important;
 }
+.edit-icon {
+  /* width: 17px!important;
+  height: 16px!important; */
+  font-size: 19px !important;
+  padding-top: 5px !important;
+  opacity: 0;
+  transition: all 0.25s ease-in-out !important;
+
+}
+
+.zone-item:hover .edit-icon {
+  opacity: 0.96 !important;
+}
 
 .align-end {
+  align-items: flex-end !important;
   align-items: flex-end !important;
 }
 

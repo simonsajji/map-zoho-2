@@ -622,24 +622,36 @@
 }
 
 .zone-cancel-btn{
-  background-color: #c82a2a;
+  background-color: #be3939;
   color:rgb(230, 230, 230);
   border: none;
   outline: none;
-  width: 50px!important;
-  height: 50px!important;
+  width: 55px!important;
+  height: 55px!important;
   border-radius: 50%;
   opacity:0.95;
 
 
 }
 .zone-save-btn{
+  background-color:#00773e;
+  color:rgb(246, 246, 246);
+  border: none;
+  outline: none;
+  width: 55px!important;
+  height: 55px!important;
+  border-radius: 50%;
+  opacity:0.95;
+
+
+}
+.zone-update-btn{
   background-color:#285bc9;
   color:rgb(246, 246, 246);
   border: none;
   outline: none;
-  width: 50px!important;
-  height: 50px!important;
+  width: 55px!important;
+  height: 55px!important;
   border-radius: 50%;
   opacity:0.95;
 

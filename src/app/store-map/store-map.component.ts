@@ -112,6 +112,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   attemptsFetchzones: any;
   enableDrawingMode:boolean = false;
   maxLimitReached:boolean = false;
+  editCanvasMode:boolean = false;
+  currentEditZone:any;
 
 
   constructor(private renderer: Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService) { }
@@ -146,8 +148,23 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           this.zonesApiErrorIntercept();
           return;
         }
-        console.log(res[0].data);
-        this.fetchedZones = res[0].data;
+        console.log(res?.Zone[0].data);
+        console.log(res?.Loc_Count);
+        let zoneInfo = res?.Loc_Count;
+        this.fetchedZones = res?.Zone[0].data;
+        if(zoneInfo){
+          this.fetchedZones.map((zone:any)=>{
+            zoneInfo.map((item:any)=>{
+              if(item?.Zone){
+                if(item?.Zone==zone?.Name && item?.Zone_ID==zone?.id) zone.dryers = item?.Dryer_Count;
+                if(item?.Zone==zone?.Name && item?.Zone_ID==zone?.id) zone.washers = item?.Washer_Count;
+              }
+            })
+          });
+
+        }
+        
+        console.log(this.fetchedZones)
         let list_ids: any = [];
         let unique: any = []
 
@@ -161,6 +178,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
         this.unSetAllZonesfromMap() // resets the whole zones overlay exclding the newly drawn
         this.setDrawingManager();
+        this.unSetCanvas();
 
 
       }
@@ -279,15 +297,44 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   setCanvas(ev: any) {
     this.newZoneForm = ev;
-    console.log(this.newZoneForm)
+    this.editCanvasMode = false;
     this.canvasMode = true;
   }
 
   unSetCanvas() {
     this.canvasMode = false;
+    this.editCanvasMode = false;
+    this.enableEditMode = false;
+    this.setFreehandMode();
     this.removeAllNewZonesInList(); // removes only unsaved ones from new drawing
+    // setting all zones  editable to false
+    this.fetchedPolygons.map((item:any)=>{
+      if(item?.polygon) item?.polygon.setEditable(false);
+    })
+    this.listOfPolygons.map((item:any)=>{
+      if(item?.polygon) {
+        item?.polygon.setEditable(false);
+        item?.polygon.setMap(null);
+      }
+    });
+    this.listOfPolygons = [];
     this.drawingService.setDrawMode(false);
   }
+
+  setEditCanvasMode(){
+    // only editing mode here
+    this.canvasMode = false;
+    this.drawingService.setDrawMode(true);
+    this.editCanvasMode = true;
+  }
+
+  updateAllTerritories(){
+    this.fetchedPolygons.map((zone:any)=>{
+     if(zone) zone?.polygon.setEditable(false);
+    });
+    this.updateZone(this.currentEditZone)
+  }
+
 
   setDrawingManager() {
     if (this.drawingManager) this.resetDrawingManager();
@@ -359,6 +406,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           console.log(this.listOfPolygons)
         })
         google.maps.event.addListener(event.getPath(), 'set_at', () => {
+          console.log(event.getPath())
           this.coordinates.splice(0, this.coordinates?.length);
           let len = event?.getPath().getLength();
           for (let i = 0; i < len; i++) {
@@ -367,19 +415,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         })
         console.log(this.coordinates);
       })
-      google.maps.event.addListener(this.drawingManager, 'overlaycomplete', (event: any) => {
-        this.all_overlays.push(event);
-        if (event.type !== google.maps.drawing.OverlayType.MARKER) {
-          // this.drawingManager.setDrawingMode(null);
-
-          // var newShape = event.overlay;
-          // newShape.type = event.type;
-          // google.maps.event.addListener(newShape, 'click',  ()=> {
-          //     this.setSelection(newShape);
-          // });
-          // this.setSelection(newShape);
-        }
-      });
+    
       this.setPolygonsfromDB();
       this.allTerritoriesLoaded = true;
     }
@@ -417,8 +453,14 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
             bounds.extend(points[i]);
           }
           let infoWindow = new google.maps.InfoWindow();
-          infoWindow.setContent(zone?.Name);
-          infoWindow.setPosition(bounds.getCenter());
+          if(zone?.dryers && zone?.washers){
+            infoWindow.setContent(`<div style= "padding:8px"> <p style="font-weight:400;font-size:13px">Washers &emsp;  : &emsp; ${(zone?.washers) ? zone?.washers : 0}  </p>   <p style="font-weight:400;font-size:13px">Dryers &emsp; &emsp; : &emsp; ${(zone?.dryers) ? zone?.dryers : 0} </p>
+            <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>
+            </div>`);
+            infoWindow.setPosition(bounds.getCenter());
+          }
+        
+         
           let posobj = bounds.getCenter();
           let marker: any = new google.maps.Marker({
             position: posobj,
@@ -430,11 +472,13 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
             label: { text: zone?.Name, color: zone.Color, fontSize: "18px", fontWeight: '600', className: 'marker-position-zones', fontFamily: 'Trebuchet' },
             opacity: 0.65
 
-          });
+          });     
+
+         let prevGeoCoordinates = points;
 
           marker.setMap(null);
-          this.fetchedPolygons.push({ id: idx, zoneid: zone?.id, polygon: polygon, name: zone?.Name, info: infoWindow, centerPosition: bounds.getCenter(), marker: marker });
-
+          this.fetchedPolygons.push({ id: idx, zoneid: zone?.id, polygon: polygon, name: zone?.Name, info: infoWindow, centerPosition: bounds.getCenter(), marker: marker, comments:zone?.Comments,color:zone?.Color,prevGeoCoordinates:prevGeoCoordinates });
+          
         }
       }
     })
@@ -446,24 +490,62 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
 
         if (poly?.polygon) {
+          // need to store the original location ids first
+
+           let location_ids_array: any = []
+          for (var i = 0; i < this.mkrs.length; i++) {
+            if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), poly?.polygon)) {
+              console.log(this.mkrs[i].location_id);
+              location_ids_array.push(this.mkrs[i].location_id);
+            }
+          };
+
+          poly.previous_location_ids = location_ids_array;
+          
           poly?.polygon.setMap(this.map)
           poly.polygon?.setEditable(true);
           google.maps.event.addListener(poly?.polygon, 'dragend', this.getPolygonCoords)
           google.maps.event.addListener(poly?.polygon?.getPath(), 'insert_at', () => {
             // this.coordinates.splice(0,this.coordinates?.length);
             let len = poly?.polygon?.getPath().getLength();
-            // for(let i=0;i<len;i++){
-            //   this.coordinates.push(poly.polygon.getPath().getAt(i).toUrlValue(5))
-            // }
+            let location_ids_array: any = []
+            for (var i = 0; i < this.mkrs.length; i++) {
+              if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), poly?.polygon)) {
+                console.log(this.mkrs[i].location_id);
+                location_ids_array.push(this.mkrs[i].location_id);
+              }
+            };
+            poly.previousLocationIds = location_ids_array;
 
           })
           google.maps.event.addListener(poly?.polygon.getPath(), 'set_at', () => {
             // this.coordinates.splice(0,this.coordinates?.length);
             let len = poly?.polygon.getPath().getLength();
+            let location_ids_array: any = []
+            for (var i = 0; i < this.mkrs.length; i++) {
+              if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), poly?.polygon)) {
+                console.log(this.mkrs[i].location_id);
+                location_ids_array.push(this.mkrs[i].location_id);
+              }
+            };
+            poly.previousLocationIds = location_ids_array;
             // for(let i=0;i<len;i++){
             //   this.coordinates.push(poly?.polygon.getPath().getAt(i).toUrlValue(5))
             // }
 
+          });
+          google.maps.event.addListener(poly?.polygon.getPath(), 'remove_at', () => {
+            // this.coordinates.splice(0,this.coordinates?.length);
+            let len = poly?.polygon.getPath().getLength();
+            let location_ids_array: any = []
+            for (var i = 0; i < this.mkrs.length; i++) {
+              if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), poly?.polygon)) {
+                console.log(this.mkrs[i].location_id);
+                location_ids_array.push(this.mkrs[i].location_id);
+              }
+            };
+            poly.previousLocationIds = location_ids_array;
+      
           });
 
           google.maps.event.addListener(poly?.polygon, 'click', (e: any) => {
@@ -473,15 +555,19 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
             poly?.polygon.getPath().forEach((element: any, index: any) => { bounds.extend(element); })
             this.map.fitBounds(bounds);
           });
-          // for (var i = 0; i < this.mkrs.length; i++) {
-          //   if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), poly?.polygon)) {
-          //     console.log(this.mkrs[i].location_id)
-          //   }
-          // }
+          google.maps.event.addListener(poly?.polygon, 'mouseover', (e: any) => {
+           if(poly?.info) poly?.info.open(this.map);
+          });
+          google.maps.event.addListener(poly?.polygon, 'mouseout', (e: any) => {
+            if(poly?.info) poly?.info.close();
+          });
+        
         }
         console.log(this.fetchedPolygons);
       });
     }
+    // here we have to unSetCanvas
+
   }
 
   jumptoPolygon(zone: any) {
@@ -505,16 +591,16 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   showPolygon(zone: any) {
     this.fetchedPolygons.map((poly: any, idx: any) => {
-      if (zone?.id == poly?.id && zone?.polygon) {
+      if (zone?.zoneid == poly?.zoneid && zone?.polygon) {
         poly?.polygon.setMap(this.map);
-        google.maps.event.addListener(this.map, 'zoom_changed', () => {
-          var zoom = this.map.getZoom();
-          if (zoom <= 10) {
-            poly?.marker.setMap(null);
-          } else {
-            poly?.marker.setMap(this.map);
-          }
-        });
+        // google.maps.event.addListener(this.map, 'zoom_changed', () => {
+        //   var zoom = this.map.getZoom();
+        //   if (zoom <= 10) {
+        //     poly?.marker.setMap(null);
+        //   } else {
+        //     poly?.marker.setMap(this.map);
+        //   }
+        // });
         poly?.marker.setMap(this.map);
         var bounds = new google.maps.LatLngBounds();
         poly?.polygon.getPath().forEach((element: any, index: any) => { bounds.extend(element); })
@@ -525,12 +611,97 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   }
   hidePolygon(zone: any) {
     this.fetchedPolygons.map((poly: any, idx: any) => {
-      if (zone?.id == poly?.id) {
+      if (zone?.zoneid == poly?.zoneid) {
         if (zone?.polygon) zone?.polygon.setMap(null);
         if (zone?.polygon) zone?.marker.setMap(null);
       }
     })
 
+  }
+
+  editAllZones(){
+    this.fetchedPolygons.map((item: any, idx: any) => {
+      item.polygon.setEditable(true);
+      if (item?.polygon) item?.polygon.setMap(this.map);
+      item?.marker.setMap(this.map);
+    })
+
+  }
+
+  editZone(zone:any){
+    this.currentEditZone = zone;
+    this.fetchedPolygons.map((item: any, idx: any) => {
+      if(item?.zoneid == zone?.zoneid) {
+        item.polygon.setEditable(true);
+      }
+    });
+    this.enableEditMode = true;
+    this.setEditCanvasMode();
+    // this.updateZone(zone);
+
+  }
+
+  updateZone(zone:any){
+    console.log(zone);
+    this.initialLoader = true;
+    this.fetchedPolygons.map((item: any, idx: any) => {
+      if (item?.zoneid == zone.zoneid && item?.name == zone.name) {
+        item?.polygon.setMap(null);
+        item?.marker.setMap(null);
+        console.log(item);
+        let location_array: any = []
+        for (var i = 0; i < this.mkrs.length; i++) {
+          if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), item?.polygon)) {
+            console.log(this.mkrs[i].location_id);
+            location_array.push(this.mkrs[i].location_id);
+          }
+        }
+
+        let loc_ids: any = (location_array.length > 1) ? location_array : location_array[0];
+        let prev_loc_ids:any = (item?.previous_location_ids?.length > 1) ? item?.previous_location_ids : item?.previous_location_ids[0];
+        let obj = {
+          "zone": {
+            "Name": item.name,
+            "id": item?.zoneid,
+            "Color":item?.color,
+            "Geocords":item?.polygon?.getPath().getArray(),
+          "Comments":item?.comments
+          },
+          "locations": {
+            "previous": prev_loc_ids,
+            "new":loc_ids
+          }
+        }
+        this.apiService.put(`${environment?.coreApiUrl}/update_zone`, obj).subscribe(
+          (dat) => {
+            console.log(dat);
+            console.log("success")
+          },
+          (error: any) => {
+            console.log(error);
+            if (error?.status == 200) {
+              this.editCanvasMode = false;
+              this.removeAllNewZonesInList();
+              this.unSetAllZonesfromMap();
+              this.callZonesApi();
+              this.hideAllZonesinCanvas();
+              this.toastr.success('The Zone has been successfully Updated');
+              this.initialLoader = false;
+            }
+            else {
+              this.editCanvasMode = false;
+              this.toastr.warning(error.statusText);
+              this.removeAllNewZonesInList();
+              this.unSetAllZonesfromMap();
+              this.callZonesApi();
+              this.hideAllZonesinCanvas();
+              this.initialLoader = false;
+            }
+          }
+        )
+      }
+    });
+    
   }
 
   viewAllZonesinCanvas() {
@@ -541,7 +712,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.fetchedPolygons.map((item: any, idx: any) => {
       item.polygon.setEditable(false);
       if (item?.polygon) item?.polygon.setMap(this.map);
-      item?.marker.setMap(this.map)
+      item?.marker.setMap(this.map);
+      
       // if (item?.polygon) item?.marker.setMap(this.map);
     })
   }
@@ -561,6 +733,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   saveZones() {
     let location_array: any = [];
     let geocoordinates: any = [];
+    this.setFreehandMode();
+    this.canvasMode = false;
     console.log(this.listOfPolygons);
     if (this.listOfPolygons.length > 1) {
       this.toastr.warning("Only Single Polygon can be SAVED as of now.");
@@ -568,7 +742,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     }
     this.listOfPolygons.forEach((poly: any, idx: any) => {
       poly?.polygon.setEditable(false);
-      console.log(poly?.polygon.latLngs?.Wc[0].Wc);
       console.log(poly?.polygon.getPath().getArray());
       if (poly?.polygon.getPath().getArray()) geocoordinates = poly?.polygon.getPath().getArray();
       for (var i = 0; i < this.mkrs.length; i++) {
@@ -592,7 +765,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         "Name": this.newZoneForm?.name,
         "Color": this.newZoneForm?.color,
         "Geocords": geocoordinates,
-        "Comments": "Tesing zones in zoftmap"
+        "Comments": "Testing zones in zoftmap"
       },
       "locations": {
         "id": loc_ids
@@ -606,7 +779,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
         this.callZonesApi();
         this.removeAllNewZonesInList();
-        this.unSetCanvas();
+        // this.unSetCanvas();
         this.hideAllZonesinCanvas();
         this.initialLoader = false;
         this.toastr.success('Territories have been saved');
@@ -614,15 +787,16 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       (error: any) => {
         console.log(error);
         if (error?.status == 200) {
-          this.callZonesApi();
           this.removeAllNewZonesInList();
           this.hideAllZonesinCanvas();
-          this.unSetCanvas();
+          this.callZonesApi();
+          // this.unSetCanvas();
           this.initialLoader = false;
           this.toastr.success('Territories have been saved');
         }
         else {
           this.toastr.warning(error.statusText);
+          this.unSetCanvas();
           this.initialLoader = false;
         }
 
@@ -644,14 +818,20 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   }
 
   setPolygonDrawingMode() {
+    
     if (this.drawingManager) {
       if(this.listOfPolygons && this.listOfPolygons.length>1){
         this.toastr.warning('Single Polygon can be saved as of now.');
+        this.setFreehandMode();
         return;
       }
       else{
-        this.drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
-        this.enableDrawingMode = true;
+        this.enableDrawingMode = !this.enableDrawingMode;
+        if(this.enableDrawingMode) this.drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
+        else if(!this.enableDrawingMode) {
+          this.setFreehandMode();
+          this.drawingManager.setDrawingMode(null);
+        }
         this.enableEditMode = false;
         this.enableDeleteMode = false;
 
@@ -660,30 +840,51 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     }
   }
 
+  cancelDrawing(){
+    this.enableDrawingMode = false;
+    this.removeIncompleteDrawing()
+    this.setFreehandMode();
+
+  }
+
+  removeIncompleteDrawing(){
+    this.drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
+    this.drawingManager.setDrawingMode(null);
+
+  }
+
+  
+
   setFreehandMode() {
     if (this.drawingManager){
-      this.drawingManager.setDrawingMode(null);
+      this.removeIncompleteDrawing()
       this.enableDrawingMode = false;
       this.enableEditMode = false;
       this.enableDeleteMode = false;
-      this.toastr.info('FREE-HAND MODE');
+      // this.toastr.info('FREE-HAND MODE');
     }
 
   }
 
   deleteModeToggle() {
+    this.removeIncompleteDrawing();
     this.enableDeleteMode = !this.enableDeleteMode;
     if (this.enableDeleteMode){
-      this.toastr.info('DELETE MODE');
+      // this.toastr.info('DELETE MODE');
+      this.removeAllNewZonesInList();
       this.enableDrawingMode = false;
       this.enableEditMode = false;
+      this.enableDeleteMode = false;
+    
     }
-    else this.toastr.info('FREE-HAND MODE');
+    else this.setFreehandMode();
+    
 
   }
 
 
   editModeToggle() {
+    this.removeIncompleteDrawing();
     this.enableEditMode = !this.enableEditMode;
     if (this.enableEditMode) {
       this.toastr.info('EDIT MODE');
@@ -691,18 +892,18 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       this.enableDrawingMode = false;
       this.listOfPolygons.forEach((poly: any, idx: any) => {
         if (this.enableEditMode) poly?.polygon.setEditable(true);
-      })
+      });
+      // this.editAllZones();
 
     }
-    else this.toastr.info('FREE-HAND MODE')
+    else this.setFreehandMode();
+      
   }
 
   getPolygonCoords(newShape: any) {
     this.coordinates.splice(0, this.coordinates.length)
-
-    var len = newShape.getPath().getLength();
-
-    for (var i = 0; i < len; i++) {
+    let len = newShape.getPath().getLength();
+    for (let i = 0; i < len; i++) {
       this.coordinates.push(newShape.getPath().getAt(i).toUrlValue(6))
     }
     return this.coordinates;
@@ -772,15 +973,17 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       (error: any) => {
         console.log(error);
         if (error?.status == 200) {
+          this.removeAllNewZonesInList();
           this.callZonesApi();
           this.hideAllZonesinCanvas();
-          this.unSetCanvas();
+          // this.unSetCanvas();
           this.initialLoader = true;
           this.toastr.success('The Zone has been successfully deleted');
           this.initialLoader = false;
         }
         else {
           this.toastr.warning(error.statusText);
+          this.unSetCanvas();
           this.initialLoader = false;
         }
       }
@@ -814,6 +1017,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       console.log(event);
       this.setFreehandMode();
       this.listOfPolygons.push({ id: this.listOfPolygons.length, polygon: event });
+      if(this.listOfPolygons.length>=1) this.maxLimitReached = true;
       this.listOfPolygons.forEach((poly: any, idx: any) => {
         if (poly?.polygon) {
           google.maps.event.addListener(poly?.polygon, 'click', () => {
@@ -838,6 +1042,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         console.log(this.listOfPolygons)
       })
       google.maps.event.addListener(event.getPath(), 'set_at', () => {
+        console.log(event.getPath())
         this.coordinates.splice(0, this.coordinates?.length);
         let len = event?.getPath().getLength();
         for (let i = 0; i < len; i++) {
@@ -846,19 +1051,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       })
       console.log(this.coordinates);
     })
-    google.maps.event.addListener(this.drawingManager, 'overlaycomplete', (event: any) => {
-      this.all_overlays.push(event);
-      if (event.type !== google.maps.drawing.OverlayType.MARKER) {
-        // this.drawingManager.setDrawingMode(null);
-
-        // var newShape = event.overlay;
-        // newShape.type = event.type;
-        // google.maps.event.addListener(newShape, 'click',  ()=> {
-        //     this.setSelection(newShape);
-        // });
-        // this.setSelection(newShape);
-      }
-    });
+  
     this.setPolygonsfromDB();
     this.allTerritoriesLoaded = true;
 

@@ -134,6 +134,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
   @Output('viewSinglePolygon') viewSinglePolygon = new EventEmitter();
   @Output('hideSinglePolygon') hideSinglePolygon = new EventEmitter();
   @Output('deleteZoneEvent') deleteZoneEvent = new EventEmitter();
+  @Output('editZoneEvent') editZoneEvent = new EventEmitter();
 
 
   constructor(private locationService: LocationService,private drawingService:DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) { }
@@ -900,6 +901,15 @@ export class RouteviewComponent implements OnInit, OnChanges {
   deleteTerritory(zone:any){
     console.log(zone);
     this.deleteZoneEvent.emit(zone);
+  }
+
+  editTerritory(zone:any){
+    console.log(zone);
+    this.editZoneEvent.emit(zone);
+  }
+
+  hideZone(zone:any){
+
   }
 
 }

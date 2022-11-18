@@ -36,6 +36,10 @@ export class ApiService {
     // options = {...options, ...{ headers: this.setHeaders()}}
     return this.http.request('delete', url, { body: data})
   }
+  put(url:any, data:any): Observable<any> {
+    // options = {...options, ...{ headers: this.setHeaders()}}
+    return this.http.request('put', url, { body: data})
+  }
 
   get(url:any): Observable<any> {
     return this.http.get(url);

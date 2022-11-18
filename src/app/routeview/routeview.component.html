@@ -257,7 +257,10 @@
                                 <div (click)="polygonClicktoJump($event,zone)" class="d-flex align-center m-t-2 c-pointer" >{{zone?.name }}</div> 
                             </div>
                             
-                        <div class="d-flex j-end  c-gr "><mat-icon class="delete-icon c-pointer" (click)="deleteTerritory(zone)" >delete</mat-icon></div>
+                        <div class="d-flex j-end gap-5 c-gr ">
+                            <i  class="fa fa-draw-polygon edit-icon f-s-18 c-gr" (click)="editTerritory(zone)"></i>
+                            <mat-icon class="delete-icon c-pointer" (click)="deleteTerritory(zone)" >delete</mat-icon>
+                        </div>
                            
                     </div>
                     </mat-selection-list>
