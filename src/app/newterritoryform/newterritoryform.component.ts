@@ -16,6 +16,7 @@ export class NewterritoryformComponent implements OnInit {
   zoneName:string = "";
   zoneColor:string = "";
   zoneComments:string = "";
+  colorCode:any = '#0388fc'
   @ViewChild('name') name :any;
   @ViewChild('color') color :any;
   @ViewChild('code') code :any;
@@ -41,6 +42,10 @@ export class NewterritoryformComponent implements OnInit {
     this.zoneComments = this.comments.nativeElement.value;
   }
 
+  colorChange(ev:any){
+    this.colorCode = ev;
+  }
+
   ngOnInit(): void{ }
 
   okClick(): void {
@@ -48,7 +53,7 @@ export class NewterritoryformComponent implements OnInit {
     this.zonesData.map((item:any)=>{
       if(item?.name.toLowerCase() ==this.code.nativeElement.value.toLowerCase()) isNameDuplicate = true;
     })
-    if(!isNameDuplicate) this.dialogRef.close({name:this.code.nativeElement.value,color:this.color.nativeElement.value,comments:this.comments?.nativeElement?.value});
+    if(!isNameDuplicate) this.dialogRef.close({name:this.code.nativeElement.value,color:this.colorCode,comments:this.comments?.nativeElement?.value});
     else this.toastr.error('The Zone name already exists')
   }
 

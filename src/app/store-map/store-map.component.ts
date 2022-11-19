@@ -174,6 +174,13 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         this.unSetAllZonesfromMap() // resets the whole zones overlay exclding the newly drawn
         this.setDrawingManager();
         // this.unSetCanvas();
+      },
+      (error:any)=>{
+        if(error?.status!=200){
+          this.toastr.warning('There was a problem fetching the zones');
+
+        }
+
       }
     )
 
@@ -385,10 +392,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         }
       });
 
-      console.log("the drawing manager is set new");
       google.maps.event.addListener(this.drawingManager, 'polygoncomplete', (event: any) => {
         event?.getPath().getLength();
-        console.log(event);
         this.setFreehandMode();
        if(this.listOfPolygons.length==0)  this.listOfPolygons.push({ id: this.listOfPolygons.length, polygon: event });
         if(this.listOfPolygons.length>=1) this.maxLimitReached = true;
@@ -403,7 +408,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
             });
 
           }
-          console.log(this.listOfPolygons)
+  
         })
         google.maps.event.addListener(event, 'dragend', this.getPolygonCoords)
         google.maps.event.addListener(event.getPath(), 'insert_at', () => {
@@ -412,17 +417,14 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           for (let i = 0; i < len; i++) {
             this.coordinates.push(event.getPath().getAt(i).toUrlValue(5))
           }
-          console.log(this.listOfPolygons)
         })
         google.maps.event.addListener(event.getPath(), 'set_at', () => {
-          console.log(event.getPath())
           this.coordinates.splice(0, this.coordinates?.length);
           let len = event?.getPath().getLength();
           for (let i = 0; i < len; i++) {
             this.coordinates.push(event.getPath().getAt(i).toUrlValue(5))
           }
         })
-        console.log(this.coordinates);
       })
     
       this.setPolygonsfromDB();
@@ -501,7 +503,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
            let location_ids_array: any = []
           for (var i = 0; i < this.mkrs.length; i++) {
             if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), poly?.polygon)) {
-              console.log(this.mkrs[i].location_id);
               location_ids_array.push(this.mkrs[i].location_id);
             }
           };
@@ -517,7 +518,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
             let location_ids_array: any = []
             for (var i = 0; i < this.mkrs.length; i++) {
               if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), poly?.polygon)) {
-                console.log(this.mkrs[i].location_id);
                 location_ids_array.push(this.mkrs[i].location_id);
               }
             };
@@ -530,7 +530,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
             let location_ids_array: any = []
             for (var i = 0; i < this.mkrs.length; i++) {
               if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), poly?.polygon)) {
-                console.log(this.mkrs[i].location_id);
                 location_ids_array.push(this.mkrs[i].location_id);
               }
             };
@@ -542,7 +541,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
             let location_ids_array: any = []
             for (var i = 0; i < this.mkrs.length; i++) {
               if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), poly?.polygon)) {
-                console.log(this.mkrs[i].location_id);
                 location_ids_array.push(this.mkrs[i].location_id);
               }
             };
@@ -653,7 +651,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         let location_array: any = []
         for (var i = 0; i < this.mkrs.length; i++) {
           if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), item?.polygon)) {
-            console.log(this.mkrs[i].location_id);
             location_array.push(this.mkrs[i].location_id);
           }
         }
@@ -675,9 +672,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         }
         this.apiService.put(`${environment?.coreApiUrl}/update_zone`, obj).subscribe(
           (dat) => {
-            console.log(dat);
             this.removeAllNewZonesInList();
-            console.log("success")
           },
           (error: any) => {
             console.log(error);
@@ -737,31 +732,24 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     let geocoordinates: any = [];
     this.setFreehandMode();
     this.canvasMode = false;
-    console.log(this.listOfPolygons)
     if (this.listOfPolygons.length > 1) {
       // this.toastr.warning("Only Single Polygon can be SAVED as of now.");
       this.listOfPolygons.splice(1);
     }
     this.listOfPolygons.forEach((poly: any, idx: any) => {
       poly?.polygon.setEditable(false);
-      console.log(poly?.polygon.getPath().getArray());
       if (poly?.polygon.getPath().getArray()) geocoordinates = poly?.polygon.getPath().getArray();
       for (var i = 0; i < this.mkrs.length; i++) {
         if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), poly?.polygon)) {
-          console.log(this.mkrs[i].location_id);
           location_array.push(this.mkrs[i].location_id);
         }
       }
     });
     geocoordinates = geocoordinates.map((item: any) => {
       let obj = { lat: item?.lat(), lng: item?.lng() };
-      console.log(obj)
-      return obj
+      return obj;
     })
-    console.log(geocoordinates)
     let loc_ids: any = (location_array.length > 1) ? location_array : location_array[0];
-
-    console.log(loc_ids)
     let save_zones_obj = {
       "zone": {
         "Name": this.newZoneForm?.name,
@@ -954,13 +942,11 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       if (item?.zoneid == zone.zoneid && item?.name == zone.name) {
         item?.polygon.setMap(null);
         item?.marker.setMap(null);
-        console.log(item)
       }
     });
     let location_array: any = []
     for (var i = 0; i < this.mkrs.length; i++) {
       if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), zone?.polygon)) {
-        console.log(this.mkrs[i].location_id);
         location_array.push(this.mkrs[i].location_id);
       }
     }
@@ -977,7 +963,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     }
     this.apiService.delete(`${environment?.coreApiUrl}/delete_zone`, obj).subscribe(
       (dat) => {
-        console.log(dat);
         this.removeAllNewZonesInList();
         console.log("success")
       },
@@ -1022,10 +1007,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       }
     });
 
-    console.log("the drawing manager is set new");
     google.maps.event.addListener(this.drawingManager, 'polygoncomplete', (event: any) => {
       event?.getPath().getLength();
-      console.log(event);
       this.setFreehandMode();
       if(this.listOfPolygons.length==0) this.listOfPolygons.push({ id: this.listOfPolygons.length, polygon: event });
       if(this.listOfPolygons.length>=1) this.maxLimitReached = true;
@@ -1040,7 +1023,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           });
 
         }
-        console.log(this.listOfPolygons)
       })
       google.maps.event.addListener(event, 'dragend', this.getPolygonCoords)
       google.maps.event.addListener(event.getPath(), 'insert_at', () => {
@@ -1049,10 +1031,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         for (let i = 0; i < len; i++) {
           this.coordinates.push(event.getPath().getAt(i).toUrlValue(5))
         }
-        console.log(this.listOfPolygons)
       })
       google.maps.event.addListener(event.getPath(), 'set_at', () => {
-        console.log(event.getPath())
         this.coordinates.splice(0, this.coordinates?.length);
         let len = event?.getPath().getLength();
         for (let i = 0; i < len; i++) {
@@ -1077,7 +1057,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       console.log("clearing the selected shap[e");
       this.listOfPolygons[this.listOfPolygons.length - 1] = null;
       this.shapeOverlay.setMap(null);
-
 
     }
     this.listOfPolygons.splice(0, this.listOfPolygons.length);

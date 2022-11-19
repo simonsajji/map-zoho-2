@@ -23,6 +23,7 @@ import { NewterritoryformComponent } from './newterritoryform/newterritoryform.c
 import { RemovespacePipe } from './pipes/removespace.pipe';
 import { RemovespecialPipe } from './pipes/removespecial.pipe';
 import { DeletezoneconfirmComponent } from './deletezoneconfirm/deletezoneconfirm.component';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import { DeletezoneconfirmComponent } from './deletezoneconfirm/deletezoneconfir
       positionClass :'toast-top-right',
       preventDuplicates: true
     }),
-    HttpClientModule
+    HttpClientModule,
+    ColorPickerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

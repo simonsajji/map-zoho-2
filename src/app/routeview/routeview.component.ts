@@ -830,8 +830,6 @@ export class RouteviewComponent implements OnInit, OnChanges {
   }
 
   changeViewMode(ev: any) {
-    console.log(ev);
-    console.log(this.selectedViewMode)
     if (this.selectedViewMode == 'zonesview') {
       this.zonesModeView = true;
       this.routesModeView = false;
@@ -857,8 +855,6 @@ export class RouteviewComponent implements OnInit, OnChanges {
     dialogRef.afterClosed().subscribe((data: {}) => {
       if (data) {
         this.newTerritoryData = data;
-        console.log(this.newTerritoryData)
-        console.log("enabling drawing mode")
         this.enableDrawingMode = true;
         this.drawingService.setDrawMode(true)
         this.initZoneCreation.emit(this.newTerritoryData);
@@ -929,7 +925,6 @@ export class RouteviewComponent implements OnInit, OnChanges {
 
   territorylistChange(ev: any, zone: any) {
     this.previousPolygonsatDB = [...this.polygonsatDb];
-    console.log(ev, zone);
     if (ev) {
       this.viewSinglePolygon.emit(zone);
       this.polygonsatDb.map((item: any, idx: any) => {
@@ -957,7 +952,6 @@ export class RouteviewComponent implements OnInit, OnChanges {
 
 
   polygonClicktoJump(ev: any, poly: any) {
-    console.log(event);
     this.jumpPolygonEvent.emit(poly);
 
   }
@@ -983,13 +977,11 @@ export class RouteviewComponent implements OnInit, OnChanges {
 
   deleteTerritory(zone: any) {
     this.previousPolygonsatDB = [...this.polygonsatDb];
-    console.log(zone);
     this.deleteZoneEvent.emit(zone);
   }
 
   editTerritory(zone: any) {
     this.previousPolygonsatDB = [...this.polygonsatDb];
-    console.log(zone);
     this.editZoneEvent.emit(zone);
   }
 

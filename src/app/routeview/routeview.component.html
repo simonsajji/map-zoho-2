@@ -255,7 +255,7 @@
                         <div *ngFor="let zone of polygonsatDb?.slice(start,end);let i = index" 
                             class="f-s-14 primary-color d-flex align-center j-space p-4 zone-item"   >
                             <div class="d-flex gap-5 flex-1">
-                                <mat-checkbox [(ngModel)]="zone.checked"
+                                <mat-checkbox [(ngModel)]="zone.checked" [style.height]="'50%'" class="d-flex align-center m-t-2 c-pointer"
                             (ngModelChange)="territorylistChange($event,zone)">
                                 </mat-checkbox>
                                 <div (click)="polygonClicktoJump($event,zone)" class="d-flex align-center m-t-2 c-pointer" >{{zone?.name }}</div> 

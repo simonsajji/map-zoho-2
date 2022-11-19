@@ -49,6 +49,9 @@ html, body {
   .w-100{
     width: 100%!important;
   }
+  .w-50{
+    width: 50%!important;
+  }
 
   .c-pointer{
     cursor: pointer!important;
