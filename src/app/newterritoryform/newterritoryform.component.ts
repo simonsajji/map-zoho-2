@@ -15,9 +15,11 @@ export class NewterritoryformComponent implements OnInit {
   zonesData:any;
   zoneName:string = "";
   zoneColor:string = "";
+  zoneComments:string = "";
   @ViewChild('name') name :any;
   @ViewChild('color') color :any;
   @ViewChild('code') code :any;
+  @ViewChild('comments') comments :any;
   constructor(
     @Inject(MAT_DIALOG_DATA) private data: any,
     private dialogRef: MatDialogRef<NewterritoryformComponent>, private toastr :ToastrServices
@@ -35,6 +37,10 @@ export class NewterritoryformComponent implements OnInit {
     this.zoneName = this.name.nativeElement.value;
   }
 
+  setnewZoneComments(ev:any){
+    this.zoneComments = this.comments.nativeElement.value;
+  }
+
   ngOnInit(): void{ }
 
   okClick(): void {
@@ -42,7 +48,7 @@ export class NewterritoryformComponent implements OnInit {
     this.zonesData.map((item:any)=>{
       if(item?.name.toLowerCase() ==this.code.nativeElement.value.toLowerCase()) isNameDuplicate = true;
     })
-    if(!isNameDuplicate) this.dialogRef.close({name:this.code.nativeElement.value,color:this.color.nativeElement.value});
+    if(!isNameDuplicate) this.dialogRef.close({name:this.code.nativeElement.value,color:this.color.nativeElement.value,comments:this.comments?.nativeElement?.value});
     else this.toastr.error('The Zone name already exists')
   }
 

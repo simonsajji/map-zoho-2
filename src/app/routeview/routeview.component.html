@@ -11,7 +11,7 @@
                 [ngClass]="selectedViewMode=='zonesview' ? 'zones-view': 'routes-view'"
                 class="viewSelector m-l-10 p-5 f-s-16 f-w-500">
                 <mat-option [ngClass]="option.value===selectedViewMode ?  'mat-option-selected-value': ''"
-                    (click)="changeViewMode($event)" [disabled]="!allTerritoriesLoaded && !fetchedZones"
+                    (click)="changeViewMode($event)" [disabled]="((!allTerritoriesLoaded && !fetchedZones) || showRoutes)"
                     [value]="option.value" *ngFor="let option of viewObjects" class="f-s-15">{{ option.viewValue }}
                 </mat-option>
             </mat-select>
@@ -238,7 +238,11 @@
     </ng-container>
 
     <ng-container *ngIf="zonesModeView">
-        <div>
+        <div *ngIf="initialLoaderZones" style="z-index:1200!important;height:40vh!important" class="d-flex align-center flex-1 j-center">
+            <mat-spinner  diameter="45">
+            </mat-spinner>
+        </div>
+        <div *ngIf="!initialLoaderZones">
             <div class="zone-edit-page m-t-10">
                 <div class="d-flex p-l-15 p-r-15 p-20">
                     <div class="m-r-10 m-r-5 f-s-13 primary-color show-all-zones c-pointer" (click)="showAllZones()">Show all</div>
@@ -257,9 +261,9 @@
                                 <div (click)="polygonClicktoJump($event,zone)" class="d-flex align-center m-t-2 c-pointer" >{{zone?.name }}</div> 
                             </div>
                             
-                        <div class="d-flex j-end gap-5 c-gr ">
-                            <i  class="fa fa-draw-polygon edit-icon f-s-18 c-gr" (click)="editTerritory(zone)"></i>
-                            <mat-icon class="delete-icon c-pointer" (click)="deleteTerritory(zone)" >delete</mat-icon>
+                        <div class="d-flex j-end gap-10 c-gr ">
+                            <i  matTooltip="EDIT" class="fa fa-draw-polygon edit-icon f-s-18 c-gr c-pointer" (click)="editTerritory(zone)"></i>
+                            <mat-icon matTooltip="DELETE" class="delete-icon c-pointer m-l-5" (click)="deleteTerritory(zone)" >delete</mat-icon>
                         </div>
                            
                     </div>

@@ -27,7 +27,7 @@
             </div>
         </div>
         <div class="p-relative">
-            <button [disabled]="listOfPolygons?.length<1" mat-mini-fab color="basic" [ngClass]="enableDeleteMode ? 'glow-btn' : ''" class="custom-mat-mini-fab " (click)="deleteModeToggle()">
+            <button [disabled]="listOfPolygons?.length<1" mat-mini-fab color="basic" [ngClass]="enableDeleteMode ? 'glow-btn' : ''" class="custom-mat-mini-fab " (click)="deleteDrawnZone()">
                 <mat-icon class="custom-mat-icon " [ngClass]="enableDeleteMode ? 'glow-icon' : ''" >delete</mat-icon>
                 <div *ngIf="enableDeleteMode" class="green-signal blink_me "></div>
               </button>
@@ -36,13 +36,13 @@
             </div>
         </div>
         <div class="p-relative">
-            <button [disabled]="listOfPolygons?.length<1" mat-mini-fab color="basic" [ngClass]="enableEditMode ? 'glow-btn' : ''" class="custom-mat-mini-fab "  (click)="editModeToggle()">
-                <mat-icon class="custom-mat-icon" [ngClass]="enableEditMode ? 'glow-icon-edit' : ''" >edit</mat-icon>
-                <div *ngIf="enableEditMode" class="green-signal blink_me "></div>
+            <button [disabled]="listOfPolygons?.length<1" mat-mini-fab color="basic" [ngClass]="(enableEditMode || listOfPolygons?.length>=1) ? 'glow-btn' : ''" class="custom-mat-mini-fab "  (click)="editModeToggle()">
+                <mat-icon class="custom-mat-icon" [ngClass]="(enableEditMode || listOfPolygons?.length>=1) ? 'glow-icon-edit' : ''" >edit</mat-icon>
+                <div *ngIf="(enableEditMode || listOfPolygons?.length>=1)" class="green-signal blink_me "></div>
             </button>
-            <div *ngIf="enableEditMode && listOfPolygons?.length>=1" class="popout-menu d-flex j-end">
+            <!-- <div *ngIf="enableEditMode && listOfPolygons?.length>=1" class="popout-menu d-flex j-end">
                 <button class="f-s-12 p-5 p-l-8 p-r-8" (click)="editModeToggle()">cancel</button>
-            </div>
+            </div> -->
         </div>        
     </div>
 
@@ -51,7 +51,7 @@
         <button matTooltip="CANCEL"  class="c-pointer zone-cancel-btn f-s-18 f-w-400 m-r-10"  (click)="unSetCanvas()">X</button>
         <button *ngIf="listOfPolygons.length>0" matTooltip="SAVE TERRITORY"  class="c-pointer zone-save-btn f-s-16 f-w-600 p-5 d-flex align-center j-center" (click)="saveZones()"><mat-icon >check</mat-icon></button>          
      </div>
-    <div  *ngIf="editCanvasMode " class="d-flex gap-5 j-center align-center p-t-10" style="z-index:1000!important;position: absolute!important;top:0%;left:42%;width:250px">
+    <div  *ngIf="editCanvasMode" class="d-flex gap-5 j-center align-center p-t-10" style="z-index:1000!important;position: absolute!important;top:0%;left:42%;width:250px">
         <button matTooltip="CANCEL UPDATE"  class="c-pointer zone-cancel-btn f-s-18 f-w-400 m-r-10"  (click)="unSetCanvas()">X</button>
         <button matTooltip="UPDATE TERRITORY"  class="c-pointer zone-update-btn f-s-16 f-w-600 p-5 d-flex align-center j-center" (click)="updateAllTerritories()"><mat-icon >check</mat-icon></button>          
      </div>
@@ -98,13 +98,14 @@
     </div>
 
     <app-routeview (enableInitialLoader)="enableLoader()"  (disableInitialLoader)="disableLoader()" [origin]="origin"
-        [destination]="destination" [fetched_locations]="fetched_locations" [map]="map" (addClusters)="makeClusters()" [fetchedZones]="fetchedZones" [polygonsatDb]="fetchedPolygons" (viewSinglePolygon)="showPolygon($event)"
-        (hideSinglePolygon)="hidePolygon($event)" 
+        [destination]="destination" [fetched_locations]="fetched_locations" [map]="map" (addClusters)="makeClusters()" [fetchedZones]="fetchedZones" [polygonsatDb]="fetchedPolygons" (viewSinglePolygon)="showPolygon($event)" (viewSinglePolygonWithoutBounds)="showPolygonWithoutBounds($event)"
+        (hideSinglePolygon)="hidePolygon($event)" [initialLoaderZones]="initialLoader"
         (clearClusters)="clearCluster()"  (initZoneCreation)="setCanvas($event)" (showZones)=" viewAllZonesinCanvas()" (deleteZoneEvent)="deleteZone($event)" (editZoneEvent)="editZone($event)" (hideZones)=" hideAllZonesinCanvas()" (jumpPolygonEvent)="jumptoPolygon($event)"
         [allTerritoriesLoaded]="allTerritoriesLoaded" #menuchild>
     </app-routeview>
 
-    <app-tableview [fetched_locations]="fetched_locations" [origin]="origin" [destination]="destination"
+
+    <app-tableview [fetched_locations]="fetched_locations" [origin]="origin" [destination]="destination" [initialLoaderTable]="initialLoader"
         [displayedColumns]="displayedColumns"  ></app-tableview>
 
 

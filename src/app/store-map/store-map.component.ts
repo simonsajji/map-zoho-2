@@ -148,6 +148,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           this.zonesApiErrorIntercept();
           return;
         }
+        console.log(res)
         console.log(res?.Zone[0].data);
         console.log(res?.Loc_Count);
         let zoneInfo = res?.Loc_Count;
@@ -163,24 +164,16 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           });
 
         }
-        
-        console.log(this.fetchedZones)
+
         let list_ids: any = [];
         let unique: any = []
-
-
         this.fetchedZones.map((item: any, idx: any) => {
           list_ids.push(item?.id)
         });
         unique = list_ids.filter((v: any, i: any, a: any) => a.indexOf(v) === i);
-        console.log(unique, unique.length)
-        console.log(list_ids, list_ids.length)
-
         this.unSetAllZonesfromMap() // resets the whole zones overlay exclding the newly drawn
         this.setDrawingManager();
-        this.unSetCanvas();
-
-
+        // this.unSetCanvas();
       }
     )
 
@@ -297,6 +290,19 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   setCanvas(ev: any) {
     this.newZoneForm = ev;
+    this.drawingManager.setOptions({
+      polygonOptions:{
+        clickable: true,
+        draggable: false,
+        editable: true,
+        fillOpacity: 0.3,
+        strokeWeight:3,
+        fillColor:(this.newZoneForm?.color) ? this.newZoneForm?.color : '#285ec9',
+        strokeColor:(this.newZoneForm?.color) ? this.newZoneForm?.color : '#285ec9',
+
+      }
+    
+    })
     this.editCanvasMode = false;
     this.canvasMode = true;
   }
@@ -319,6 +325,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     });
     this.listOfPolygons = [];
     this.drawingService.setDrawMode(false);
+    this.initialLoader = false;
   }
 
   setEditCanvasMode(){
@@ -329,6 +336,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   }
 
   updateAllTerritories(){
+    this.editCanvasMode = false;
+    this.canvasMode = false;
     this.fetchedPolygons.map((zone:any)=>{
      if(zone) zone?.polygon.setEditable(false);
     });
@@ -353,7 +362,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           editable: true,
           fillColor: '#285ec9',
           fillOpacity: 0.3,
-          strokeColor: '#285ec9'
+          strokeColor: '#285ec9',
+          strokeWeight:3,
 
         },
         polylineOptions: {
@@ -380,7 +390,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         event?.getPath().getLength();
         console.log(event);
         this.setFreehandMode();
-        this.listOfPolygons.push({ id: this.listOfPolygons.length, polygon: event });
+       if(this.listOfPolygons.length==0)  this.listOfPolygons.push({ id: this.listOfPolygons.length, polygon: event });
         if(this.listOfPolygons.length>=1) this.maxLimitReached = true;
         this.listOfPolygons.forEach((poly: any, idx: any) => {
           if (poly?.polygon) {
@@ -402,7 +412,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           for (let i = 0; i < len; i++) {
             this.coordinates.push(event.getPath().getAt(i).toUrlValue(5))
           }
-          console.log(this.coordinates);
           console.log(this.listOfPolygons)
         })
         google.maps.event.addListener(event.getPath(), 'set_at', () => {
@@ -487,11 +496,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
     if (this.fetchedPolygons.length > 0) {
       this.fetchedPolygons.forEach((poly: any, idx: any) => {
-
-
         if (poly?.polygon) {
           // need to store the original location ids first
-
            let location_ids_array: any = []
           for (var i = 0; i < this.mkrs.length; i++) {
             if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), poly?.polygon)) {
@@ -529,10 +535,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
               }
             };
             poly.previousLocationIds = location_ids_array;
-            // for(let i=0;i<len;i++){
-            //   this.coordinates.push(poly?.polygon.getPath().getAt(i).toUrlValue(5))
-            // }
-
           });
           google.maps.event.addListener(poly?.polygon.getPath(), 'remove_at', () => {
             // this.coordinates.splice(0,this.coordinates?.length);
@@ -550,43 +552,44 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
           google.maps.event.addListener(poly?.polygon, 'click', (e: any) => {
             // poly?.info.open(this.map);
+            if(poly?.info) poly?.info.open(this.map);
             poly?.marker.setMap(this.map)
             var bounds = new google.maps.LatLngBounds();
             poly?.polygon.getPath().forEach((element: any, index: any) => { bounds.extend(element); })
             this.map.fitBounds(bounds);
           });
-          google.maps.event.addListener(poly?.polygon, 'mouseover', (e: any) => {
-           if(poly?.info) poly?.info.open(this.map);
-          });
-          google.maps.event.addListener(poly?.polygon, 'mouseout', (e: any) => {
-            if(poly?.info) poly?.info.close();
-          });
-        
+          // google.maps.event.addListener(poly?.polygon, 'mouseover', (e: any) => {
+          //  if(poly?.info) poly?.info.open(this.map);
+          // });
+          // google.maps.event.addListener(poly?.polygon, 'mouseout', (e: any) => {
+          //   if(poly?.info) poly?.info.close();
+          // });
         }
-        console.log(this.fetchedPolygons);
       });
     }
     // here we have to unSetCanvas
+    this.unSetCanvas();
 
   }
 
   jumptoPolygon(zone: any) {
     this.fetchedPolygons.map((poly: any, idx: any) => {
-      if (zone?.id == poly?.id) {
-        //   google.maps.event.addListener(this.map, 'zoom_changed', ()=> { 
-        //     var zoom = this.map.getZoom(); 
-        //     if (zoom <= 10) { 
-        //         poly?.marker.setMap(null); 
-        //     } else { 
-        //         poly?.marker.setMap(this.map); 
-        //     } 
-        // });
-        // poly?.marker.setMap(this.map);
+      if (zone?.zoneid == poly?.zoneid) {
         var bounds = new google.maps.LatLngBounds();
         poly?.polygon.getPath().forEach((element: any, index: any) => { bounds.extend(element); })
         this.map.fitBounds(bounds);
       }
     })
+  }
+
+  showPolygonWithoutBounds(zone:any){
+    this.fetchedPolygons.map((poly: any, idx: any) => {
+      if (zone?.zoneid == poly?.zoneid && zone?.polygon) {
+        poly?.polygon.setMap(this.map);
+        poly?.marker.setMap(this.map);
+      }
+    })
+
   }
 
   showPolygon(zone: any) {
@@ -607,7 +610,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         this.map.fitBounds(bounds);
       }
     })
-
   }
   hidePolygon(zone: any) {
     this.fetchedPolygons.map((poly: any, idx: any) => {
@@ -630,25 +632,24 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   editZone(zone:any){
     this.currentEditZone = zone;
+    this.currentEditZone?.info?.setMap(null);
     this.fetchedPolygons.map((item: any, idx: any) => {
       if(item?.zoneid == zone?.zoneid) {
-        item.polygon.setEditable(true);
+       if(item?.polygon) item.polygon.setEditable(true);
+       if(item?.info) item?.info.setMap(null);
       }
     });
     this.enableEditMode = true;
     this.setEditCanvasMode();
-    // this.updateZone(zone);
 
   }
 
   updateZone(zone:any){
-    console.log(zone);
     this.initialLoader = true;
     this.fetchedPolygons.map((item: any, idx: any) => {
       if (item?.zoneid == zone.zoneid && item?.name == zone.name) {
         item?.polygon.setMap(null);
         item?.marker.setMap(null);
-        console.log(item);
         let location_array: any = []
         for (var i = 0; i < this.mkrs.length; i++) {
           if (google.maps.geometry.poly?.containsLocation(this.mkrs[i].getPosition(), item?.polygon)) {
@@ -675,6 +676,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         this.apiService.put(`${environment?.coreApiUrl}/update_zone`, obj).subscribe(
           (dat) => {
             console.log(dat);
+            this.removeAllNewZonesInList();
             console.log("success")
           },
           (error: any) => {
@@ -686,7 +688,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
               this.callZonesApi();
               this.hideAllZonesinCanvas();
               this.toastr.success('The Zone has been successfully Updated');
-              this.initialLoader = false;
+              // this.initialLoader = false;
             }
             else {
               this.editCanvasMode = false;
@@ -726,7 +728,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.fetchedPolygons.map((item: any, idx: any) => {
       if (item?.polygon) item.polygon.setEditable(false);
       if (item?.polygon) item?.polygon.setMap(null);
-      item?.marker.setMap(null);
+     if(item?.marker) item?.marker.setMap(null);
     })
   }
 
@@ -735,9 +737,9 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     let geocoordinates: any = [];
     this.setFreehandMode();
     this.canvasMode = false;
-    console.log(this.listOfPolygons);
+    console.log(this.listOfPolygons)
     if (this.listOfPolygons.length > 1) {
-      this.toastr.warning("Only Single Polygon can be SAVED as of now.");
+      // this.toastr.warning("Only Single Polygon can be SAVED as of now.");
       this.listOfPolygons.splice(1);
     }
     this.listOfPolygons.forEach((poly: any, idx: any) => {
@@ -765,18 +767,15 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         "Name": this.newZoneForm?.name,
         "Color": this.newZoneForm?.color,
         "Geocords": geocoordinates,
-        "Comments": "Testing zones in zoftmap"
+        "Comments": this.newZoneForm?.comments
       },
       "locations": {
         "id": loc_ids
       }
     };
-    console.log(save_zones_obj)
     this.initialLoader = true;
     this.apiService.post(`${environment?.coreApiUrl}/save_zone`, save_zones_obj).subscribe(
       (res: any) => {
-        console.log(res);
-
         this.callZonesApi();
         this.removeAllNewZonesInList();
         // this.unSetCanvas();
@@ -788,13 +787,15 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         console.log(error);
         if (error?.status == 200) {
           this.removeAllNewZonesInList();
-          this.hideAllZonesinCanvas();
+          this.unSetAllZonesfromMap();
           this.callZonesApi();
+          this.hideAllZonesinCanvas();
+          // this.initialLoader = false;
           // this.unSetCanvas();
-          this.initialLoader = false;
           this.toastr.success('Territories have been saved');
         }
         else {
+          this.removeAllNewZonesInList();
           this.toastr.warning(error.statusText);
           this.unSetCanvas();
           this.initialLoader = false;
@@ -810,8 +811,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   removeAllNewZonesInList() {
     this.unsavedZoneList = [...this.listOfPolygons];
     this.listOfPolygons.map((poly: any) => {
-      poly?.polygon.setEditable(false);
-      poly.polygon.setMap(null);
+     if(poly?.polygon) poly?.polygon.setEditable(false);
+     if(poly?.polygon) poly.polygon.setMap(null);
     })
     this.listOfPolygons = [];
     this.maxLimitReached = false;
@@ -822,17 +823,19 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     if (this.drawingManager) {
       if(this.listOfPolygons && this.listOfPolygons.length>1){
         this.toastr.warning('Single Polygon can be saved as of now.');
+        this.enableEditMode = true;
         this.setFreehandMode();
         return;
       }
-      else{
+      else if(this.listOfPolygons.length<1){
         this.enableDrawingMode = !this.enableDrawingMode;
         if(this.enableDrawingMode) this.drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
         else if(!this.enableDrawingMode) {
           this.setFreehandMode();
           this.drawingManager.setDrawingMode(null);
         }
-        this.enableEditMode = false;
+        // this.enableEditMode = false;
+        // this.enableEditMode = false;
         this.enableDeleteMode = false;
 
       }
@@ -882,12 +885,21 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   }
 
+  deleteDrawnZone(){
+    this.removeIncompleteDrawing();
+    this.removeAllNewZonesInList();
+      this.enableDrawingMode = false;
+      this.enableEditMode = false;
+      this.enableDeleteMode = false;
+
+  }
+
 
   editModeToggle() {
     this.removeIncompleteDrawing();
     this.enableEditMode = !this.enableEditMode;
     if (this.enableEditMode) {
-      this.toastr.info('EDIT MODE');
+      // this.toastr.info('EDIT MODE');
       this.enableDeleteMode = false;
       this.enableDrawingMode = false;
       this.listOfPolygons.forEach((poly: any, idx: any) => {
@@ -914,7 +926,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     // this.clearSelection();
     // this.stopDrawing()
     this.selectedShape = newShape;
-    console.log(this.selectedShape)
     newShape.setEditable(true);
 
   }
@@ -938,7 +949,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   }
 
   confirmDeleteZone(zone: any) {
-    console.log(zone);
     this.initialLoader = true;
     this.fetchedPolygons.map((item: any, idx: any) => {
       if (item?.zoneid == zone.zoneid && item?.name == zone.name) {
@@ -968,6 +978,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.apiService.delete(`${environment?.coreApiUrl}/delete_zone`, obj).subscribe(
       (dat) => {
         console.log(dat);
+        this.removeAllNewZonesInList();
         console.log("success")
       },
       (error: any) => {
@@ -977,12 +988,12 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           this.callZonesApi();
           this.hideAllZonesinCanvas();
           // this.unSetCanvas();
-          this.initialLoader = true;
           this.toastr.success('The Zone has been successfully deleted');
-          this.initialLoader = false;
+          // this.initialLoader = false;
         }
         else {
           this.toastr.warning(error.statusText);
+          this.removeAllNewZonesInList();
           this.unSetCanvas();
           this.initialLoader = false;
         }
@@ -1016,7 +1027,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       event?.getPath().getLength();
       console.log(event);
       this.setFreehandMode();
-      this.listOfPolygons.push({ id: this.listOfPolygons.length, polygon: event });
+      if(this.listOfPolygons.length==0) this.listOfPolygons.push({ id: this.listOfPolygons.length, polygon: event });
       if(this.listOfPolygons.length>=1) this.maxLimitReached = true;
       this.listOfPolygons.forEach((poly: any, idx: any) => {
         if (poly?.polygon) {
@@ -1038,7 +1049,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         for (let i = 0; i < len; i++) {
           this.coordinates.push(event.getPath().getAt(i).toUrlValue(5))
         }
-        console.log(this.coordinates);
         console.log(this.listOfPolygons)
       })
       google.maps.event.addListener(event.getPath(), 'set_at', () => {
@@ -1049,7 +1059,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           this.coordinates.push(event.getPath().getAt(i).toUrlValue(5))
         }
       })
-      console.log(this.coordinates);
     })
   
     this.setPolygonsfromDB();
@@ -1103,6 +1112,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           }
           this.map.fitBounds(bounds);
         }
+        else if(status != "OK") this.toastr.error('Could not fetch the Location')
       }
     );
   }
@@ -1197,7 +1207,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     });
     marker['location_id'] = loc_id;
     google.maps.event.addListener(marker, 'click', (evt: any) => {
-      this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${loc_id}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${title} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route_name} </i> </p>
+      this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${title} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route_name} </i> </p>
       <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>
     </div>`);
       this.infoWin.open(this.map, marker);
