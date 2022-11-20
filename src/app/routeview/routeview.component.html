@@ -238,9 +238,10 @@
     </ng-container>
 
     <ng-container *ngIf="zonesModeView">
-        <div *ngIf="initialLoaderZones" style="z-index:1200!important;height:40vh!important" class="d-flex align-center flex-1 j-center">
+        <div *ngIf="initialLoaderZones" style="z-index:1200!important;height:40vh!important" class="d-flex flex-column align-center flex-1 j-center">
             <mat-spinner  diameter="45">
             </mat-spinner>
+            <div class="f-s-11 f-w-500 p-t-10">Updating Territories</div>
         </div>
         <div *ngIf="!initialLoaderZones">
             <div class="zone-edit-page m-t-10">

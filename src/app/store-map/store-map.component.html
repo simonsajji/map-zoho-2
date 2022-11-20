@@ -63,7 +63,7 @@
            
         <i *ngIf="sarea.value!=''" class="fa fa-times f-s-14 c-gr-light m-r-10 c-pointer"
             (click)="clearSearchArea()"></i>
-        <div class="d-flex align-center "  matTooltip="Map Properties">
+        <div class="d-flex align-center m-r-5"  matTooltip="Map Properties">
             <div [matMenuTriggerFor]="mapprops" class="d-flex align-center ">
                 <img src="assets/svgs/map-marked-alt.svg"  style="opacity:0.75" class="p-6 c-pointer m-l-10" width="28px" height="26px" alt="" srcset="">
                 <i class="fa fa-angle-down  f-s-18 c-gr m-t-4 p-4" ></i>
@@ -93,8 +93,8 @@
                 </div>
             </mat-menu>
         </div> 
-        <img class="p-6 c-pointer  m-l-5 m-r-10" width="22px" height="22px" src="assets/current_loc.png" alt=""
-        matTooltip="Jump to Current Location" (click)="navigateCurrentLocation()">
+        <!-- <img class="p-6 c-pointer  m-l-5 m-r-10" width="22px" height="22px" src="assets/current_loc.png" alt=""
+        matTooltip="Jump to Current Location" (click)="navigateCurrentLocation()"> -->
     </div>
 
     <app-routeview (enableInitialLoader)="enableLoader()"  (disableInitialLoader)="disableLoader()" [origin]="origin"

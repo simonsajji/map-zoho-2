@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component,Input,Output, ElementRef, OnChanges, OnInit, ViewChild,AfterViewInit,ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component,Input,Output, ElementRef, OnChanges, OnInit, ViewChild,AfterViewInit,ChangeDetectorRef,SimpleChanges } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { animate, animation, style, transition, trigger, useAnimation, state, keyframes } from '@angular/animations';
 import {MatPaginator} from '@angular/material/paginator';
@@ -111,7 +111,8 @@ export class TableviewComponent implements OnInit,OnChanges {
     this.dataSource.paginator = this.paginator;
   }
 
-  ngOnChanges(){
+  ngOnChanges(changes:SimpleChanges){
+    
     this.selection = this.locationService.getSelectionModel();
     this.dataSource = new MatTableDataSource<any>(this.fetched_locations?.data);
    if(this.fetched_locations?.data) this.dataBaseColumns = Object.keys(this.fetched_locations?.data[0]);
@@ -125,6 +126,7 @@ export class TableviewComponent implements OnInit,OnChanges {
     this.dataSource.paginator = this.paginator;
     this.OnRouteOptions = this.fetched_locations?.data.map((item:any)=>item?.On_Route);
     this.OnRouteOptions = [...new Set(this.OnRouteOptions)];
+    if(changes['initialLoaderTable']) this.clearAllFilters();
   }
 
   toggleTableView(){

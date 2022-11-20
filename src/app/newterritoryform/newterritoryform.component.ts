@@ -25,6 +25,7 @@ export class NewterritoryformComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) private data: any,
     private dialogRef: MatDialogRef<NewterritoryformComponent>, private toastr :ToastrServices
     ) {
+    dialogRef.disableClose = true;  
     if (data) {
       this.zonesData = [...data?.zones];
     }
@@ -43,18 +44,27 @@ export class NewterritoryformComponent implements OnInit {
   }
 
   colorChange(ev:any){
+  
     this.colorCode = ev;
   }
 
   ngOnInit(): void{ }
 
   okClick(): void {
-    let isNameDuplicate:boolean = false;
-    this.zonesData.map((item:any)=>{
-      if(item?.name.toLowerCase() ==this.code.nativeElement.value.toLowerCase()) isNameDuplicate = true;
-    })
-    if(!isNameDuplicate) this.dialogRef.close({name:this.code.nativeElement.value,color:this.colorCode,comments:this.comments?.nativeElement?.value});
-    else this.toastr.error('The Zone name already exists')
+    if(this.code.nativeElement.value=='' || this.comments.nativeElement.value=='' || this.code.nativeElement.value==' '){
+      this.toastr.warning('Please enter the fields before saving the new Territory');
+      return;
+    }
+    else{
+      let isNameDuplicate:boolean = false;
+      this.zonesData.map((item:any)=>{
+        if(item?.name.toLowerCase() ==this.code.nativeElement.value.toLowerCase()) isNameDuplicate = true;
+      })
+      if(!isNameDuplicate) this.dialogRef.close({name:this.code.nativeElement.value,color:this.colorCode,comments:this.comments?.nativeElement?.value});
+      else this.toastr.error('The Zone name already exists');
+
+    }
+    
   }
 
   cancelClick(): void {
