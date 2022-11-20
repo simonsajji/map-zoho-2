@@ -7,13 +7,13 @@ import { FormControl } from '@angular/forms';
 import { TooltipPosition } from '@angular/material/tooltip';
 import { ApiService } from 'src/app/services/api.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { LocationService } from '../services/location.service';
+import { LocationService } from '../../../../services/location.service';
 import { isThisSecond } from 'date-fns';
 import { environment } from 'src/environments/environment';
 import { animate, animation, style, transition, trigger, useAnimation, state, keyframes } from '@angular/animations';
 import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, Input, Output, ViewChild, AfterViewInit, ChangeDetectorRef, EventEmitter, ViewEncapsulation, SimpleChanges } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-import { DrawingService } from '../services/drawing.service';
+import { DrawingService } from '../../../../services/drawing.service';
 import { NewterritoryformComponent } from '../newterritoryform/newterritoryform.component'
 
 
@@ -100,7 +100,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
   @Input('allTerritoriesLoaded') allTerritoriesLoaded: any;
   @Input('polygonsatDb') polygonsatDb: any;
   @Input('fetchedZones') fetchedZones: any;
-  @Input() initialLoaderZones: any;
+  @Input('initialLoaderZones') initialLoaderMaps: any;
   @ViewChild('timepicker') timepicker: any;
   initialLoader: boolean = false;
   wypntMarkers: any;

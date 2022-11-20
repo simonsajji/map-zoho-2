@@ -12,11 +12,11 @@ import {FormControl} from '@angular/forms';
 import {TooltipPosition} from '@angular/material/tooltip';
 import { ApiService } from 'src/app/services/api.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { LocationService } from '../services/location.service';
+import { LocationService } from '../../../../services/location.service';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import {EditcolumnComponent} from '../editcolumn/editcolumn.component'
 import { isThisSecond } from 'date-fns';
-import { DrawingService } from '../services/drawing.service';
+import { DrawingService } from '../../../../services/drawing.service';
 
 interface TableObj {
   value: string;
@@ -98,6 +98,7 @@ export class TableviewComponent implements OnInit,OnChanges {
   constructor(private http: HttpClient,private cdr:ChangeDetectorRef,private toastr:ToastrServices,private dialog:MatDialog,private apiService:ApiService,private locationService:LocationService,private drawingService:DrawingService) { }
 
   ngOnInit(): void {
+    this.pageSizeperPage = 20;
     this.locationService.getSelectedPoints().subscribe((item:any)=>{
       this.selectedLocations = item;
     });
@@ -272,7 +273,7 @@ export class TableviewComponent implements OnInit,OnChanges {
   }
 
   applyFilter(filterValue: any,column:any) { 
-    
+    this.selection.deselect(...this.getPageData())  // needs to clear the checked locations before filtering
     if(filterValue.target?.value == ''){
       this.isFilterActive = false;
       this.filteredColumns.map((item:any,idx:any)=>{

@@ -22,7 +22,7 @@
     /* margin-right: 10px;
     padding: 6px 20px; */
     border-radius: 4px!important;
-    background-color: rgb(201, 76, 76);
+    background-color: rgb(221, 91, 91);
     color:white;
     margin-right: 10px;
     padding: 2px 20px!important;
@@ -158,11 +158,9 @@ button:focus {
     border-bottom: 0.01rem dashed gray;
 }
 
-.c-red{
-    color:rgb(201, 76, 76);
 
-}
-.c-purple{
-    color:rgb(78, 65, 197);
+
+.c-red{
+    color:rgb(221, 91, 91);
 
 }

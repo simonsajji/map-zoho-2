@@ -15,9 +15,9 @@ import { FormControl } from '@angular/forms';
 import { TooltipPosition } from '@angular/material/tooltip';
 import { ApiService } from 'src/app/services/api.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { LocationService } from '../services/location.service';
+import { LocationService } from '../../../../services/location.service';
 import { Loader } from "@googlemaps/js-api-loader";
-import { DrawingService } from '../services/drawing.service';
+import { DrawingService } from '../../../../services/drawing.service';
 import { RouteviewComponent } from '../routeview/routeview.component';
 import { DeletezoneconfirmComponent } from '../deletezoneconfirm/deletezoneconfirm.component';
 
@@ -635,6 +635,12 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       if(item?.zoneid == zone?.zoneid) {
        if(item?.polygon) item.polygon.setEditable(true);
        if(item?.info) item?.info.setMap(null);
+       if(item?.polygon){
+        let bounds = new google.maps.LatLngBounds();
+            item?.polygon.getPath().forEach((element: any, index: any) => { bounds.extend(element); })
+            this.map.fitBounds(bounds);
+       }
+       // set bounds here only for current edit zone
       }
     });
     this.enableEditMode = true;

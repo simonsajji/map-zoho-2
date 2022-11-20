@@ -1,6 +1,6 @@
 import { Component, OnInit,Inject,ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ToastrServices } from '../services/toastr.service';
+import { ToastrServices } from '../../../../services/toastr.service';
 
 @Component({
   selector: 'app-newterritoryform',
