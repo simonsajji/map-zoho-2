@@ -5,17 +5,6 @@
         </mat-spinner>
     </div>
 
-    <!-- <button mat-mini-fab color="basic" [ngClass]="enableDeleteMode ? 'glow-btn' : ''" class="custom-mat-mini-fab " style="z-index:1000!important;position: absolute!important;top:60%;left:2%" (click)="deleteModeToggle()">
-        <mat-icon class="custom-mat-icon " [ngClass]="enableDeleteMode ? 'glow-icon' : ''">delete</mat-icon>
-        <div *ngIf="enableDeleteMode" class="green-signal"></div>
-      </button>
-
-      <button mat-mini-fab color="basic" [ngClass]="enableEditMode ? 'glow-btn' : ''" class="custom-mat-mini-fab " style="z-index:1000!important;position: absolute!important;top:66%;left:2%" (click)="editModeToggle()">
-        <mat-icon class="custom-mat-icon" [ngClass]="enableEditMode ? 'glow-icon-edit' : ''">edit</mat-icon>
-        <div *ngIf="enableEditMode" class="green-signal"></div>
-    
-    </button> -->
-
     <div  class="btn-group "  *ngIf="canvasMode && !editCanvasMode" style="z-index:1000!important;position: absolute!important;top:50%;right:0.55%;opacity: 1!important;">
         <div class="p-relative">
             <button  [disabled]="maxLimitReached" mat-mini-fab color="basic"  class="custom-mat-mini-fab " (click)="setPolygonDrawingMode()" >
@@ -57,7 +46,15 @@
      </div>
 
     <div class="searchArea d-flex align-center ">
-        <!-- <i class="fa fa-bars f-s-22 m-l-10 " aria-hidden="true" ></i> -->
+        <div class="menu-backdrop map-menu-ctn">
+            <i class="menu-backdrop fa fa-bars f-s-20 primary-color m-l-10 c-pointer" aria-hidden="true" (click)="isMenuOpen=!isMenuOpen" ></i>
+            <div *ngIf="isMenuOpen" class="menu-backdrop map-menu">
+                <button mat-button class="menu-backdrop log-out-btn c-pointer" (click)="logOut()">
+                    <span class="menu-backdrop">Logout</span>
+                </button>
+            </div>
+        </div>
+        
         <input type="text" ngx-google-places-autocomplete [options]="options" (onAddressChange)="AddressChange($event)"
             placeholder="Search for Name or Address" class="f-s-15 w-100 p-l-10" #sarea>  
            

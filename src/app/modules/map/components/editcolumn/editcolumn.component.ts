@@ -1,4 +1,4 @@
-import { Component, OnInit,Inject } from '@angular/core';
+import { Component, OnInit,Inject, HostListener } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
@@ -13,10 +13,12 @@ export class EditcolumnComponent implements OnInit {
   columns:any;
   selectedOptions: string[] = [];
   orderedColumns: string[] = [];
+ 
   constructor(
     @Inject(MAT_DIALOG_DATA) private data: any,
     private dialogRef: MatDialogRef<EditcolumnComponent>
     ) {
+    
     if (data) {
       this.columns = data.columns ;
       this.selectedOptions = [...data?.selectedcolumns];

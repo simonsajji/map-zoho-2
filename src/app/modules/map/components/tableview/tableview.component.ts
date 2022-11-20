@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component,Input,Output, ElementRef, OnChanges, OnInit, ViewChild,AfterViewInit,ChangeDetectorRef,SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component,Input,Output, ElementRef, OnChanges, OnInit, ViewChild,AfterViewInit,ChangeDetectorRef,SimpleChanges, HostListener } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { animate, animation, style, transition, trigger, useAnimation, state, keyframes } from '@angular/animations';
 import {MatPaginator} from '@angular/material/paginator';
@@ -93,9 +93,9 @@ export class TableviewComponent implements OnInit,OnChanges {
   @Input('displayedColumns')   displayedColumns: string[] = [];
   @Input('showRoutes')  showRoutes:boolean = false;
   @Input('initialLoaderTable') initialLoaderTable:boolean = false;
-  
+ 
 
-  constructor(private http: HttpClient,private cdr:ChangeDetectorRef,private toastr:ToastrServices,private dialog:MatDialog,private apiService:ApiService,private locationService:LocationService,private drawingService:DrawingService) { }
+  constructor(private http: HttpClient,private cdr:ChangeDetectorRef,private toastr:ToastrServices,private dialog:MatDialog,private apiService:ApiService,private locationService:LocationService,private drawingService:DrawingService) {}
 
   ngOnInit(): void {
     this.pageSizeperPage = 20;

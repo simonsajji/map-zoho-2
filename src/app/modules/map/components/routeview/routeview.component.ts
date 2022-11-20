@@ -11,7 +11,7 @@ import { LocationService } from '../../../../services/location.service';
 import { isThisSecond } from 'date-fns';
 import { environment } from 'src/environments/environment';
 import { animate, animation, style, transition, trigger, useAnimation, state, keyframes } from '@angular/animations';
-import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, Input, Output, ViewChild, AfterViewInit, ChangeDetectorRef, EventEmitter, ViewEncapsulation, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, Input, Output, ViewChild, AfterViewInit, ChangeDetectorRef, EventEmitter, ViewEncapsulation, SimpleChanges, HostListener } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { DrawingService } from '../../../../services/drawing.service';
 import { NewterritoryformComponent } from '../newterritoryform/newterritoryform.component'
@@ -115,9 +115,8 @@ export class RouteviewComponent implements OnInit, OnChanges {
   selectedTerritories: any = [];
   zone_list: any = ['Territory-1'];
   pagedList: [] = [];
-  // MatPaginator Inputs
   length: number = 0;
-  pageSize: number = 5;  //displaying three cards each row
+  pageSize: number = 5;  
   pageSizeOptions: number[] = [3, 6, 5, 9, 10, 12, 26];
   start: any;
   end: any;
@@ -125,6 +124,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
   checkedZonesList: any = [];
   previousPolygonsatDB: any = [];
   disableTerritoriesViewMode:boolean = false;
+
 
   @Output('clearClusters') clearClusters = new EventEmitter();
   @Output('addClusters') addClusters = new EventEmitter();
@@ -177,15 +177,10 @@ export class RouteviewComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     this.selection = this.locationService.getSelectionModel();
     if (changes['polygonsatDb']) {
-      console.log(this.polygonsatDb);
-      console.log(this.checkedZonesList);
       this.savedCheckedZonesList();
       if(this.previousPolygonsatDB.length>0) this.addNewZonetoCheckList();
       this.previousPolygonsatDB = [...this.polygonsatDb];
-      
     }
-  
-
   }
 
   navigationDrawer() {
@@ -233,7 +228,8 @@ export class RouteviewComponent implements OnInit, OnChanges {
       data: {
         locations: `${this.selectedLocations?.length}`,
         destinationRoute: null,
-        clearRoute:false
+        clearRoute:false,
+        isExistingRoute:(this.wypntMarkers && this.wypntMarkers.length>0) ? true : false
       }
     });
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
@@ -294,9 +290,6 @@ export class RouteviewComponent implements OnInit, OnChanges {
       });
       rows.unshift(keys);
       let csvContent = "data:text/csv;charset=utf-8,";
-      // rows.map((item:any,idx:any)=>{
-      //   item.splice(item.length - 4,4)
-      // })
       rows[0].push("Amount");
       //
       let summaryData = this.findOcc(this.csvData, "Coin_Card_Location");
@@ -747,7 +740,6 @@ export class RouteviewComponent implements OnInit, OnChanges {
         var leg = this.result.routes[0].legs[0];
         var leg2 = this.result.routes[0].legs[legLength - 1];
         // this.makeMarker(leg2.end_location, "end", leg2.end_location, leg2);
-
         this.showRoutes = true;
         this.disableTerritoriesViewMode = true;
         this.showBuildRoute.emit(this.showRoutes);
@@ -912,7 +904,6 @@ export class RouteviewComponent implements OnInit, OnChanges {
     if(this.previousPolygonsatDB.length<this.polygonsatDb.length && this.previousPolygonsatDB){
       const onlyInA = this.onlyInLeft(this.polygonsatDb, this.previousPolygonsatDB);
       const result: any[] = [...onlyInA];
-      console.log(result);
       if(result.length>0){
         this.polygonsatDb.map((zone:any)=>{
           result.map((item:any)=>{

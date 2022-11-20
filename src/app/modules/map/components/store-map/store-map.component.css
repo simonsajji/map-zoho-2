@@ -822,3 +822,24 @@
   border: 0!important;
 }
 
+
+.map-menu-ctn{
+  position: relative;
+}
+.map-menu{
+  z-index: 1000!important;
+  position: absolute;
+  top:170%;
+  width: 150px;
+  height: fit-content;
+  background-color: white;
+  border: 0.01rem solid gray;
+  border-radius: 6px;
+  box-shadow: rgba(50, 50, 93, 0.15) 0px 2px 5px -1px, rgba(0, 0, 0, 0.15) 0px 2px 2px 1px;
+
+}
+
+.log-out-btn{
+  width: 99%;
+  text-align: left!important;
+}

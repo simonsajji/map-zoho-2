@@ -162,13 +162,7 @@ section {
     width: 96%;
   }
   
-  .eyeIcon {
-    position: absolute;
-    z-index: 4;
-    right: 20px;
-    bottom: 0px;
-    cursor: pointer;
-  }
+
   
   .clear {
     clear: both;
@@ -233,6 +227,14 @@ section {
       /* padding-top: 10px; */
       max-width: 600px;
       width: 35vw;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .pass-field{
+      width: calc(80%);
+     
     }
     
     .contentBody {
@@ -266,4 +268,17 @@ section {
   
   .basic-color{
     color:#438ec7!important;
+  }
+
+  .eyeIcon {
+    position: absolute;
+    z-index: 4;
+    right: 10px;
+    bottom: 70%;
+    cursor: pointer;
+    width: 5px;
+    height: 1px;
+    border: 0!important;
+    outline: none!important;
+    padding: 0!important;
   }

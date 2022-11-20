@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, HostListener, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
@@ -8,11 +8,11 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 })
 export class ConfirmBoxComponent implements OnInit {
   message: string = "";
-  datanew : any;
+  datanew: any;
   constructor(
     @Inject(MAT_DIALOG_DATA) private data: any,
     private dialogRef: MatDialogRef<ConfirmBoxComponent>
-    ) {
+  ) {
     if (data) {
       this.message = data.message || this.message;
       this.datanew = data;
@@ -20,7 +20,7 @@ export class ConfirmBoxComponent implements OnInit {
     // this.dialogRef.updateSize('300vw','300vw')
   }
 
-  ngOnInit(): void{ }
+  ngOnInit(): void { }
 
   okClick(): void {
     this.dialogRef.close(true);

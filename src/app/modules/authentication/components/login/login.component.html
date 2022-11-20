@@ -1,9 +1,7 @@
 <div>
-    <div class="spinner" *ngIf="toggleSpinner">
-        loading...
-    </div>
-    <div *ngIf="showLoginForm"  [ngStyle]="{'opacity': toggleSpinner ? '0.2' : null}">
-        <!-- <div class="row header-section p-10">
+
+  <div *ngIf="showLoginForm">
+    <!-- <div class="row header-section p-10">
             <div class="col-md-5 p-10">
                 <div class="logo-container">
                 </div>
@@ -12,70 +10,64 @@
                 </div>
             </div>
         </div> -->
-        <div class="content-body">
-            <mat-card>
-                <mat-card-content>
-                  <div class="header">
-                    <P class="f-s-18 f-w-500">ZOFT PORTAL LOGIN </P>
-                  </div>
-                  <form (ngSubmit)="submitClick()" name="loginForm" [formGroup]="loginForm">
-                    <div class="emailInput">
-                      <mat-form-field class="full-width"  appearance="outline"  >
-                        <mat-label>Email</mat-label>
-                        <!-- <input
+    <div class="content-body">
+      <mat-card>
+        <mat-card-content>
+          <div class="header">
+            <P class="f-s-18 f-w-500">ZOFT PORTAL LOGIN </P>
+          </div>
+          <form (ngSubmit)="submitClick()" name="loginForm" [formGroup]="loginForm">
+            <div class="emailInput">
+              <mat-form-field class="full-width" appearance="outline">
+                <mat-label>Email</mat-label>
+                <!-- <input
                           formControlName="email"
                           matInput #email
                           placeholder="Enter email address" 
                         /> -->
-                        <input
-                          matInput #email autocomplete="off" formControlName="email"
-                        />
-                        <mat-error *ngIf="!loginForm.controls['email'].valid">
-                            Email is required
-                          </mat-error>
-                      </mat-form-field>
-                    </div>
-            
-                    <div class="passInput">
-                      <span class="f-s-12 basic-color">
-                        <a class="basic-color" class="aLink" routerLink="/auth/forgot-password">Forgot Password?</a>
-                      </span>
-                      <mat-form-field class="full-width" appearance="outline">
-                        <mat-label>Password</mat-label>
-                        <input formControlName="password"  matInput [type]=" hide ? 'password' : 'text'" required />
-                        <!-- <input formControlName="password" matInput [type]=" hide ? 'password' : 'text'" required /> -->
-                        <!-- <button  mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide Password'"
-                        [attr.aria-pressed]="hide">
-                        <mat-icon>
-                            {{hide ? 'visibility_off' : 'visibility'}}
-                        </mat-icon>
-                    </button> -->
+                <input matInput #email autocomplete="off" formControlName="email" />
+                <mat-error *ngIf="!loginForm.controls['email'].valid">
+                  Email is required
+                </mat-error>
+              </mat-form-field>
+            </div>
 
+            <div class="passInput">
+              
+              <mat-form-field class="pass-field" appearance="outline">
+                <mat-label>Password</mat-label>
+                <input formControlName="password" matInput [type]=" hide ? 'password' : 'text'" required />
+                <button class="eyeIcon" (click)="hide = !hide">
+                  <mat-icon class="f-s-15">
+                    {{hide ? 'visibility_off' : 'visibility'}}
+                  </mat-icon>
+                </button>
                     <!-- <mat-error *ngIf="!loginForm.controls['password'].valid">
                         Password is required
                       </mat-error> -->
-                    <mat-error *ngIf="loginForm?.get('password')?.hasError('minlength')">
-                       minimum require 4 characters
-                      </mat-error>
-                    </mat-form-field>
-                    </div>
-                    <mat-error class="error" *ngIf="
+                <mat-error *ngIf="loginForm?.get('password')?.hasError('minlength')">
+                  minimum require 4 characters
+                </mat-error>
+              </mat-form-field>
+              
+            </div>
+            <mat-error class="error" *ngIf="
                     wrongUser && !accBlocked && !loginForm?.get('password')?.hasError('minlength') 
                    ">Invalid email or password</mat-error>
-                              <mat-error class="error" *ngIf="accBlocked &&
+            <mat-error class="error" *ngIf="accBlocked &&
                   !loginForm?.get('password')?.hasError('minlength')
                  ">Your account has been blocked for one hour</mat-error>
-                    <div class="d-flex  p-55-1rem align-center j-end">
-                      <!-- <div class="f-s-14 f-w-500 c-gr">Create New Account</div> -->
-                      <button mat-stroked-button type="submit" class="login-btn f-s-15 f-w-500">Login</button>
-                    </div>
-                    
-                  </form>
-            
-                  
-                </mat-card-content>
-              </mat-card>
-        </div>
-        
+            <div class="d-flex  p-55-1rem align-center j-end">
+              <!-- <div class="f-s-14 f-w-500 c-gr">Create New Account</div> -->
+              <button mat-stroked-button type="submit" class="login-btn f-s-15 f-w-500">Login</button>
+            </div>
+
+          </form>
+
+
+        </mat-card-content>
+      </mat-card>
     </div>
+
+  </div>
 </div>

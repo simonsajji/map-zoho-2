@@ -260,7 +260,7 @@
                 </div>
                 <p class="t-a-center f-s-12 flex-wrap c-gr p-l-15 p-r-15 p-10">Click territory name to jump to the
                     territory region. To edit territory, point at the territory and select action on the right.</p>
-                <div class="p-l-15 p-r-15 " [ngClass]="end<=5 ? 'list-zones-min' : 'list-zones-max'" >
+                <div class="p-l-15 p-r-15 " [ngClass]="((end - start)<=5) ? 'list-zones-min' : 'list-zones-max'" >
                     <mat-selection-list #list [ngModel]="selectedTerritories" [disableRipple]="true"  >
                         <div *ngFor="let zone of polygonsatDb?.slice(start,end);let i = index" 
                             class="f-s-14 primary-color d-flex align-center j-space p-4 zone-item"   >

@@ -1,5 +1,5 @@
 import { LocationStrategy } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef, Renderer2, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef, Renderer2, ViewEncapsulation, HostListener } from '@angular/core';
 import MarkerClusterer from '@googlemaps/markerclustererplus';
 import { isThisSecond } from 'date-fns';
 import { environment } from 'src/environments/environment';
@@ -20,6 +20,7 @@ import { Loader } from "@googlemaps/js-api-loader";
 import { DrawingService } from '../../../../services/drawing.service';
 import { RouteviewComponent } from '../routeview/routeview.component';
 import { DeletezoneconfirmComponent } from '../deletezoneconfirm/deletezoneconfirm.component';
+import {Router} from '@angular/router'
 
 interface TableObj {
   value: string;
@@ -34,7 +35,10 @@ interface TableMode {
   selector: 'store-map',
   templateUrl: './store-map.component.html',
   styleUrls: ['./store-map.component.css'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  host: {
+    '(document:click)': '(onBodyClick($event))'
+  }
 })
 export class StoreMapComponent implements OnInit, AfterViewInit {
 
@@ -45,9 +49,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   mkrs: any = [];
   shortestRte: any;
   map: any;
-  // directionsService = new google.maps.DirectionsService();
   directionsRenderer: any;
-  // stepDisplay = new google.maps.InfoWindow() ;
   showSliderMenu: boolean = false;
   showRoutes: boolean = false;
   result: any;
@@ -75,7 +77,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   originMkr: any;
   destMkr: any;
   startstopmkr: any;
-  // locs: any = environment?.locations;
   displayedColumns: string[] = [];
   dataBaseColumns: any;
   dataSource: any;
@@ -114,9 +115,34 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   maxLimitReached:boolean = false;
   editCanvasMode:boolean = false;
   currentEditZone:any;
+  isMenuOpen:boolean = false;
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(e: KeyboardEvent) {
+    if (e.key === 'F12') {
+      return false;
+    }
+    if (e.ctrlKey && e.shiftKey && e.key === "I") {
+      return false;
+    }
+    if (e.ctrlKey && e.shiftKey && e.key === "C") {
+      return false;
+    }
+    if (e.ctrlKey && e.shiftKey && e.key === "J") {
+      return false;
+    }
+    if (e.ctrlKey && e.key == "U") {
+      return false;
+    }
+    return true;
+  }
 
 
-  constructor(private renderer: Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService) { }
+  constructor(private renderer: Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService,private router:Router) {
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+   }
 
   ngOnChanges() { }
 
@@ -128,9 +154,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         this.initTable();
         this.makeClusters();
         this.callZonesApi();
-
-
-
       });
   }
 
@@ -148,9 +171,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           this.zonesApiErrorIntercept();
           return;
         }
-        console.log(res)
-        console.log(res?.Zone[0].data);
-        console.log(res?.Loc_Count);
         let zoneInfo = res?.Loc_Count;
         this.fetchedZones = res?.Zone[0].data;
         if(zoneInfo){
@@ -917,11 +937,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   }
 
   setSelection(newShape: any) {
-    // this.clearSelection();
-    // this.stopDrawing()
     this.selectedShape = newShape;
     newShape.setEditable(true);
-
   }
 
   deleteZone(zone: any) {
@@ -970,7 +987,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.apiService.delete(`${environment?.coreApiUrl}/delete_zone`, obj).subscribe(
       (dat) => {
         this.removeAllNewZonesInList();
-        console.log("success")
+        this.callZonesApi();
       },
       (error: any) => {
         console.log(error);
@@ -1060,24 +1077,20 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   clearSelection() {
     this.drawingManager.setDrawingMode(null);
     if (this.shapeOverlay) {
-      console.log("clearing the selected shap[e");
       this.listOfPolygons[this.listOfPolygons.length - 1] = null;
       this.shapeOverlay.setMap(null);
 
     }
     this.listOfPolygons.splice(0, this.listOfPolygons.length);
-
   }
 
   stopDrawing() {
-    // this.drawingManager.setMap(null);
     this.canvasMode = false;
     this.clearSelection();
     this.drawingService.setDrawMode(false);
     this.drawingManager.setDrawingMode(null);
     this.drawingManager.setMap(null)
   }
-
 
   public AddressChange(address: any) {
     this.formattedaddress = address.formatted_address;
@@ -1244,6 +1257,30 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   showBuildedRoute(ev: any) {
     this.showRoutes = ev;
+  }
+
+  logOut(){
+    this.isMenuOpen = false;
+    const dialogRef = this.dialog.open(ConfirmBoxComponent, {
+      data: {
+        message: 'Are you sure want to Logout?',
+        logout:true,
+      },
+    });
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed == true) {
+        localStorage.clear();
+        sessionStorage.clear();
+        this.router.navigate(['']);
+      }
+    });
+  }
+
+  onBodyClick(event:any): void {
+    if (!event.target.classList.contains('menu-backdrop')) {
+      this.isMenuOpen = false;
+    }
+  
   }
 
 

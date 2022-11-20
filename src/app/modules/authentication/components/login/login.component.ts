@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
@@ -16,29 +16,46 @@ export class LoginComponent implements OnInit {
   toggleSpinner: boolean | any;
   hide: boolean = true;
   accBlocked: boolean | any;
-  constructor(private formBuilder: FormBuilder, private router: Router,  public auth: AuthService) {
-    if(this.auth.isAuthenticated()){
-      // let user: any = this.auth.getUser();
-      console.log("authenticated")
-      let role = sessionStorage.getItem('userRole');
-      console.log(role)
-      if(role === 'admin') this.router.navigate(['/map']);
-      if(!role) {
-        console.log("not user Role")
-        this.showLoginForm = true;
-      }
-    } else{
-      console.log("not logingin in");
-      this.showLoginForm = true;
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(e: KeyboardEvent) {
+    if (e.key === 'F12') {
+      return false;
     }
+    if (e.ctrlKey && e.shiftKey && e.key === "I") {
+      return false;
+    }
+    if (e.ctrlKey && e.shiftKey && e.key === "C") {
+      return false;
+    }
+    if (e.ctrlKey && e.shiftKey && e.key === "J") {
+      return false;
+    }
+    if (e.ctrlKey && e.key == "U") {
+      return false;
+    }
+    return true;
+  }
+  
+  constructor(private formBuilder: FormBuilder, private router: Router, public auth: AuthService) {
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+    if (this.auth.isAuthenticated()) {
+      // let user: any = this.auth.getUser();
+      let role = sessionStorage.getItem('userRole');
+      if (role === 'admin') this.router.navigate(['/map']);
+      if (!role) this.showLoginForm = true;
+      
+    } 
+    else this.showLoginForm = true;
     this.loginForm = this.formBuilder.group({
       email: [null, Validators.required,],
-      password: [null,[Validators.required],
+      password: [null, [Validators.required],
       ],
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   get email() {
     return this.loginForm.get("email");
@@ -51,7 +68,7 @@ export class LoginComponent implements OnInit {
   submitClick(): void {
     this.toggleSpinner = true;
     let invalidLoginStatus: any = sessionStorage.getItem('invalidLoginStatus');
-    if (invalidLoginStatus) { 
+    if (invalidLoginStatus) {
       invalidLoginStatus = JSON.parse(invalidLoginStatus);
       if (invalidLoginStatus.attempt === 2 && this.checkTimeDifference(invalidLoginStatus?.time) && this.loginForm?.value?.email === invalidLoginStatus.email) {
         this.loginForm.value.lock = true; // third attempt
@@ -60,19 +77,16 @@ export class LoginComponent implements OnInit {
         this.loginForm.value.lock = false;
       }
     }
-
     let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDg4MDQ5ODksImlhdCI6MTY0ODc5Nzc4OSwic3ViIjoiZjUxYjQ2YjQtZjc2ZC00OTExLThhMWQtMjU3MDAxNGI0NzYzIiwidXNlcklkIjoxLCJyb2xlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiR1MxIn0.DjkxJRpUTdV8-3dYYfHaG9rsKpgASR0U1nPji1TeL7k";
 
-    console.log(this.loginForm?.value?.email)
-    console.log(this.loginForm?.value);
-    if(this.loginForm?.value?.email.toLowerCase()==='admin' && this.loginForm?.value?.password==='12345678'){
+    if (this.loginForm?.value?.email.toLowerCase() === 'admin' && this.loginForm?.value?.password === 'zmap#4565realjs&py?@22') {
       this.toggleSpinner = false;
       sessionStorage.setItem('userToken', token);
       sessionStorage.setItem('userRole', 'admin');
-      if(this.loginForm?.value?.email === 'admin') this.router.navigate(['/map']);
+      if (this.loginForm?.value?.email.toLowerCase() === 'admin' && this.loginForm?.value?.password === 'zmap#4565realjs&py?@22') this.router.navigate(['/map']);
     }
-    else{
-      this.wrongUser=true;
+    else {
+      this.wrongUser = true;
       this.toggleSpinner = false;
     }
 
@@ -81,7 +95,7 @@ export class LoginComponent implements OnInit {
     //   this.wrongUser = false;
     //   if (data?.token) { //receiver, register, vendor, admin
     //     this.toggleSpinner = false;
-        
+
     //     localStorage.setItem('userToken', data?.token);
     //     localStorage.setItem('userRole', data?.user?.role);
     //     if(data?.user?.role === 'receiver') this.router.navigate(['/receiving/home']);
@@ -118,7 +132,7 @@ export class LoginComponent implements OnInit {
   //   }
   // }
 
-  checkTimeDifference(oldTime:any) {
+  checkTimeDifference(oldTime: any) {
     const currentDate: any = new Date();
     oldTime = new Date(oldTime)
     const diffMs = (currentDate - oldTime); // milliseconds between now & old
