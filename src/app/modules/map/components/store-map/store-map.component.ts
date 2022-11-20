@@ -159,7 +159,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   zonesApiErrorIntercept() {
     this.attemptsFetchzones++;
-    if (this.attemptsFetchzones > 2) this.toastr.error("There was an error in Fetching Zones ")
+    if (this.attemptsFetchzones > 2) this.toastr.error("There was an error in Fetching the Zones ")
     this.callZonesApi();
   }
 
@@ -197,8 +197,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       },
       (error:any)=>{
         if(error?.status!=200){
-          this.toastr.warning('There was a problem fetching the zones');
-
+          this.toastr.error('Error occured while fetching the zones');
         }
 
       }
@@ -713,7 +712,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
             }
             else {
               this.editCanvasMode = false;
-              this.toastr.warning(error.statusText);
+              this.toastr.error("Error occured while updating the Zones");
               this.removeAllNewZonesInList();
               this.unSetAllZonesfromMap();
               this.callZonesApi();
@@ -736,8 +735,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       item.polygon.setEditable(false);
       if (item?.polygon) item?.polygon.setMap(this.map);
       item?.marker.setMap(this.map);
-      
-      // if (item?.polygon) item?.marker.setMap(this.map);
     })
   }
   hideAllZonesinCanvas() {
@@ -759,7 +756,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.setFreehandMode();
     this.canvasMode = false;
     if (this.listOfPolygons.length > 1) {
-      // this.toastr.warning("Only Single Polygon can be SAVED as of now.");
       this.listOfPolygons.splice(1);
     }
     this.listOfPolygons.forEach((poly: any, idx: any) => {
@@ -810,7 +806,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         }
         else {
           this.removeAllNewZonesInList();
-          this.toastr.warning(error.statusText);
+          this.toastr.error("Error occured while saving the Territories");
           this.unSetCanvas();
           this.initialLoader = false;
         }
@@ -1000,7 +996,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           // this.initialLoader = false;
         }
         else {
-          this.toastr.warning(error.statusText);
+          this.toastr.warning("Deletion of the zone was unsuccessful");
           this.removeAllNewZonesInList();
           this.unSetCanvas();
           this.initialLoader = false;

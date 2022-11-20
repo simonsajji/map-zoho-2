@@ -58,7 +58,7 @@ const routes: Routes = [
     GooglePlaceModule,
     RouterModule.forChild(routes),
     ToastrModule.forRoot({
-      positionClass :'toast-bottom-right'
+      positionClass :'toast-top-right'
     }),
     HttpClientModule,
     ColorPickerModule
