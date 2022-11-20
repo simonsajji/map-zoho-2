@@ -1,19 +1,47 @@
 <div *ngIf="datanew?.destinationRoute" class="mat-parent flex-column ">
-    <div class=" f-s-15 m-b-5 f-w-400 ">Are you sure want to <span class="f-w-500">add</span> selected <span class="f-w-500  m-0"> {{datanew?.locations}} locations </span></div>
-    <div class="f-s-15 f-w-500"><span class="f-w-400">to</span> current route ?</div>
-   
-    <div class="btn-parent text-center d-flex align-center j-center ">
-        <button mat-button class=" bg-primary-color m-r-5 f-s-13"  (click)="okClick()">ADD</button>
-        <button mat-button class="btn btn-secondary btn-cancel f-s-13" style="background-color:transparent!important;color:black" (click)="cancelClick()">SKIP</button>
+    <p class="f-s-18 p-l-10 f-w-500">Add Locations</p>
+    <div class="f-s-15 p-l-10 p-r-10 w-100 d-flex gap-10">
+        <div class=" f-s-15 m-b-5 f-w-400 ">Are you sure to <span class="c-red f-w-500"> add </span> all selected  <span class="f-w-500"> {{datanew?.locations}} locations </span> ? </div>
     </div>
+    <div class="btn-parent text-center d-flex align-center j-end w-100 t-a-right">
+        <button mat-button class="  f-s-13 bg-primary-color btn-ok  f-w-500" style="border-radius:5px!important"
+            (click)="okClick()">ADD</button>
+        <button mat-button class="btn-cancel f-s-13 p-5  m-r-5 f-w-500" 
+            (click)="cancelClick()">CANCEL</button>
+        
+    </div>
+
+    
 </div> 
 <div *ngIf="!datanew?.destinationRoute" class="mat-parent flex-column">
-    <div class=" f-s-15 m-b-5 f-w-400 ">Are you sure want to <span class="f-w-500">remove</span> all selected <span class="f-w-500  m-0"> {{datanew?.locations}} locations </span></div>
-    <div class="f-s-15 f-w-500"><span class="f-w-400">from the </span>  current route ?</div>
+   <ng-container *ngIf="datanew?.clearRoute">
+        <p class="f-s-16 p-l-10 f-w-500">Clear Route</p>
+        <div class="f-s-15 p-l-10 p-r-10 w-100 d-flex gap-10">
+            <div class=" f-s-15 m-b-5 f-w-400 ">Are you sure to <span class="c-purple f-w-500"> clear route</span> containing<span class="f-w-500"> {{datanew?.locations}} locations </span> ? </div>
+        </div>
+        <div class="btn-parent text-center d-flex align-center j-end w-100 t-a-right">
+            <button mat-button class="  f-s-13  btn-ok  f-w-500" style="border-radius:5px!important"
+                (click)="okClick()">CLEAR ROUTE</button>
+            <button mat-button class="btn-cancel f-s-13 p-5  m-r-5 f-w-500" 
+                (click)="cancelClick()">CANCEL</button>
+            
+        </div>
+
+   </ng-container>
+   <ng-container *ngIf="!datanew?.clearRoute">
+        <p class="f-s-16 p-l-10 f-w-500">Clear Selected Locations</p>
+        <div class="f-s-15 p-l-10 p-r-10 w-100 d-flex gap-10">
+            <div class=" f-s-15 m-b-5 f-w-400 ">Are you sure to <span class="c-purple f-w-500"> unselect </span> all selected<span class="f-w-500"> {{datanew?.locations}} locations </span> ? </div>
+        </div>
+        <div class="btn-parent text-center d-flex align-center j-end w-100 t-a-right">
+            <button mat-button class="  f-s-13  btn-ok  f-w-500" style="border-radius:5px!important"
+                (click)="okClick()">REMOVE</button>
+            <button mat-button class="btn-cancel f-s-13 p-5  m-r-5 f-w-500" 
+                (click)="cancelClick()">CANCEL</button>
+            
+        </div>
+
+   </ng-container>
    
-    <div class="btn-parent text-center d-flex align-center j-center ">
-        <button mat-button class=" bg-primary-color m-r-5 f-s-13" style="border-radius:5px!important" (click)="okClick()">REMOVE</button>
-        <button mat-button class="btn btn-secondary btn-cancel f-s-13" style="background-color:transparent!important;color:black;border-radius:5px!important" (click)="cancelClick()">SKIP</button>
-    </div>
 </div> 
 

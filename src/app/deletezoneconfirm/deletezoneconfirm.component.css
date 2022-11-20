@@ -15,15 +15,18 @@
   }
 
 .btn-parent{
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
 .btn-ok{
     /* margin-right: 10px;
     padding: 6px 20px; */
     border-radius: 4px!important;
-    background-color: transparent;
-    color:rgb(204, 40, 40);
+    background-color: rgb(201, 76, 76);
+    color:white;
+    margin-right: 10px;
+    padding: 2px 20px!important;
+    border-radius: 4px!important;
 }
 
 
@@ -153,4 +156,9 @@ button:focus {
 
 .border-bottom-dashed{
     border-bottom: 0.01rem dashed gray;
+}
+
+.c-red{
+    color:rgb(201, 76, 76);
+
 }

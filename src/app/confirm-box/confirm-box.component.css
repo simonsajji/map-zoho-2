@@ -1,23 +1,46 @@
+
+::-webkit-scrollbar {
+    width: 7px;
+  }
+  
+::-webkit-scrollbar-track {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+  }
+  
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background: rgb(227, 227, 227);
+  }
+
 .btn-parent{
     margin-top: 20px;
 }
 
 .btn-ok{
+    /* margin-right: 10px;
+    padding: 6px 20px; */
+    border-radius: 4px!important;
+    background-color: rgb(201, 76, 76);
+    color:white;
     margin-right: 10px;
-    padding: 6px 20px;
+    padding: 2px 20px!important;
     border-radius: 4px!important;
 }
 
-.btn-cancel{
-    background-color: #6d7f8e !important;
-}
 
 .mat-parent{
-    padding: 10px 10px;
-    width: fit-content;
-    height: fit-content;
+    padding: 0px 0px;
+     width: 28vw;
+     overflow: hidden;
+     border-radius: 6px!important;
+  
 }
 
+.column-list{
+    overflow-y: auto;
+}
 
 button{
     border: none;
@@ -32,6 +55,13 @@ button:focus {
     outline: none !important;
     box-shadow: none;
   }
+
+  .btn-cancel{
+    background-color: transparent!important;
+    color:rgb(72, 72, 72)!important;
+
+}
+
 
 .c-green{
     color:rgb(4, 82, 131);
@@ -86,7 +116,53 @@ button:focus {
     font-weight: 500!important;
 }
 
+.mat-list-option:hover{
+    background-color: transparent!important;
+}
+
+.mat-list-option:nth-child(1){
+    background-color: transparent!important;
+}
+
+
+
+::ng-deep .mat-pseudo-checkbox-checked{
+    background-color: #3668cc !important;
+}
+
 .mat-dialog-container {
-    padding: 10px !important;
+    padding: 5px !important;
   }
+.primary-color{
+    color: #0b4ed5!important
+}
   
+
+.mat-form-field{
+    width: 48%!important;
+}
+
+.d-flex{
+    display: flex!important;
+}
+
+.align-center{
+    align-items: center!important;
+}
+
+.j-center{
+    justify-content: center!important;
+}
+
+.border-bottom-dashed{
+    border-bottom: 0.01rem dashed gray;
+}
+
+.c-red{
+    color:rgb(201, 76, 76);
+
+}
+.c-purple{
+    color:rgb(78, 65, 197);
+
+}

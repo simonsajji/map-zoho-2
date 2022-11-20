@@ -124,6 +124,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
   newTerritoryData: any;
   checkedZonesList: any = [];
   previousPolygonsatDB: any = [];
+  disableTerritoriesViewMode:boolean = false;
 
   @Output('clearClusters') clearClusters = new EventEmitter();
   @Output('addClusters') addClusters = new EventEmitter();
@@ -206,11 +207,13 @@ export class RouteviewComponent implements OnInit, OnChanges {
       data: {
         locations: `${this.selectedLocations?.length}`,
         destinationRoute: null,
+        clearRoute:true
       }
     });
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (confirmed == true) {
         this.showRoutes = false;
+        this.disableTerritoriesViewMode = false;
         this.showBuildRoute.emit(this.showRoutes);
         this.selectedLocations = [];
         this.locationService.setSelectedPoints([]);
@@ -230,11 +233,13 @@ export class RouteviewComponent implements OnInit, OnChanges {
       data: {
         locations: `${this.selectedLocations?.length}`,
         destinationRoute: null,
+        clearRoute:false
       }
     });
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (confirmed == true) {
         this.showRoutes = false;
+        this.disableTerritoriesViewMode = false;
         this.showBuildRoute.emit(this.showRoutes);
         this.selectedLocations = [];
         this.locationService.setSelectedPoints([]);
@@ -263,6 +268,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
 
   editRoute() {
     this.showRoutes = !this.showRoutes;
+    this.disableTerritoriesViewMode = true;
     this.showBuildRoute.emit(this.showRoutes);
   }
 
@@ -732,6 +738,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
         this.clearWaypointMkrs();
         this.removeRoute();
         this.clearOriginDestinationMkrs();
+        this.disableTerritoriesViewMode = false;
         return;
       }
       else {
@@ -742,6 +749,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
         // this.makeMarker(leg2.end_location, "end", leg2.end_location, leg2);
 
         this.showRoutes = true;
+        this.disableTerritoriesViewMode = true;
         this.showBuildRoute.emit(this.showRoutes);
       }
       var renderer = new google.maps.DirectionsRenderer();
@@ -784,6 +792,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
   renderRoute() {
     this.directionsRenderer?.setDirections(this.shortestResult); // shortest or result
     this.showRoutes = true;
+    this.disableTerritoriesViewMode = true;
     this.showBuildRoute.emit(this.showRoutes);
   }
 
@@ -825,6 +834,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
     }
     routeResults.routes = [this.shortestRte];
     this.showRoutes = true;
+    this.disableTerritoriesViewMode = true;
     this.showBuildRoute.emit(this.showRoutes);
     return routeResults;
   }
