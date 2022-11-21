@@ -18,7 +18,6 @@ export class AuthService {
     else {
       let userCheck = false;
       let decodedToken: any = jwt_decode(token);
-      console.log(decodedToken)
       if(decodedToken?.role=='admin') userCheck = true;
       if(userCheck) return true;
       else return false;

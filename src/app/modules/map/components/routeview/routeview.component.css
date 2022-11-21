@@ -774,7 +774,7 @@ table {
 .delete-icon {
   /* width: 17px!important;
   height: 16px!important; */
-  font-size: 19px !important;
+  font-size: 18px !important;
   padding-top: 5px !important;
   opacity: 0;
   transition: all 0.25s ease-in-out !important;
@@ -787,7 +787,7 @@ table {
 .edit-icon {
   /* width: 17px!important;
   height: 16px!important; */
-  font-size: 19px !important;
+  font-size: 18px !important;
   padding-top: 5px !important;
   opacity: 0;
   transition: all 0.25s ease-in-out !important;
@@ -831,4 +831,17 @@ table {
 .list-zones-min{
   overflow-y: auto;
   height: 40vh;
+}
+
+.text-overflow-ellipsis{
+  white-space: nowrap; 
+  width: 100%; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-overflow: ellipsis!important;
+
+}
+
+.territory-head{
+  margin-left:11%;
 }

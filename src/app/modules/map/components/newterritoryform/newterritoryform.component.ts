@@ -51,7 +51,7 @@ export class NewterritoryformComponent implements OnInit {
   ngOnInit(): void { }
 
   okClick(): void {
-    if (this.code.nativeElement.value == '' || this.comments.nativeElement.value == '' || this.code.nativeElement.value == ' ') {
+    if (this.code.nativeElement.value == ''  || this.code.nativeElement.value == ' ') {
       this.toastr.warning('Please enter the fields before saving the new Territory');
       return;
     }

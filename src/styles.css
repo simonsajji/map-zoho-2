@@ -158,3 +158,12 @@ html, body {
 .w-80{
   width: 80%!important;
 }
+
+.text-overflow-ellipsis{
+  white-space: nowrap; 
+  width: 100%; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-overflow: ellipsis!important;
+
+}

@@ -259,24 +259,33 @@
                     <div class="m-r-10 m-l-5 f-s-13 primary-color hide-all-zones c-pointer" (click)="hideAllZones()">Hide all</div>
                 </div>
                 <p class="t-a-center f-s-12 flex-wrap c-gr p-l-15 p-r-15 p-10">Click territory name to jump to the
-                    territory region. To edit territory, point at the territory and select action on the right.</p>
+                    territory region. To edit/delete territory, point at the territory and select action on the right.</p>
+                
                 <div class="p-l-15 p-r-15 " [ngClass]="((end - start)<=5) ? 'list-zones-min' : 'list-zones-max'" >
                     <mat-selection-list #list [ngModel]="selectedTerritories" [disableRipple]="true"  >
+                        <div  class="f-s-14 primary-color d-flex align-center j-space p-4 p-l-3 p-r-0" >
+                            <div class="d-flex gap-5 flex-1 text-overflow-ellipsis c-gr f-s-11 t-a-center territory-head">Territory</div>
+                            <div class="d-flex j-end gap-10 c-gr ">
+                                <div class="f-s-11 m-l-2">Edit</div>
+                                <div class="f-s-11">Delete</div>
+                            </div>
+        
+                        </div>
                         <div *ngFor="let zone of polygonsatDb?.slice(start,end);let i = index" 
                             class="f-s-14 primary-color d-flex align-center j-space p-4 zone-item"   >
-                            <div class="d-flex gap-5 flex-1">
+                            <div class="d-flex gap-5 flex-1 text-overflow-ellipsis">
                                 <mat-checkbox [(ngModel)]="zone.checked" [style.height]="'50%'" class="d-flex align-center m-t-2 c-pointer"
                             (ngModelChange)="territorylistChange($event,zone)">
                                 </mat-checkbox>
-                                <div (click)="polygonClicktoJump($event,zone)" class="d-flex align-center m-t-2 c-pointer" >{{zone?.name }}</div> 
+                                <div (click)="polygonClicktoJump($event,zone)"  class="m-t-2 c-pointer text-overflow-ellipsis" >{{zone?.name }}</div> 
                             </div>
                             
-                        <div class="d-flex j-end gap-10 c-gr ">
-                            <i  class="fa fa-draw-polygon edit-icon f-s-18 c-gr c-pointer" (click)="editTerritory(zone)"></i>
-                            <mat-icon  class="delete-icon c-pointer m-l-5" (click)="deleteTerritory(zone)" >delete</mat-icon>
-                        </div>
+                            <div class="d-flex j-end gap-10 c-gr ">
+                                <i   class="fa fa-draw-polygon edit-icon c-gr c-pointer" (click)="editTerritory(zone)"></i>
+                                <mat-icon  class="delete-icon c-pointer m-l-6" (click)="deleteTerritory(zone)" >delete</mat-icon>
+                            </div>
                            
-                    </div>
+                        </div>
                     </mat-selection-list>
                     <mat-paginator [length]="polygonsatDb?.length" [hidePageSize]="true"
                         [pageSize]="pageSize" 
@@ -284,7 +293,7 @@
                         (page)="OnPageChange($event)" class="mat-paginator zone-edit-page2">
                     </mat-paginator>
                 </div>
-                <p class="t-a-center f-s-12  w-100 flex-wrap c-gr  p-b-20">You are now editing territories</p>
+                <!-- <p class="t-a-center f-s-12  w-100 flex-wrap c-gr  p-b-20">You are now editing territories</p> -->
             </div>
 
         </div>

@@ -8,7 +8,6 @@ export class AuthGuardService implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot): boolean | any {
     let roles = route.data['role'];
-    console.log(roles)
     if (!this.auth.isAuthenticated()) {
       this.router.navigate(['']);
       return false;
@@ -16,15 +15,12 @@ export class AuthGuardService implements CanActivate {
       let roleCheck = false;
       let user: any = this.auth.getUser();
       let userRole = sessionStorage.getItem('userRole');
-      console.log(user.role)
-      console.log(userRole)
       if(user?.role == userRole) roleCheck = true;
       if (roleCheck) {
         let permissionCheck: boolean = false;
         roles?.forEach((element:any) => {
           if (userRole === element) permissionCheck = true;
         });
-        console.log(permissionCheck)
         if (permissionCheck) return true;
         else {
           this.router.navigate(['']);

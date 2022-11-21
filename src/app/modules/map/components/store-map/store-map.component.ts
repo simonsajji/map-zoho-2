@@ -116,6 +116,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   editCanvasMode:boolean = false;
   currentEditZone:any;
   isMenuOpen:boolean = false;
+  timeOutApiRequest:any;
 
   
 
@@ -501,7 +502,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           }
           let infoWindow = new google.maps.InfoWindow();
           if(zone?.dryers && zone?.washers){
-            infoWindow.setContent(`<div style= "padding:8px"> <p style="font-weight:400;font-size:13px">Washers &emsp;  : &emsp; ${(zone?.washers) ? zone?.washers : 0}  </p>   <p style="font-weight:400;font-size:13px">Dryers &emsp; &emsp; : &emsp; ${(zone?.dryers) ? zone?.dryers : 0} </p>
+            infoWindow.setContent(`<div style= "padding:8px"><p style="font-weight:500;font-size:13px">Name &emsp;&emsp;   &emsp; ${zone?.Name}  </p> <p style="font-weight:400;font-size:13px">Washers &emsp;  : &emsp; ${(zone?.washers) ? zone?.washers : 0}  </p>   <p style="font-weight:400;font-size:13px">Dryers &emsp; &emsp; : &emsp; ${(zone?.dryers) ? zone?.dryers : 0} </p>
             <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>
             </div>`);
             infoWindow.setPosition(bounds.getCenter());
@@ -650,6 +651,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       if (zone?.zoneid == poly?.zoneid) {
         if (zone?.polygon) zone?.polygon.setMap(null);
         if (zone?.polygon) zone?.marker.setMap(null);
+        if(zone?.info) zone?.info?.close(); 
       }
     })
 
@@ -721,13 +723,17 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           (error: any) => {
             console.log(error);
             if (error?.status == 200) {
-              this.editCanvasMode = false;
-              this.removeAllNewZonesInList();
-              this.unSetAllZonesfromMap();
-              this.callZonesApi();
-              this.hideAllZonesinCanvas();
-              this.toastr.success('The Zone has been successfully Updated');
-              // this.initialLoader = false;
+              clearTimeout(this.timeOutApiRequest);
+              this.timeOutApiRequest = setTimeout(()=>{
+                this.editCanvasMode = false;
+                this.removeAllNewZonesInList();
+                this.unSetAllZonesfromMap();
+                this.callZonesApi();
+                this.hideAllZonesinCanvas();
+                this.toastr.success('The Zone has been successfully Updated');
+                // this.initialLoader = false;
+              },2500)
+             
             }
             else {
               this.editCanvasMode = false;
@@ -764,7 +770,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.fetchedPolygons.map((item: any, idx: any) => {
       if (item?.polygon) item.polygon.setEditable(false);
       if (item?.polygon) item?.polygon.setMap(null);
-     if(item?.marker) item?.marker.setMap(null);
+      if(item?.marker) item?.marker.setMap(null);
+      if(item?.info) item?.info?.close(); 
     })
   }
 
@@ -812,15 +819,21 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         this.toastr.success('Territories have been saved');
       },
       (error: any) => {
-        console.log(error);
+        
+        // console.log(error);
         if (error?.status == 200) {
-          this.removeAllNewZonesInList();
-          this.unSetAllZonesfromMap();
-          this.callZonesApi();
-          this.hideAllZonesinCanvas();
-          // this.initialLoader = false;
-          // this.unSetCanvas();
-          this.toastr.success('Territories have been saved');
+          clearTimeout(this.timeOutApiRequest);
+          this.timeOutApiRequest = setTimeout(()=>{
+            this.removeAllNewZonesInList();
+            this.unSetAllZonesfromMap();
+            this.callZonesApi();
+            this.hideAllZonesinCanvas();
+            // this.initialLoader = false;
+            // this.unSetCanvas();
+            this.toastr.success('Territories have been saved');
+          
+          },2500);
+          
         }
         else {
           this.removeAllNewZonesInList();
@@ -1005,14 +1018,17 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         this.callZonesApi();
       },
       (error: any) => {
-        console.log(error);
+        // console.log(error);
         if (error?.status == 200) {
-          this.removeAllNewZonesInList();
-          this.callZonesApi();
-          this.hideAllZonesinCanvas();
-          // this.unSetCanvas();
-          this.toastr.success('The Zone has been successfully deleted');
-          // this.initialLoader = false;
+          clearTimeout(this.timeOutApiRequest);
+          this.timeOutApiRequest = setTimeout(()=>{
+            this.removeAllNewZonesInList();
+            this.callZonesApi();
+            this.hideAllZonesinCanvas();
+            // this.unSetCanvas();
+            this.toastr.success('The Zone has been successfully deleted');
+            // this.initialLoader = false;
+          },2500);
         }
         else {
           this.removeAllNewZonesInList();
