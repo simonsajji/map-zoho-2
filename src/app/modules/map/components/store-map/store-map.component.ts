@@ -137,12 +137,24 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         this.initTable();
         this.makeClusters();
         this.callZonesApi();
-      });
+        if(!dat){
+          this.toastr.warning("Error");
+          this.initialLoader = false;
+        }
+      },
+      (error)=>{
+        if(error?.status !==200){
+          this.toastr.error("Error pccured in fetching locations");
+          this.initialLoader = false;
+
+        }
+      }
+      );
   }
 
   zonesApiErrorIntercept() {
     this.attemptsFetchzones++;
-    if (this.attemptsFetchzones > 2) this.toastr.error("There was an error in Fetching the Zones ")
+    if (this.attemptsFetchzones > 2) this.toastr.error("There was an error in fetching the zones ")
     this.callZonesApi();
   }
 
@@ -180,7 +192,9 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       },
       (error:any)=>{
         if(error?.status!=200){
-          this.toastr.error('Error occured while fetching the zones');
+          this.toastr.error('Error occured while fetching the updated zones');
+          this.initialLoader = false;
+          this.unSetCanvas();
         }
 
       }
@@ -730,7 +744,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
                 this.unSetAllZonesfromMap();
                 this.callZonesApi();
                 this.hideAllZonesinCanvas();
-                this.toastr.success('The Zone has been successfully Updated');
+                this.toastr.success('The Territory has been successfully updated');
                 // this.initialLoader = false;
               },2500)
              
@@ -741,7 +755,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
               this.unSetAllZonesfromMap();
               this.callZonesApi();
               this.hideAllZonesinCanvas();
-              this.toastr.error("Error occured while updating the Zones");
+              this.toastr.error("Error occured while updating the Territories");
             }
           }
         )

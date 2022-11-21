@@ -145,7 +145,7 @@
                             <span class="f-w-600 c-pointer primary-color f-s-14" (click)="picker1.open()">{{displayDate | date:
                                 'dd/MM/YY'}}</span>
                             <span class="c-gr f-w-500 f-s-14 ">Departing</span>
-                            <span class="f-w-600 c-pointer primary-color f-s-14" (click)="openTimePicker()">{{(this.currentTime < this.displayTime) ? displayTime : 'Now'}}</span>
+                            <span class="f-w-600 c-pointer primary-color f-s-14" (click)="openTimePicker()">{{(currentTime != displayTime) ? displayTime : ((displayDate.getTime() < currentDate.getTime()) ? displayTime : 'Now') }}</span>
     
                         </div>
                    <div [style.width]="20 + 'px'" class="date-arrow-btns"> <i [style.width]="50 + '%'" class="fa fa-chevron-right f-s-14  f-s-600  c-pointer " aria-hidden="true"
@@ -156,7 +156,7 @@
                 <div class="calendar-parent" style="position:relative">
                     <input matInput [min]="currentDate" [matDatepicker]="picker1" (dateChange)="dateChange($event)">
                     <mat-datepicker #picker1></mat-datepicker>
-                    <input matInput [ngxTimepicker]="timepicker" [min]="minTime" [ngModel]="displayTime" >
+                    <input matInput [ngxTimepicker]="timepicker"  [ngModel]="displayTime" >
                     <ngx-material-timepicker #timepicker (timeSet)="onTimeset($event)" ></ngx-material-timepicker>
                 </div>
             </div>

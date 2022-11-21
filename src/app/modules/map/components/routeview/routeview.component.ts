@@ -151,10 +151,10 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
       this.currentTime = this.formatAMPM(new Date());
       this.currentTimeUTC = new Date().getTime();
       this.minTime = this.formatAMPM(new Date());
-      let newdate = this.displayDate.toLocaleString().split(',')[0];
-      this.displayTimeUTC = new Date(`${newdate}  ${this.displayTime }`).getTime();
-      this.displayTime =  (this.currentTimeUTC < this.displayTimeUTC) ?  this.displayTime : this.currentTime;
-      this.minTime =  (this.currentTimeUTC < this.displayTimeUTC) ?  '00:00' : this.currentTime;
+      // let newdate = this.displayDate.toLocaleString().split(',')[0];
+      // this.displayTimeUTC = new Date(`${newdate}  ${this.displayTime }`).getTime();
+      // this.displayTime =  (this.currentTimeUTC < this.displayTimeUTC) ?  this.displayTime : this.currentTime;
+      // this.minTime =  (this.currentTimeUTC < this.displayTimeUTC) ?  '00:00' : this.currentTime;
     }, 1000);
   }
 
