@@ -826,11 +826,11 @@ table {
 
 .list-zones-max{
   overflow-y: auto;
-  height: 60vh;
+  height: 75vh;
 }
 .list-zones-min{
   overflow-y: auto;
-  height: 40vh;
+  height: 65vh;
 }
 
 .text-overflow-ellipsis{

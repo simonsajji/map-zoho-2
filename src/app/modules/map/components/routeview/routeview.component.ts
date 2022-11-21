@@ -11,7 +11,7 @@ import { LocationService } from '../../../../services/location.service';
 import { isThisSecond } from 'date-fns';
 import { environment } from 'src/environments/environment';
 import { animate, animation, style, transition, trigger, useAnimation, state, keyframes } from '@angular/animations';
-import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, Input, Output, ViewChild, AfterViewInit, ChangeDetectorRef, EventEmitter, ViewEncapsulation, SimpleChanges, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, Input, Output, ViewChild, AfterViewInit, ChangeDetectorRef, EventEmitter, ViewEncapsulation, SimpleChanges, HostListener, OnDestroy } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { DrawingService } from '../../../../services/drawing.service';
 import { NewterritoryformComponent } from '../newterritoryform/newterritoryform.component'
@@ -42,7 +42,7 @@ interface ViewObj {
 
   ]
 })
-export class RouteviewComponent implements OnInit, OnChanges {
+export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   navigation: boolean = false;
   showOverlay: boolean = false;
   showRoutes: boolean = false;
@@ -124,6 +124,7 @@ export class RouteviewComponent implements OnInit, OnChanges {
   checkedZonesList: any = [];
   previousPolygonsatDB: any = [];
   disableTerritoriesViewMode:boolean = false;
+  fetchTimeInterval:any;
 
 
   @Output('clearClusters') clearClusters = new EventEmitter();
@@ -142,13 +143,19 @@ export class RouteviewComponent implements OnInit, OnChanges {
   @Output('viewSinglePolygonWithoutBounds') viewSinglePolygonWithoutBounds = new EventEmitter();
 
 
-  constructor(private locationService: LocationService, private drawingService: DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) { }
+  constructor(private locationService: LocationService, private drawingService: DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) { 
+    this.fetchTimeInterval = setInterval(() => {
+      this.currentTime = this.formatAMPM(new Date());
+      this.minTime = this.formatAMPM(new Date());
+    }, 1000);
+  }
 
   ngOnInit(): void {
     this.routesModeView = true;
     this.zonesModeView = false;
     this.start = 0;
     this.end = 5;
+   
 
     this.directionsService = new google.maps.DirectionsService();
     this.infoWin = new google.maps.InfoWindow();
@@ -167,9 +174,11 @@ export class RouteviewComponent implements OnInit, OnChanges {
 
     this.currentDate = new Date();
     this.currentTime = this.formatAMPM(new Date());
+   
     this.displayTime = this.formatAMPM(new Date());
     this.displayDate = new Date();
-    this.minTime = this.currentTime;
+    // this.minTime = this.currentTime;
+   
     this.initMap();
     this.makeClusters();
   }
@@ -186,6 +195,10 @@ export class RouteviewComponent implements OnInit, OnChanges {
   navigationDrawer() {
     this.navigation = !this.navigation;
     this.showOverlay = !this.showOverlay;
+  }
+
+  openTimePicker():any{
+      this.timepicker.open();
   }
 
   deleteWaypoint(loc: any) {
@@ -929,14 +942,14 @@ export class RouteviewComponent implements OnInit, OnChanges {
     if (ev) {
       this.viewSinglePolygon.emit(zone);
       this.polygonsatDb.map((item: any, idx: any) => {
-        if (zone?.id == item?.id) item.checked = true;
+        if (zone?.zoneid == item?.zoneid) item.checked = true;
       });
       this.updateCheckedZonesList();
     }
     else {
       this.hideSinglePolygon.emit(zone);
       this.polygonsatDb.map((item: any, idx: any) => {
-        if (zone?.id == item?.id) item.checked = false;
+        if (zone?.zoneid == item?.zoneid) item.checked = false;
 
       });
       this.updateCheckedZonesList();
@@ -983,9 +996,18 @@ export class RouteviewComponent implements OnInit, OnChanges {
 
   editTerritory(zone: any) {
     this.previousPolygonsatDB = [...this.polygonsatDb];
+    this.viewSinglePolygon.emit(zone);
+      this.polygonsatDb.map((item: any, idx: any) => {
+        if (zone?.zoneid == item?.zoneid) item.checked = true;
+      });
+      this.updateCheckedZonesList();
+
     this.editZoneEvent.emit(zone);
   }
 
+  ngOnDestroy(): void {
+    clearInterval(this.fetchTimeInterval);
+  }
   
 
 }

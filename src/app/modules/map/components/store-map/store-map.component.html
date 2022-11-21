@@ -56,7 +56,7 @@
         </div> -->
         
         <input type="text" ngx-google-places-autocomplete [options]="options" (onAddressChange)="AddressChange($event)"
-            placeholder="Search for Name or Address" class="f-s-15 w-100 p-l-10" #sarea>  
+            placeholder="Search for Location Name or Address" class="f-s-15 w-100 p-l-10" #sarea>  
            
         <i *ngIf="sarea.value!=''" class="fa fa-times f-s-14 c-gr-light m-r-10 c-pointer"
             (click)="clearSearchArea()"></i>
