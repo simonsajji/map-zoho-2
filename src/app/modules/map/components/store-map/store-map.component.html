@@ -41,7 +41,7 @@
         <button *ngIf="listOfPolygons.length>0" matTooltip="SAVE TERRITORY"  class="c-pointer zone-save-btn f-s-16 f-w-600 p-5 d-flex align-center j-center" (click)="saveZones()"><mat-icon >check</mat-icon></button>          
      </div>
     <div  *ngIf="editCanvasMode" class="d-flex gap-5 j-center align-center p-t-10" style="z-index:1000!important;position: absolute!important;top:0%;left:42%;width:250px">
-        <button matTooltip="CANCEL UPDATE"  class="c-pointer zone-cancel-btn f-s-18 f-w-400 m-r-10"  (click)="unSetCanvas()">X</button>
+        <button matTooltip="CANCEL UPDATE"  class="c-pointer zone-cancel-btn f-s-18 f-w-400 m-r-10"  (click)="cancelUpdate()">X</button>
         <button matTooltip="UPDATE TERRITORY"  class="c-pointer zone-update-btn f-s-16 f-w-600 p-5 d-flex align-center j-center" (click)="updateAllTerritories()"><mat-icon >check</mat-icon></button>          
      </div>
 

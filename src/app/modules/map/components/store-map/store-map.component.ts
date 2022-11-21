@@ -117,25 +117,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   currentEditZone:any;
   isMenuOpen:boolean = false;
 
-  @HostListener('document:keydown', ['$event'])
-  handleKeyboardEvent(e: KeyboardEvent) {
-    if (e.key === 'F12') {
-      return false;
-    }
-    if (e.ctrlKey && e.shiftKey && e.key === "I") {
-      return false;
-    }
-    if (e.ctrlKey && e.shiftKey && e.key === "C") {
-      return false;
-    }
-    if (e.ctrlKey && e.shiftKey && e.key === "J") {
-      return false;
-    }
-    if (e.ctrlKey && e.key == "U") {
-      return false;
-    }
-    return true;
-  }
+  
 
 
   constructor(private renderer: Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService,private router:Router) {
@@ -339,7 +321,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.enableEditMode = false;
     this.setFreehandMode();
     this.removeAllNewZonesInList(); // removes only unsaved ones from new drawing
-    // setting all zones  editable to false
     this.fetchedPolygons.map((item:any)=>{
       if(item?.polygon) item?.polygon.setEditable(false);
     })
@@ -349,6 +330,42 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         item?.polygon.setMap(null);
       }
     });
+
+   this.currentEditZone = null;
+    this.listOfPolygons = [];
+    this.drawingService.setDrawMode(false);
+    this.initialLoader = false;
+  }
+  cancelUpdate() {
+    this.canvasMode = false;
+    this.editCanvasMode = false;
+    this.enableEditMode = false;
+    this.setFreehandMode();
+    this.removeAllNewZonesInList(); // removes only unsaved ones from new drawing
+    if(this.currentEditZone){
+      this.fetchedPolygons.map((item: any, idx: any) => {
+        if(item?.zoneid == this.currentEditZone?.zoneid) {
+          if(item?.polygon && this.currentEditZone?.polygon) {
+   
+            item.polygon.setPath( this.currentEditZone.prevGeoCoordinates);
+          }
+        
+         // set bounds here only for current edit zone
+        }
+      });
+      
+    }
+    this.fetchedPolygons.map((item:any)=>{
+      if(item?.polygon) item?.polygon.setEditable(false);
+    })
+    this.listOfPolygons.map((item:any)=>{
+      if(item?.polygon) {
+        item?.polygon.setEditable(false);
+        item?.polygon.setMap(null);
+      }
+    });
+
+   this.currentEditZone = null;
     this.listOfPolygons = [];
     this.drawingService.setDrawMode(false);
     this.initialLoader = false;
@@ -682,6 +699,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
         let loc_ids: any = (location_array.length > 1) ? location_array : location_array[0];
         let prev_loc_ids:any = (item?.previous_location_ids?.length > 1) ? item?.previous_location_ids : item?.previous_location_ids[0];
+        if(loc_ids == undefined || null) loc_ids = null;
+        if(prev_loc_ids == undefined || null) prev_loc_ids = null;
         let obj = {
           "zone": {
             "Name": item.name,
@@ -712,12 +731,11 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
             }
             else {
               this.editCanvasMode = false;
-              this.toastr.error("Error occured while updating the Zones");
               this.removeAllNewZonesInList();
               this.unSetAllZonesfromMap();
               this.callZonesApi();
               this.hideAllZonesinCanvas();
-              this.initialLoader = false;
+              this.toastr.error("Error occured while updating the Zones");
             }
           }
         )
@@ -806,9 +824,10 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         }
         else {
           this.removeAllNewZonesInList();
+          this.unSetAllZonesfromMap();
+          this.callZonesApi();
+          this.hideAllZonesinCanvas();
           this.toastr.error("Error occured while saving the Territories");
-          this.unSetCanvas();
-          this.initialLoader = false;
         }
 
       }
@@ -996,10 +1015,10 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           // this.initialLoader = false;
         }
         else {
-          this.toastr.warning("Deletion of the zone was unsuccessful");
           this.removeAllNewZonesInList();
-          this.unSetCanvas();
-          this.initialLoader = false;
+          this.callZonesApi();
+          this.hideAllZonesinCanvas();
+          this.toastr.warning("Deletion of the zone was unsuccessful");
         }
       }
     )
