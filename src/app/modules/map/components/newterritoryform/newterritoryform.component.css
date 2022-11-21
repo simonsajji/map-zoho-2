@@ -1,0 +1,170 @@
+
+::-webkit-scrollbar {
+    width: 7px;
+  }
+  
+::-webkit-scrollbar-track {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+  }
+  
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background: rgb(227, 227, 227);
+  }
+
+.btn-parent{
+    margin-top: 30px;
+}
+
+.btn-ok{
+    /* margin-right: 10px;
+    padding: 6px 20px; */
+    border-radius: 4px!important;
+    background-color: transparent;
+}
+
+.btn-cancel{
+    background-color: transparent;
+
+}
+
+.mat-parent{
+    padding: 0px 0px;
+     width: 52vw;
+     overflow: hidden;
+  
+}
+
+.column-list{
+    overflow-y: auto;
+}
+
+button{
+    border: none;
+    outline: none;
+    border-radius: 2px;
+    cursor: pointer;
+    color: #fff;
+    padding-top: 4px !important;
+}
+
+button:focus {
+    outline: none !important;
+    box-shadow: none;
+  }
+
+.c-green{
+    color:rgb(4, 82, 131);
+}
+
+.bg-green{
+    background-color: rgba(29, 119, 151, 0.94);
+}
+
+.sub-head{
+    position: relative;
+    height: 15px;
+}
+
+.sub-head  .hor-line{
+    display: inline-block;
+    position: absolute;
+    border:0;
+    border-bottom: 0.01rem solid rgb(202, 202, 202);    
+    right: 0;
+
+}
+
+.sub-head > span{
+    margin-right: 2px;
+}
+
+.c-black{
+    color: black;
+}
+
+.c-light-dark{
+    color:rgb(96, 96, 96);
+}
+
+.route-name{
+    /* width: 280px; */
+    height: 15px;
+    text-overflow: ellipsis!important;
+    /* overflow:  */
+    
+}
+
+.text-overfl{
+    text-overflow: ellipsis;
+}
+
+.f-w-400{
+    font-weight: 400!important;
+}
+.f-w-500{
+    font-weight: 500!important;
+}
+
+.mat-list-option:hover{
+    background-color: transparent!important;
+}
+
+.mat-list-option:nth-child(1){
+    background-color: transparent!important;
+}
+
+
+
+::ng-deep .mat-pseudo-checkbox-checked{
+    background-color: #3668cc !important;
+}
+
+.mat-dialog-container {
+    padding: 5px !important;
+  }
+.primary-color{
+    color: #0b4ed5!important
+}
+  
+
+.mat-form-field{
+    width: 48%!important;
+}
+
+.d-flex{
+    display: flex!important;
+}
+
+.align-center{
+    align-items: center!important;
+}
+
+.j-center{
+    justify-content: center!important;
+}
+.color-outer-ctn{
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0.15rem solid rgb(208, 208, 208);
+    border-radius: 5px;
+    background-color: rgb(208, 208, 208);
+    /* border-radius: 50%; */
+
+
+}
+.color-picker-ctn{
+    width: 40%;
+    height: 45%;
+    border: 0.2rem solid rgb(249, 249, 249);
+    border-radius: 50%;
+    outline: none;
+   
+    
+}
+

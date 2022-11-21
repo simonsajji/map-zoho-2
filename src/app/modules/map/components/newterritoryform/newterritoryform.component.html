@@ -1,0 +1,48 @@
+<div class="mat-parent flex-column ">
+    <p class="f-s-20 p-l-10 f-w-500">Territory properties</p>
+    <div class="f-s-14 p-l-10 p-r-10 w-100 d-flex column-list">
+        <mat-form-field class="m-r-5 m-l-5 flex-1">
+            <mat-label class="f-s-13">Name</mat-label>
+            <input matInput #name (keyup)="setnewZoneName($event)">
+        </mat-form-field>
+        <mat-form-field class="m-r-5 m-l-5 flex-1">
+            <mat-label class="f-s-13">Code</mat-label>
+            <input matInput [value]="name.value | removespecial" #code>            
+        </mat-form-field>
+    </div>
+    <div class="d-flex f-s-14 p-l-10 p-r-10 w-100 d-flex column-list">
+        <mat-form-field class="m-r-5 m-l-5 flex-1">
+            <mat-label class="f-s-13">Comments</mat-label>
+            <input matInput #comments (keyup)="setnewZoneComments($event)">
+        </mat-form-field>
+    </div>
+    <div class="d-flex f-s-14 p-l-15 m-t-20 p-r-10 w-100 align-center column-list">
+        <div class="f-s-13 m-r-5">Mode:</div>
+        <div class="f-s-13 d-flex align-center ">
+            <mat-radio-button  value="chocolate" color="primary" checked="true"></mat-radio-button>
+            <mat-label class="d-flex align-center"><div class="m-r-5 d-flex align-center">Hand drawn <mat-icon matTooltip="Draw Polygon by hand" class="f-s-14 c-pointer d-flex align-center j-center">help</mat-icon></div> </mat-label>   
+        </div>
+    </div>
+    <div class="d-flex f-s-14 p-l-15 m-t-20 p-r-10 w-100 align-center column-list">
+        <div class="flex-column d-flex gap-5  flex-1 ">
+            <div class="m-t-2 m-b-2 f-s-14 f-w-500 ">Visualization</div>
+            <div class="d-flex gap-5 f-s-13 align-bottom p-5 p-l-0">
+                <mat-label class="m-r-5 f-s-14">Color:</mat-label>
+                <!-- <mat-label class="f-s-12" [style.color]="colorCode">{{colorCode}}</mat-label> -->
+                <!-- <input matInput #color (keyup)="setnewZoneColor($event)"> -->
+                <div class="color-outer-ctn">
+                    <input class="color-picker-ctn c-pointer" readonly (colorPickerChange)="colorChange($event)" [cpOutputFormat]="'hex'" [(colorPicker)]="colorCode" [style.background]="colorCode" value=""/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="btn-parent text-center d-flex align-center j-end w-100 t-a-right">
+        <button mat-button class="btn primary-color btn-cancel f-s-14 p-5 m-r-5" [disableRipple]="true"
+            (click)="cancelClick()">CANCEL</button>
+        <button mat-button class=" primary-color  f-s-14 btn-ok p-5" [disableRipple]="true"
+            (click)="okClick()">SAVE</button>
+    </div>
+
+</div>

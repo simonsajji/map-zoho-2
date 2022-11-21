@@ -1,0 +1,109 @@
+<div class="container" style="overflow:hidden!important">
+    <div id="map" #mapContainer style="height: 100vh;width: calc(100vw);z-index: 10;overflow: hidden;"></div>
+    <div *ngIf="initialLoader" style="z-index:1200!important">
+        <mat-spinner style="z-index:1000!important;position: absolute!important;top:50%;left:49%" diameter="45">
+        </mat-spinner>
+    </div>
+
+    <div  class="btn-group "  *ngIf="canvasMode && !editCanvasMode" style="z-index:1000!important;position: absolute!important;top:50%;right:0.55%;opacity: 1!important;">
+        <div class="p-relative">
+            <button  [disabled]="maxLimitReached" mat-mini-fab color="basic"  class="custom-mat-mini-fab " (click)="setPolygonDrawingMode()" >
+                <i class="fa fa-draw-polygon f-s-18 w-100 h-100" [ngClass]="enableDrawingMode ? 'glow-icon-poly' : ''" ></i>
+                <div *ngIf="enableDrawingMode" class="green-signal blink_me "></div>
+              </button>
+              <div *ngIf="enableDrawingMode" class="popout-menu d-flex j-end">
+                <button class="f-s-12 p-5 p-l-8 p-r-8" (click)="cancelDrawing()">Stop Drawing</button>
+            </div>
+        </div>
+        <div class="p-relative">
+            <button [disabled]="listOfPolygons?.length<1" mat-mini-fab color="basic" [ngClass]="enableDeleteMode ? 'glow-btn' : ''" class="custom-mat-mini-fab " (click)="deleteDrawnZone()">
+                <mat-icon class="custom-mat-icon " [ngClass]="enableDeleteMode ? 'glow-icon' : ''" >delete</mat-icon>
+                <div *ngIf="enableDeleteMode" class="green-signal blink_me "></div>
+              </button>
+              <div *ngIf="enableDeleteMode && listOfPolygons?.length>=1" class="popout-menu d-flex j-end">
+                <button class="f-s-12 p-5 p-l-8 p-r-8" (click)="deleteModeToggle()">cancel</button>
+            </div>
+        </div>
+        <div class="p-relative">
+            <button [disabled]="listOfPolygons?.length<1" mat-mini-fab color="basic" [ngClass]="(enableEditMode || listOfPolygons?.length>=1) ? 'glow-btn' : ''" class="custom-mat-mini-fab "  (click)="editModeToggle()">
+                <mat-icon class="custom-mat-icon" [ngClass]="(enableEditMode || listOfPolygons?.length>=1) ? 'glow-icon-edit' : ''" >edit</mat-icon>
+                <div *ngIf="(enableEditMode || listOfPolygons?.length>=1)" class="green-signal blink_me "></div>
+            </button>
+            <!-- <div *ngIf="enableEditMode && listOfPolygons?.length>=1" class="popout-menu d-flex j-end">
+                <button class="f-s-12 p-5 p-l-8 p-r-8" (click)="editModeToggle()">cancel</button>
+            </div> -->
+        </div>        
+    </div>
+
+
+    <div  *ngIf="canvasMode && !editCanvasMode" class="d-flex gap-5 j-center align-center p-t-10" style="z-index:1000!important;position: absolute!important;top:0%;left:42%;width:250px">
+        <button matTooltip="CANCEL"  class="c-pointer zone-cancel-btn f-s-18 f-w-400 m-r-10"  (click)="unSetCanvas()">X</button>
+        <button *ngIf="listOfPolygons.length>0" matTooltip="SAVE TERRITORY"  class="c-pointer zone-save-btn f-s-16 f-w-600 p-5 d-flex align-center j-center" (click)="saveZones()"><mat-icon >check</mat-icon></button>          
+     </div>
+    <div  *ngIf="editCanvasMode" class="d-flex gap-5 j-center align-center p-t-10" style="z-index:1000!important;position: absolute!important;top:0%;left:42%;width:250px">
+        <button matTooltip="CANCEL UPDATE"  class="c-pointer zone-cancel-btn f-s-18 f-w-400 m-r-10"  (click)="cancelUpdate()">X</button>
+        <button matTooltip="UPDATE TERRITORY"  class="c-pointer zone-update-btn f-s-16 f-w-600 p-5 d-flex align-center j-center" (click)="updateAllTerritories()"><mat-icon >check</mat-icon></button>          
+     </div>
+
+    <div class="searchArea d-flex align-center ">
+        <!-- <div class="menu-backdrop map-menu-ctn">
+            <i class="menu-backdrop fa fa-bars f-s-20 primary-color m-l-10 c-pointer" aria-hidden="true" (click)="isMenuOpen=!isMenuOpen" ></i>
+            <div *ngIf="isMenuOpen" class="menu-backdrop map-menu">
+                <button mat-button class="menu-backdrop log-out-btn c-pointer" (click)="logOut()">
+                    <span class="menu-backdrop">Logout</span>
+                </button>
+            </div>
+        </div> -->
+        
+        <input type="text" ngx-google-places-autocomplete [options]="options" (onAddressChange)="AddressChange($event)"
+            placeholder="Search for Location Name or Address" class="f-s-15 w-100 p-l-10" #sarea>  
+           
+        <i *ngIf="sarea.value!=''" class="fa fa-times f-s-14 c-gr-light m-r-10 c-pointer"
+            (click)="clearSearchArea()"></i>
+        <div class="d-flex align-center m-r-5"  matTooltip="Map Properties">
+            <div [matMenuTriggerFor]="mapprops" class="d-flex align-center ">
+                <img src="assets/svgs/map-marked-alt.svg"  style="opacity:0.75" class="p-6 c-pointer m-l-10" width="28px" height="26px" alt="" srcset="">
+                <i class="fa fa-angle-down  f-s-18 c-gr m-t-4 p-4" ></i>
+
+            </div>
+            
+            <mat-menu #mapprops="matMenu" class="matpanel">
+                <div (click) ="$event.stopPropagation()" class=" d-flex j-center gap-10 align-center  tranparency-form" >
+                    <div class="f-s-14 c-gr" >Map Transparency:</div>
+                    <div class="d-flex align-center gap-5">
+                        <mat-label class="f-s-14 c-gr-light">0%</mat-label>
+                        <mat-slider
+                            class="example-margin"
+                            [max]="100"
+                            [min]="2"
+                            [step]="2"
+                            [value]="transparencyValue"
+                            [disabled]="false"
+                            (valueChange)="transparencyChange($event)"
+                            color="primary"
+                        >
+                        <input matSliderThumb >
+                        </mat-slider>
+                        <mat-label class="f-s-14 c-gr-light">100%</mat-label>
+                    </div>
+                    
+                </div>
+            </mat-menu>
+        </div> 
+        <!-- <img class="p-6 c-pointer  m-l-5 m-r-10" width="22px" height="22px" src="assets/current_loc.png" alt=""
+        matTooltip="Jump to Current Location" (click)="navigateCurrentLocation()"> -->
+    </div>
+
+    <app-routeview (enableInitialLoader)="enableLoader()"  (disableInitialLoader)="disableLoader()" [origin]="origin"
+        [destination]="destination" [fetched_locations]="fetched_locations" [map]="map" (addClusters)="makeClusters()" [fetchedZones]="fetchedZones" [polygonsatDb]="fetchedPolygons" (viewSinglePolygon)="showPolygon($event)" (viewSinglePolygonWithoutBounds)="showPolygonWithoutBounds($event)"
+        (hideSinglePolygon)="hidePolygon($event)" [initialLoaderZones]="initialLoader"
+        (clearClusters)="clearCluster()"  (initZoneCreation)="setCanvas($event)" (showZones)=" viewAllZonesinCanvas()" (deleteZoneEvent)="deleteZone($event)" (editZoneEvent)="editZone($event)" (hideZones)=" hideAllZonesinCanvas()" (jumpPolygonEvent)="jumptoPolygon($event)"
+        [allTerritoriesLoaded]="allTerritoriesLoaded" #menuchild>
+    </app-routeview>
+
+
+    <app-tableview [fetched_locations]="fetched_locations" [origin]="origin" [destination]="destination" [initialLoaderTable]="initialLoader"
+        [displayedColumns]="displayedColumns"  ></app-tableview>
+
+
+</div>
