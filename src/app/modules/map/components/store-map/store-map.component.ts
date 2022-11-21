@@ -716,7 +716,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
             "new":loc_ids
           }
         }
-        console.log(obj)
         this.apiService.put(`${environment?.coreApiUrl}/update_zone`, obj).subscribe(
           (dat) => {
             this.removeAllNewZonesInList();

@@ -845,3 +845,9 @@ table {
 .territory-head{
   margin-left:11%;
 }
+
+.date-arrow-btns-disabled{
+  opacity: 0.4;
+  color:grey;
+  pointer-events: none!important;
+}

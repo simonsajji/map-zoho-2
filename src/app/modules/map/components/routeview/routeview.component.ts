@@ -15,6 +15,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, Inpu
 import { SelectionModel } from '@angular/cdk/collections';
 import { DrawingService } from '../../../../services/drawing.service';
 import { NewterritoryformComponent } from '../newterritoryform/newterritoryform.component'
+import { AnyCatcher } from 'rxjs/internal/AnyCatcher';
 
 
 interface ViewObj {
@@ -125,6 +126,8 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   previousPolygonsatDB: any = [];
   disableTerritoriesViewMode:boolean = false;
   fetchTimeInterval:any;
+  currentTimeUTC:any;
+  displayTimeUTC:any;
 
 
   @Output('clearClusters') clearClusters = new EventEmitter();
@@ -146,7 +149,12 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   constructor(private locationService: LocationService, private drawingService: DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) { 
     this.fetchTimeInterval = setInterval(() => {
       this.currentTime = this.formatAMPM(new Date());
+      this.currentTimeUTC = new Date().getTime();
       this.minTime = this.formatAMPM(new Date());
+      let newdate = this.displayDate.toLocaleString().split(',')[0];
+      this.displayTimeUTC = new Date(`${newdate}  ${this.displayTime }`).getTime();
+      this.displayTime =  (this.currentTimeUTC < this.displayTimeUTC) ?  this.displayTime : this.currentTime;
+      this.minTime =  (this.currentTimeUTC < this.displayTimeUTC) ?  '00:00' : this.currentTime;
     }, 1000);
   }
 
@@ -174,6 +182,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
 
     this.currentDate = new Date();
     this.currentTime = this.formatAMPM(new Date());
+    this.currentTimeUTC = new Date().getTime();
    
     this.displayTime = this.formatAMPM(new Date());
     this.displayDate = new Date();

@@ -138,14 +138,14 @@
     
             <div *ngIf="!showRoutes" class="m-t-10 m-b-20">
                 <div class="d-flex align-baseline j-center gap-2 w-100 ">
-                    <div [style.width]="20 + 'px'" class="date-arrow-btns"><i [style.width]="50 + '%'" class="fa fa-chevron-left f-s-14  m-l-5 c-pointer " aria-hidden="true"
+                    <div [style.width]="20 + 'px'" class="date-arrow-btns" ><i [ngClass]="(currentDate.getTime()<displayDate.getTime()) ? '': 'date-arrow-btns-disabled'" [style.width]="50 + '%'" class="fa fa-chevron-left f-s-14  m-l-5 c-pointer " aria-hidden="true"
                         (click)="leftDateClick()"></i></div>
                     
                         <div class="d-flex gap-2 j-center flex-wrap flex-1" >
                             <span class="f-w-600 c-pointer primary-color f-s-14" (click)="picker1.open()">{{displayDate | date:
                                 'dd/MM/YY'}}</span>
                             <span class="c-gr f-w-500 f-s-14 ">Departing</span>
-                            <span class="f-w-600 c-pointer primary-color f-s-14" (click)="openTimePicker()">{{(this.currentTime!=this.displayTime) ? displayTime : 'Now'}}</span>
+                            <span class="f-w-600 c-pointer primary-color f-s-14" (click)="openTimePicker()">{{(this.currentTime < this.displayTime) ? displayTime : 'Now'}}</span>
     
                         </div>
                    <div [style.width]="20 + 'px'" class="date-arrow-btns"> <i [style.width]="50 + '%'" class="fa fa-chevron-right f-s-14  f-s-600  c-pointer " aria-hidden="true"
@@ -156,7 +156,7 @@
                 <div class="calendar-parent" style="position:relative">
                     <input matInput [min]="currentDate" [matDatepicker]="picker1" (dateChange)="dateChange($event)">
                     <mat-datepicker #picker1></mat-datepicker>
-                    <input matInput [ngxTimepicker]="timepicker" [min]="minTime"  >
+                    <input matInput [ngxTimepicker]="timepicker" [min]="minTime" [ngModel]="displayTime" >
                     <ngx-material-timepicker #timepicker (timeSet)="onTimeset($event)" ></ngx-material-timepicker>
                 </div>
             </div>
