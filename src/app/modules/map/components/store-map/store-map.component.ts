@@ -122,9 +122,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
 
   constructor(private renderer: Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService,private router:Router) {
-    document.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
-    });
+    
    }
 
   ngOnChanges() { }
@@ -137,12 +135,24 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         this.initTable();
         this.makeClusters();
         this.callZonesApi();
-      });
+        if(!dat){
+          this.toastr.warning("Error occured in fetching locations");
+          this.initialLoader = false;
+        }
+      },
+      (error)=>{
+        if(error?.status !==200){
+          this.toastr.error("Error occured in fetching locations");
+          this.initialLoader = false;
+
+        }
+      }
+      );
   }
 
   zonesApiErrorIntercept() {
     this.attemptsFetchzones++;
-    if (this.attemptsFetchzones > 2) this.toastr.error("There was an error in Fetching the Zones ")
+    if (this.attemptsFetchzones > 2) this.toastr.error("There was an error in fetching the zones ")
     this.callZonesApi();
   }
 
@@ -180,7 +190,9 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       },
       (error:any)=>{
         if(error?.status!=200){
-          this.toastr.error('Error occured while fetching the zones');
+          this.toastr.error('Error occured while fetching the updated zones');
+          this.initialLoader = false;
+          this.unSetCanvas();
         }
 
       }
@@ -243,7 +255,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.fetched_locations?.data?.map((location: any) => {
       if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_ID), location?.Route)
     });
-    this.initialLoader = false;
+    // this.initialLoader = false;
   }
 
   transparencyChange(ev: any) {
@@ -471,10 +483,9 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   }
 
   setPolygonsfromDB() {
-    // reseting the fetchedpolygons to empty and loading it with fetchedvalues from Database
-      this.fetchedPolygons = [];
-      this.removeAllNewZonesInList();
-
+  // reseting the fetchedpolygons to empty and loading it with fetchedvalues from Database
+    this.fetchedPolygons = [];
+    this.removeAllNewZonesInList();
     this.fetchedZones.map((zone: any, idx: any) => {
       if (zone?.geocoords?.length > 0 && zone?.geocoords) {
         let geo = zone?.geocoords;
@@ -502,6 +513,13 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           }
           let infoWindow = new google.maps.InfoWindow();
           if(zone?.dryers && zone?.washers){
+            infoWindow.setContent(`<div style= "padding:8px"><p style="font-weight:500;font-size:13px">${zone?.Name} </p> <p style="font-weight:400;font-size:13px">Number of Washers  &nbsp;  : &emsp; ${(zone?.washers) ? zone?.washers : 0}  </p>   <p style="font-weight:400;font-size:13px">Number of Dryers &emsp; &hairsp; : &emsp; ${(zone?.dryers) ? zone?.dryers : 0} </p>
+            <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>
+            </div>`);
+            infoWindow.setPosition(bounds.getCenter());
+          }
+
+          else{
             infoWindow.setContent(`<div style= "padding:8px"><p style="font-weight:500;font-size:13px">${zone?.Name} </p> <p style="font-weight:400;font-size:13px">Number of Washers  &nbsp;  : &emsp; ${(zone?.washers) ? zone?.washers : 0}  </p>   <p style="font-weight:400;font-size:13px">Number of Dryers &emsp; &hairsp; : &emsp; ${(zone?.dryers) ? zone?.dryers : 0} </p>
             <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>
             </div>`);
@@ -602,9 +620,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         }
       });
     }
-    // here we have to unSetCanvas
     this.unSetCanvas();
-
   }
 
   jumptoPolygon(zone: any) {
@@ -716,7 +732,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
             "new":loc_ids
           }
         }
-        console.log(obj)
         this.apiService.put(`${environment?.coreApiUrl}/update_zone`, obj).subscribe(
           (dat) => {
             this.removeAllNewZonesInList();
@@ -731,7 +746,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
                 this.unSetAllZonesfromMap();
                 this.callZonesApi();
                 this.hideAllZonesinCanvas();
-                this.toastr.success('The Zone has been successfully Updated');
+                this.toastr.success('The Territory has been successfully updated');
                 // this.initialLoader = false;
               },2500)
              
@@ -742,7 +757,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
               this.unSetAllZonesfromMap();
               this.callZonesApi();
               this.hideAllZonesinCanvas();
-              this.toastr.error("Error occured while updating the Zones");
+              this.toastr.error("Error occured while updating the Territories");
             }
           }
         )

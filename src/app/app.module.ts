@@ -14,7 +14,6 @@ import { TitlecasePipe } from './pipes/titlecase.pipe';
 import { RemoveunderscorePipe } from './pipes/removeunderscore.pipe';
 import { ToastrModule} from 'ngx-toastr';
 import { ConfirmBoxComponent } from './modules/map/components/confirm-box/confirm-box.component';
-import { HttpClientModule } from '@angular/common/http';
 import { TableviewComponent } from './modules/map/components/tableview/tableview.component';
 import { RouteviewComponent } from './modules/map/components/routeview/routeview.component';
 import { EditcolumnComponent } from './modules/map/components/editcolumn/editcolumn.component';
@@ -25,6 +24,8 @@ import { RemovespecialPipe } from './pipes/removespecial.pipe';
 import { DeletezoneconfirmComponent } from './modules/map/components/deletezoneconfirm/deletezoneconfirm.component';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { AuthGuardService } from './services/auth-guard.service';
+import { Interceptor } from './interceptor/interceptor';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 @NgModule({
   declarations: [
