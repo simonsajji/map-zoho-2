@@ -136,13 +136,13 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         this.makeClusters();
         this.callZonesApi();
         if(!dat){
-          this.toastr.warning("Error");
+          this.toastr.warning("Error occured in fetching locations");
           this.initialLoader = false;
         }
       },
       (error)=>{
         if(error?.status !==200){
-          this.toastr.error("Error pccured in fetching locations");
+          this.toastr.error("Error occured in fetching locations");
           this.initialLoader = false;
 
         }
@@ -255,7 +255,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.fetched_locations?.data?.map((location: any) => {
       if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_ID), location?.Route)
     });
-    this.initialLoader = false;
+    // this.initialLoader = false;
   }
 
   transparencyChange(ev: any) {
@@ -483,10 +483,9 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   }
 
   setPolygonsfromDB() {
-    // reseting the fetchedpolygons to empty and loading it with fetchedvalues from Database
-      this.fetchedPolygons = [];
-      this.removeAllNewZonesInList();
-
+  // reseting the fetchedpolygons to empty and loading it with fetchedvalues from Database
+    this.fetchedPolygons = [];
+    this.removeAllNewZonesInList();
     this.fetchedZones.map((zone: any, idx: any) => {
       if (zone?.geocoords?.length > 0 && zone?.geocoords) {
         let geo = zone?.geocoords;
@@ -621,9 +620,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         }
       });
     }
-    // here we have to unSetCanvas
     this.unSetCanvas();
-
   }
 
   jumptoPolygon(zone: any) {

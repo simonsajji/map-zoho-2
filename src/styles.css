@@ -116,9 +116,12 @@ div{
   color:#285ec9!important;
   /* color:#2464ad!important; */
 }
+.primary-color-alt{
+  color:#5071b4!important;
+  /* color:#2464ad!important; */
+}
 .bg-primary-color{
   background-color:#285ec9!important;
-  /* color:#2464ad!important; */
 }
 
 .mat-dialog-container {

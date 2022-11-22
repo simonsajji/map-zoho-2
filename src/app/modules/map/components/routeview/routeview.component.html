@@ -44,8 +44,8 @@
             <!-- <button mat-button></button> -->
             <!-- <i class="fa fa-ellipsis-v f-s-16 primary-color dot m-r-25  p-t-10 c-pointer"
                 [matMenuTriggerFor]="routemenu"></i> -->
-                <button [matMenuTriggerFor]="routemenu" mat-icon-button class="m-r-5 m-b-3 d-flex align-center j-center" style="z-index:1500!important">
-                    <i class="fa fa-cog f-s-16 primary-color dot c-pointer m-b-10 m-r-10"
+                <button [matMenuTriggerFor]="routemenu" mat-icon-button class="m-r-8 m-b-3 d-flex align-center j-center" style="z-index:1500!important">
+                    <i class="fa fa-ellipsis-h f-s-22 primary-color-alt dot c-pointer m-b-10 p-b-2 m-r-10 p-r-5"
                 ></i> 
                   </button>
             <mat-menu #routemenu="matMenu">
@@ -75,7 +75,7 @@
     </div>
 
     <ng-container *ngIf="routesModeView">
-        <div *ngIf="initialLoaderMaps" style="z-index:1200!important;height:40vh!important" class="d-flex flex-column align-center flex-1 j-center">
+        <div *ngIf="initialLoaderMaps " style="z-index:1200!important;height:40vh!important" class="d-flex flex-column align-center flex-1 j-center">
             <mat-spinner  diameter="45">
             </mat-spinner>
             <div class="f-s-11 f-w-500 p-t-10">Please Wait</div>
