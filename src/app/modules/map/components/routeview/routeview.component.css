@@ -132,7 +132,7 @@
 .right-content {
   overflow-y: auto;
   overflow-x: hidden;
-  height: calc(92vh - 100px) !important;
+  height: calc(92vh - 120px) !important;
 }
 
 .right-content-show-routes {
@@ -706,7 +706,8 @@ table {
 }
 
 .mat-option-selected-value {
-  color: #00359e;
+  color: #031842;
+  background-color: #dedede!important;
 }
 
 .mat-mini-fab {
@@ -774,7 +775,7 @@ table {
 .delete-icon {
   /* width: 17px!important;
   height: 16px!important; */
-  font-size: 18px !important;
+  font-size: 20px !important;
   padding-top: 5px !important;
   opacity: 0;
   transition: all 0.25s ease-in-out !important;
@@ -787,7 +788,7 @@ table {
 .edit-icon {
   /* width: 17px!important;
   height: 16px!important; */
-  font-size: 18px !important;
+  font-size: 20px !important;
   padding-top: 5px !important;
   opacity: 0;
   transition: all 0.25s ease-in-out !important;
@@ -803,10 +804,7 @@ table {
   align-items: flex-end !important;
 }
 
-/* .mat-menu-panel{
-  max-width: 200px!important;
-  width: 200px!important;
-} */
+
 
 .date-arrow-btns{
   border-radius: 50%;
@@ -826,11 +824,11 @@ table {
 
 .list-zones-max{
   overflow-y: auto;
-  height: 75vh;
+  height: 85vh;
 }
 .list-zones-min{
   overflow-y: auto;
-  height: 65vh;
+  height: 82vh;
 }
 
 .text-overflow-ellipsis{
@@ -843,11 +841,26 @@ table {
 }
 
 .territory-head{
-  margin-left:11%;
+  margin-left:10%;
 }
 
 .date-arrow-btns-disabled{
   opacity: 0.4;
   color:grey;
   pointer-events: none!important;
+}
+
+::ng-deep .mat-menu-panel{
+  min-width: 160px!important;
+}
+
+
+.gap-12{
+  gap:12%;
+}
+.gap-15{
+  gap:15%;
+}
+.gap-20{
+  gap:20%;
 }

@@ -133,15 +133,19 @@ div{
 
 #toast-container > .toast-success {
   font-size: 14px!important;
+  min-width: 400px;
 }
 #toast-container > .toast-error {
   font-size: 14px!important;
+  min-width: 400px;
 }
 #toast-container > .toast-warning{
  font-size: 14px!important;
+ min-width: 400px;
 }
 #toast-container > .toast-info {
  font-size: 14px!important;
+ min-width: 400px;
 }
 
 
@@ -171,3 +175,4 @@ div{
   text-overflow: ellipsis!important;
 
 }
+

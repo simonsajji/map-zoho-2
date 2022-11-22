@@ -122,9 +122,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
 
   constructor(private renderer: Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService,private router:Router) {
-    document.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
-    });
+    
    }
 
   ngOnChanges() { }
@@ -516,6 +514,13 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           }
           let infoWindow = new google.maps.InfoWindow();
           if(zone?.dryers && zone?.washers){
+            infoWindow.setContent(`<div style= "padding:8px"><p style="font-weight:500;font-size:13px">${zone?.Name} </p> <p style="font-weight:400;font-size:13px">Number of Washers  &nbsp;  : &emsp; ${(zone?.washers) ? zone?.washers : 0}  </p>   <p style="font-weight:400;font-size:13px">Number of Dryers &emsp; &hairsp; : &emsp; ${(zone?.dryers) ? zone?.dryers : 0} </p>
+            <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>
+            </div>`);
+            infoWindow.setPosition(bounds.getCenter());
+          }
+
+          else{
             infoWindow.setContent(`<div style= "padding:8px"><p style="font-weight:500;font-size:13px">${zone?.Name} </p> <p style="font-weight:400;font-size:13px">Number of Washers  &nbsp;  : &emsp; ${(zone?.washers) ? zone?.washers : 0}  </p>   <p style="font-weight:400;font-size:13px">Number of Dryers &emsp; &hairsp; : &emsp; ${(zone?.dryers) ? zone?.dryers : 0} </p>
             <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>
             </div>`);
