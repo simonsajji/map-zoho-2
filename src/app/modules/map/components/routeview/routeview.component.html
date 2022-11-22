@@ -31,11 +31,11 @@
 
         <div *ngIf="showRoutes" class="primary-color f-s-14 flex-3 t-a-right d-flex align-center m-t-2 flex-end j-end m-r-20 add_loc_link c-pointer">
             <div (click)="downloadCSV()">
-                <img class="p-6 p-t-7" src="assets/csv1.png" title="Export as CSV" width="19px" height="18px" alt=""
+                <img matTooltip="Export as CSV" class="p-6 p-t-8" src="assets/csv1.png"  width="19px" height="18px" alt=""
                     srcset="">
             </div>
             <div>
-                <img title="Add a point to the Route" class="p-6 p-t-8" width="18px" height="17px" src="assets/edit.png"
+                <img matTooltip="Edit route"  class="p-6 p-t-8" width="18px" height="17px" src="assets/edit.png"
                     alt="" (click)="editRoute()" title="Edit Route">
             </div>
         </div>
@@ -57,8 +57,8 @@
         <div *ngIf="showRoutes && (selectedViewMode != 'zonesview')">
             <!-- <i class="fa fa-ellipsis-v f-s-15  primary-color dot m-r-20   p-t-10 c-pointer"
                 [matMenuTriggerFor]="routebuildmenu"></i> -->
-                <button [matMenuTriggerFor]="routebuildmenu" mat-icon-button class="m-r-5 m-b-3 d-flex align-center j-center" style="z-index:1500!important">
-                    <i class="fa fa-cog f-s-16 primary-color dot c-pointer m-b-10 m-r-10"
+                <button [matMenuTriggerFor]="routebuildmenu" mat-icon-button class="m-r-8 m-b-3 d-flex align-center j-center" style="z-index:1500!important">
+                    <i class="fa fa-ellipsis-h f-s-22 primary-color-alt dot c-pointer m-b-10 p-b-2 m-r-10 p-r-5"
                 ></i> 
                   </button>
             <mat-menu #routebuildmenu="matMenu">
