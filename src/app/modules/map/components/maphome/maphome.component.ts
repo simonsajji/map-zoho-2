@@ -6,8 +6,6 @@ import { Component, HostListener, OnInit } from '@angular/core';
   styleUrls: ['./maphome.component.css']
 })
 export class MaphomeComponent implements OnInit {
-
-
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(e: KeyboardEvent) {
     if (e.key === 'F12') {

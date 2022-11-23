@@ -117,13 +117,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   currentEditZone:any;
   isMenuOpen:boolean = false;
   timeOutApiRequest:any;
-
-  
-
-
-  constructor(private renderer: Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService,private router:Router) {
-    
-   }
+  constructor(private renderer: Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService,private router:Router) {}
 
   ngOnChanges() { }
 
@@ -602,21 +596,25 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
             poly.previousLocationIds = location_ids_array;
       
           });
-
           google.maps.event.addListener(poly?.polygon, 'click', (e: any) => {
-            // poly?.info.open(this.map);
-            if(poly?.info) poly?.info.open(this.map);
+            this.fetchedPolygons.map((zone:any)=>{
+                if(zone?.info) zone?.info.close();              
+            })
+            if(poly?.info) poly?.info.open(this.map);           
             poly?.marker.setMap(this.map)
             var bounds = new google.maps.LatLngBounds();
             poly?.polygon.getPath().forEach((element: any, index: any) => { bounds.extend(element); })
             this.map.fitBounds(bounds);
           });
-          // google.maps.event.addListener(poly?.polygon, 'mouseover', (e: any) => {
-          //  if(poly?.info) poly?.info.open(this.map);
-          // });
-          // google.maps.event.addListener(poly?.polygon, 'mouseout', (e: any) => {
-          //   if(poly?.info) poly?.info.close();
-          // });
+
+          google.maps.event.addListener(this.map, 'zoom_changed', () => {
+            var zoom = this.map.getZoom();
+            if (zoom <= 9) {
+              if(zoom<=6)  poly?.marker.setLabel({ text: poly?.name, color: poly.color, fontSize: `0px`, fontWeight: '600',  fontFamily: 'Trebuchet' ,className: 'marker-position-zones'});
+              else poly?.marker.setLabel({ text: poly?.name, color: poly?.color, fontSize: `${zoom +2}px`, fontWeight: '600',  fontFamily: 'Trebuchet',className: 'marker-position-zones'});
+            }   
+            else poly?.marker.setLabel({ text: poly?.name, color: poly.color, fontSize: "17px", fontWeight: '600',  fontFamily: 'Trebuchet' ,className: 'marker-position-zones'});
+          });
         }
       });
     }
@@ -647,14 +645,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.fetchedPolygons.map((poly: any, idx: any) => {
       if (zone?.zoneid == poly?.zoneid && zone?.polygon) {
         poly?.polygon.setMap(this.map);
-        // google.maps.event.addListener(this.map, 'zoom_changed', () => {
-        //   var zoom = this.map.getZoom();
-        //   if (zoom <= 10) {
-        //     poly?.marker.setMap(null);
-        //   } else {
-        //     poly?.marker.setMap(this.map);
-        //   }
-        // });
         poly?.marker.setMap(this.map);
         var bounds = new google.maps.LatLngBounds();
         poly?.polygon.getPath().forEach((element: any, index: any) => { bounds.extend(element); })
@@ -662,6 +652,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       }
     })
   }
+
   hidePolygon(zone: any) {
     this.fetchedPolygons.map((poly: any, idx: any) => {
       if (zone?.zoneid == poly?.zoneid) {
@@ -677,7 +668,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.fetchedPolygons.map((item: any, idx: any) => {
       item.polygon.setEditable(true);
       if (item?.polygon) item?.polygon.setMap(this.map);
-      item?.marker.setMap(this.map);
+      if(item?.marker) item?.marker.setMap(this.map);
     })
 
   }
@@ -714,7 +705,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
             location_array.push(this.mkrs[i].location_id);
           }
         }
-
         let loc_ids: any = (location_array.length > 1) ? location_array : location_array[0];
         let prev_loc_ids:any = (item?.previous_location_ids?.length > 1) ? item?.previous_location_ids : item?.previous_location_ids[0];
         if(loc_ids == undefined || null) loc_ids = null;
@@ -772,9 +762,20 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       if (shape?.polygon) shape?.polygon?.setMap(this.map);
     });
     this.fetchedPolygons.map((item: any, idx: any) => {
-      item.polygon.setEditable(false);
+      if (item?.polygon) item.polygon.setEditable(false);
       if (item?.polygon) item?.polygon.setMap(this.map);
-      item?.marker.setMap(this.map);
+      if(item?.marker) item?.marker.setMap(this.map);
+      google.maps.event.addListener(this.map, 'zoom_changed', () => {
+        var zoom = this.map.getZoom();
+        if (zoom <= 9) {
+          if(zoom<=6)  item?.marker.setLabel({ text: item?.name, color: item.color, fontSize: `0px`, fontWeight: '600',  fontFamily: 'Trebuchet' });
+          else item?.marker.setLabel({ text: item?.name, color: item.color, fontSize: `${zoom +2}px`, fontWeight: '600',  fontFamily: 'Trebuchet' });
+        }
+                
+        else {
+          item?.marker.setLabel({ text: item?.name, color: item.color, fontSize: "14px", fontWeight: '600',  fontFamily: 'Trebuchet' });
+        }
+      });
     })
   }
   hideAllZonesinCanvas() {
@@ -1007,8 +1008,9 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.initialLoader = true;
     this.fetchedPolygons.map((item: any, idx: any) => {
       if (item?.zoneid == zone.zoneid && item?.name == zone.name) {
-        item?.polygon.setMap(null);
-        item?.marker.setMap(null);
+      //  if(item?.polygon) item?.polygon.setMap(null);
+      //  if(item?.marker) item?.marker.setMap(null);
+        if(item?.info) item?.info.close(); 
       }
     });
     let location_array: any = []

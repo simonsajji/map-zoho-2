@@ -670,7 +670,7 @@ table {
   bottom: 6px;
   left: -20%;
   position: relative;
-  width: 60px !important;
+  /* width: 60px !important; */
   word-wrap: initial;
   display: flex;
   padding-left: 10px;

@@ -128,8 +128,6 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   fetchTimeInterval:any;
   currentTimeUTC:any;
   displayTimeUTC:any;
-
-
   @Output('clearClusters') clearClusters = new EventEmitter();
   @Output('addClusters') addClusters = new EventEmitter();
   @Output('enableInitialLoader') enableInitialLoader = new EventEmitter();
@@ -144,7 +142,6 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   @Output('deleteZoneEvent') deleteZoneEvent = new EventEmitter();
   @Output('editZoneEvent') editZoneEvent = new EventEmitter();
   @Output('viewSinglePolygonWithoutBounds') viewSinglePolygonWithoutBounds = new EventEmitter();
-
 
   constructor(private locationService: LocationService, private drawingService: DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) {   }
 

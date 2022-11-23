@@ -580,7 +580,6 @@
     bottom: 6px;
     left: -20%;
     position: relative;
-    width: 60px!important;
     word-wrap: initial;
     display: flex;
     padding-left:10px;
@@ -594,7 +593,6 @@
     bottom: 6px;
     left: -20%;
     position: relative;
-    width: 60px!important;
     word-wrap: initial;
     display: flex;
     padding-left:10px;
@@ -843,3 +841,10 @@
   width: 99%;
   text-align: left!important;
 }
+
+
+/* .label-zones{
+  text-shadow: #FC0 1px 0 10px;
+  text-shadow: white 2px 5px!important;
+
+} */
