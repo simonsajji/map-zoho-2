@@ -222,6 +222,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
         this.locationService.setSelectedPoints([]);
         // this.selection.clear();
         this.locationService.clearSelectionModel();
+        this.clearClusters.emit();
         this.addClusters.emit();
         this.clearWaypointMkrs();
         this.removeRoute();
@@ -232,32 +233,37 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
     });
   }
   clearAllWaypoints() {
-    const dialogRef = this.dialog.open(ConfirmBoxComponent, {
-      data: {
-        locations: `${this.selectedLocations?.length}`,
-        destinationRoute: null,
-        clearRoute:false,
-        isExistingRoute:(this.wypntMarkers && this.wypntMarkers.length>0) ? true : false
-      }
-    });
-    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-      if (confirmed == true) {
-        this.showRoutes = false;
-        this.disableTerritoriesViewMode = false;
-        this.showBuildRoute.emit(this.showRoutes);
-        this.selectedLocations = [];
-        this.locationService.setSelectedPoints([]);
-        this.addClusters.emit();
-        // this.selection.clear();
-        this.clearWaypointMkrs();
-        this.clearOriginDestinationMkrs();
-        this.removeRoute();
+    if(this.selectedLocations.length>0 || (this.wypntMarkers && this.wypntMarkers.length>0)){
+      const dialogRef = this.dialog.open(ConfirmBoxComponent, {
+        data: {
+          locations: `${this.selectedLocations?.length}`,
+          destinationRoute: null,
+          clearRoute:false,
+          isExistingRoute:(this.wypntMarkers && this.wypntMarkers.length>0) ? true : false
+        }
+      });
+      dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+        if (confirmed == true) {
+          this.showRoutes = false;
+          this.disableTerritoriesViewMode = false;
+          this.showBuildRoute.emit(this.showRoutes);
+          this.selectedLocations = [];
+          this.locationService.setSelectedPoints([]);
+          this.clearClusters.emit();
+          this.addClusters.emit();
+          // this.selection.clear();
+          this.clearWaypointMkrs();
+          this.clearOriginDestinationMkrs();
+          this.removeRoute();
+  
+          this.locationService.clearSelectionModel();
+        }
+        // else this.selection.clear();
+        else this.locationService.clearSelectionModel();
+      });
 
-        this.locationService.clearSelectionModel();
-      }
-      // else this.selection.clear();
-      else this.locationService.clearSelectionModel();
-    });
+    }
+   
   }
 
   removeRoute() {
