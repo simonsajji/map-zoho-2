@@ -108,7 +108,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   routesModeView: boolean = true;
   zonesModeView: boolean = false;
   viewObjects: ViewObj[] = [
-    { value: 'routesview', viewValue: 'Route' },
+    { value: 'routesview', viewValue: 'Routes' },
     { value: 'zonesview', viewValue: 'Territories' },
   ];
   selectedViewMode = this.viewObjects[0].value;
@@ -174,7 +174,6 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
     this.displayTime = this.formatAMPM(new Date());
     this.displayDate = new Date();
     // this.minTime = this.currentTime;
-   
     this.initMap();
     this.makeClusters();
   }
@@ -462,17 +461,14 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
       if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_ID), location?.Route)
     });
     this.initialLoader = false;
-
   }
 
   makeClusters() {
     var mkrClusters = new MarkerClusterer(this.map, this.mkrs, {
       imagePath:
         "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-
     });
   }
-
 
   makeMarker(position: any, icon: any, address: any, route: any, loc_id: any) {
     let label = address + "";
@@ -527,7 +523,6 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
       map: this.map,
       icon: markerIcon,
       label: { text: label, color: "#1440de", fontSize: "11px", fontWeight: '600', className: 'marker-position' },
-
     });
     google.maps.event.addListener(marker, 'click', (evt: any) => {
       this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${loc_id}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${title} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route_name} </i> </p>

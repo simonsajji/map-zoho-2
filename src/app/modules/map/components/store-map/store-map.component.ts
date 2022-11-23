@@ -773,7 +773,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         }
                 
         else {
-          item?.marker.setLabel({ text: item?.name, color: item.color, fontSize: "14px", fontWeight: '600',  fontFamily: 'Trebuchet' });
+          item?.marker.setLabel({ text: item?.name, color: item.color, fontSize: "16px", fontWeight: '600',  fontFamily: 'Trebuchet' });
         }
       });
     })
