@@ -49,7 +49,7 @@
                 ></i> 
                   </button>
             <mat-menu #routemenu="matMenu">
-                <div mat-menu-item [disabled]="selectedLocations.length<=0"  (click)="clearAllWaypoints()">
+                <div mat-menu-item [disabled]="selectedLocations.length<=0 || initialLoaderMaps"  (click)="clearAllWaypoints()">
                     <span >Clear all</span>
                 </div>
             </mat-menu>

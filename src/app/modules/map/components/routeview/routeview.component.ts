@@ -333,8 +333,6 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
 
   }
 
-
-
   findOcc(arr: any, key: any) {
     let arr2: any = [];
     arr.forEach((x: any) => {
