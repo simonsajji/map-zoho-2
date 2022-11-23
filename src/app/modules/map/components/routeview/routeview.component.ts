@@ -232,6 +232,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
       else this.locationService.clearSelectionModel();
     });
   }
+
   clearAllWaypoints() {
     if(this.selectedLocations.length>0 || (this.wypntMarkers && this.wypntMarkers.length>0)){
       const dialogRef = this.dialog.open(ConfirmBoxComponent, {
@@ -255,15 +256,12 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
           this.clearWaypointMkrs();
           this.clearOriginDestinationMkrs();
           this.removeRoute();
-  
           this.locationService.clearSelectionModel();
         }
         // else this.selection.clear();
         else this.locationService.clearSelectionModel();
       });
-
     }
-   
   }
 
   removeRoute() {
@@ -636,7 +634,6 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
 
 
   buildRoute() {
-
     if (this.selectedLocations.length > 0) {
       this.clearWaypointMkrs();
       this.clearOriginDestinationMkrs();
@@ -697,7 +694,6 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
       }
 
     });
-    // this.wayPoints.splice(-1)
     locs?.Route.map((item: any, i: any) => {
       if (i != 0 && i != locs?.Route.length - 1) {
         let loc_obj = { lat: parseFloat(item?.Latitude), lng: parseFloat(item?.Longitude) };
@@ -732,7 +728,6 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
 
     var service_callback = (response: any, status: any) => {
       if (status != 'OK') {
-        // console.warn('Directions request failed due to ' + status);
         this.toastr.warning('Directions request failed due to ' + status);
         this.locationService.clearSelectionModel();
         this.addClusters.emit();
@@ -776,6 +771,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
       };
       service.route(service_options, service_callback);
     }
+    
   }
 
   markLocations() {
