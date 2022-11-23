@@ -138,7 +138,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         if (error?.status !== 200) {
           this.toastr.error("Error occured in fetching locations");
           this.initialLoader = false;
-
         }
       }
     );
@@ -188,7 +187,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           this.initialLoader = false;
           this.unSetCanvas();
         }
-
       }
     )
 
@@ -263,9 +261,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       this.map.setOptions({
         styles: [{ "stylers": [{ "gamma": 1 }] }]
       })
-
     }
-
   }
 
   navigateCurrentLocation() {
@@ -353,11 +349,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       this.fetchedPolygons.map((item: any, idx: any) => {
         if (item?.zoneid == this.currentEditZone?.zoneid) {
           if (item?.polygon && this.currentEditZone?.polygon) {
-
             item.polygon.setPath(this.currentEditZone.prevGeoCoordinates);
           }
-
-          // set bounds here only for current edit zone
         }
       });
 
@@ -909,17 +902,13 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   }
 
-
-
   setFreehandMode() {
     if (this.drawingManager) {
       this.removeIncompleteDrawing()
       this.enableDrawingMode = false;
       this.enableEditMode = false;
       this.enableDeleteMode = false;
-      // this.toastr.info('FREE-HAND MODE');
     }
-
   }
 
   deleteModeToggle() {
@@ -931,7 +920,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       this.enableDrawingMode = false;
       this.enableEditMode = false;
       this.enableDeleteMode = false;
-
     }
     else this.setFreehandMode();
   }
@@ -944,7 +932,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.enableDeleteMode = false;
   }
 
-
   editModeToggle() {
     this.removeIncompleteDrawing();
     this.enableEditMode = !this.enableEditMode;
@@ -956,10 +943,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         if (this.enableEditMode) poly?.polygon.setEditable(true);
       });
       // this.editAllZones();
-
     }
     else this.setFreehandMode();
-
   }
 
   getPolygonCoords(newShape: any) {
@@ -1317,8 +1302,5 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     }
 
   }
-
-
-
 
 }
