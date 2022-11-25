@@ -321,7 +321,7 @@
                 </div>
             </div>
 
-            <mat-paginator #paginator_ [pageSize]="pageSizeperPage_" [pageSizeOptions]="[5,10,20,50,70]"
+            <mat-paginator #paginator_ [pageSize]="pageSizeperPage_" [pageSizeOptions]="[5,10,20,50,70]" [hidePageSize]="true"
                 showFirstLastButtons [pageIndex]="pgIndex_" (page)='onChangedPage($event)' class="pgntr">
             </mat-paginator>
         </div>
