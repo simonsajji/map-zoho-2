@@ -16,7 +16,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { DrawingService } from '../../../../services/drawing.service';
 import { NewterritoryformComponent } from '../newterritoryform/newterritoryform.component'
 import { AnyCatcher } from 'rxjs/internal/AnyCatcher';
-
+import {MatPaginator} from '@angular/material/paginator';
+import {MatTableDataSource} from '@angular/material/table';
 
 interface ViewObj {
   value: string;
@@ -112,8 +113,6 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   selectedViewMode = this.viewObjects[0].value;
   enableDrawingMode: boolean = false;
   selectedTerritories: any = [];
-  zone_list: any = ['Territory-1'];
-  pagedList: [] = [];
   length: number = 0;
   pageSize: number = 5;  
   pageSizeOptions: number[] = [3, 6, 5, 9, 10, 12, 26];
@@ -126,6 +125,23 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   fetchTimeInterval:any;
   currentTimeUTC:any;
   displayTimeUTC:any;
+
+  zoneSelectionModel_:any = new SelectionModel<any>(true,[]);;
+  dataSource_:any;
+  pageSizeperPage_:any;
+  displayedColumns_:any;
+  masterCheckbox_:any;
+  private paginator_:MatPaginator|any;
+  @ViewChild(MatPaginator) set matPaginator(mp:MatPaginator){
+    this.paginator_ = mp;
+    this.setDataSourceAttributes()
+  }
+  filteredColumns_:any = [];
+  isFilterActive_:boolean = false;
+  enableZoneFilter_:boolean = false;
+  @ViewChild('filterZoneName') filterZoneName_ :any;
+  pgIndex_:any = 0; 
+
   @Output('clearClusters') clearClusters = new EventEmitter();
   @Output('addClusters') addClusters = new EventEmitter();
   @Output('enableInitialLoader') enableInitialLoader = new EventEmitter();
@@ -141,9 +157,10 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   @Output('editZoneEvent') editZoneEvent = new EventEmitter();
   @Output('viewSinglePolygonWithoutBounds') viewSinglePolygonWithoutBounds = new EventEmitter();
 
-  constructor(private locationService: LocationService, private drawingService: DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) {   }
+  constructor(private locationService: LocationService,private cdr:ChangeDetectorRef, private drawingService: DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) {   }
 
   ngOnInit(): void {
+    this.pageSizeperPage_ = 5;
     this.routesModeView = true;
     this.zonesModeView = false;
     this.start = 0;
@@ -172,12 +189,61 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    this.displayedColumns_ = ['select','name'];
     this.selection = this.locationService.getSelectionModel();
-    if (changes['polygonsatDb']) {
+    if (changes['polygonsatDb']){
       this.savedCheckedZonesList();
       if(this.previousPolygonsatDB.length>0) this.addNewZonetoCheckList();
       this.previousPolygonsatDB = [...this.polygonsatDb];
+      this.dataSource_ = new MatTableDataSource<any>(this.polygonsatDb);   
     }
+    if(changes['initialLoaderZones']) this.clearAllFilters();
+  }
+
+  setDataSourceAttributes(){
+    this.dataSource_.paginator = this.paginator_;
+    if(this.paginator_){
+      this.applyFilter('','');
+    }
+  }
+
+  applyFilter(filterValue: any,column:any) { 
+    // this.selection_.deselect(...this.getPageData())  // needs to clear the checked locations before filtering
+    if(filterValue.target?.value == ''){
+      this.isFilterActive_ = false;
+      this.filteredColumns_.map((item:any,idx:any)=>{
+        if(item==column) this.filteredColumns_.splice(idx,1)
+      });
+      this.clearAllFilters();
+      // this.zoneService.clearSelectionModel();
+    } 
+    else { 
+      if(column=='name') this.enableZoneFilter_ = true;
+      this.isFilterActive_ = true;
+      this.filteredColumns_.push(column);
+      this.dataSource_.filterPredicate = function(data:any, filter: string): any {
+      if(column == 'name') return data?.name?.toLowerCase().includes(filter);   
+      };
+    if(filterValue?.target?.value) filterValue = filterValue.target?.value?.trim().toLowerCase();
+    else filterValue = filterValue;
+      this.dataSource_.filter = filterValue;
+      this.cdr.detectChanges();
+   }
+  }
+
+  clearAllFilters(){
+    this.applyFilter('','');
+    this.enableZoneFilter_ = true;
+    if(this.filterZoneName_?.nativeElement) this.filterZoneName_.nativeElement.value = '';
+    this.isFilterActive_ = false;
+  }
+
+ 
+
+  onChangedPage(event:any){
+    this.pageSizeperPage_ = event?.pageSize;
+    // this.masterCheckbox_ = false;
+   
   }
 
   navigationDrawer() {
@@ -910,7 +976,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
 
   territorylistChange(ev: any, zone: any) {
     this.previousPolygonsatDB = [...this.polygonsatDb];
-    if (ev) {
+    if (ev?.checked) {
       this.viewSinglePolygon.emit(zone);
       this.polygonsatDb.map((item: any, idx: any) => {
         if (zone?.zoneid == item?.zoneid) item.checked = true;

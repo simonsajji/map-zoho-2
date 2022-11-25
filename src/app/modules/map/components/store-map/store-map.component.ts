@@ -1300,7 +1300,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     if (!event.target.classList.contains('menu-backdrop')) {
       this.isMenuOpen = false;
     }
-
   }
 
 }

@@ -25,7 +25,6 @@ export class MaphomeComponent implements OnInit {
     }
     return true;
   }
-
   constructor() { 
     document.addEventListener('contextmenu', function(e) {
       e.preventDefault();
