@@ -903,6 +903,16 @@ mat-cell > div.ellipsis {
 
 .mat-cell {
   padding: 2px 2px 2px 0!important;
+
+}
+
+mat-header-row, mat-row{
+  border-bottom-style: none;
+}
+
+.mat-header-row, .mat-row {
+  min-height: 30px!important;
+  height: 35px!important;
 }
 
 .btn-addrte{
