@@ -11,13 +11,14 @@
                 [ngClass]="selectedViewMode=='zonesview' ? 'zones-view': 'routes-view'"
                 class="viewSelector m-l-12 p-l-2 p-5 f-s-16 f-w-500">
                 <mat-option [ngClass]="option.value===selectedViewMode ?  'mat-option-selected-value': ''"
-                    (click)="changeViewMode($event)" [disabled]="((!allTerritoriesLoaded && !fetchedZones) || showRoutes || initialLoaderMaps || disableTerritoriesViewMode)"
+                    (click)="changeViewMode($event)"
+                    [disabled]="((!allTerritoriesLoaded && !fetchedZones) || showRoutes || initialLoaderMaps || disableTerritoriesViewMode)"
                     [value]="option.value" *ngFor="let option of viewObjects" class="f-s-15">{{ option.viewValue }}
                 </mat-option>
             </mat-select>
             <ng-container *ngIf="zonesModeView">
-                <button mat-mini-fab color="primary" class="d-flex align-center j-center m-l-2" matTooltip="New Territory"
-                    [matMenuTriggerFor]="zonebuildmenu">
+                <button mat-mini-fab color="primary" class="d-flex align-center j-center m-l-2"
+                    matTooltip="New Territory" [matMenuTriggerFor]="zonebuildmenu">
                     <div class="f-s-22">+</div>
                 </button>
                 <mat-menu #zonebuildmenu="matMenu">
@@ -29,38 +30,36 @@
 
         </div>
 
-        <div *ngIf="showRoutes" class="primary-color f-s-14 flex-3 t-a-right d-flex align-center m-t-2 flex-end j-end m-r-20 add_loc_link c-pointer">
+        <div *ngIf="showRoutes"
+            class="primary-color f-s-14 flex-3 t-a-right d-flex align-center m-t-2 flex-end j-end m-r-20 add_loc_link c-pointer">
             <div (click)="downloadCSV()">
-                <img matTooltip="Export as CSV" class="p-6 p-t-8" src="assets/csv1.png"  width="19px" height="18px" alt=""
-                    srcset="">
+                <img matTooltip="Export as CSV" class="p-6 p-t-8" src="assets/csv1.png" width="19px" height="18px"
+                    alt="" srcset="">
             </div>
             <div>
-                <img matTooltip="Edit route"  class="p-6 p-t-8" width="18px" height="17px" src="assets/edit.png"
-                    alt="" (click)="editRoute()" title="Edit Route">
+                <img matTooltip="Edit route" class="p-6 p-t-8" width="18px" height="17px" src="assets/edit.png" alt=""
+                    (click)="editRoute()">
             </div>
         </div>
 
         <div *ngIf="!showRoutes && (selectedViewMode != 'zonesview')">
-            <!-- <button mat-button></button> -->
-            <!-- <i class="fa fa-ellipsis-v f-s-16 primary-color dot m-r-25  p-t-10 c-pointer"
-                [matMenuTriggerFor]="routemenu"></i> -->
-                <button [matMenuTriggerFor]="routemenu" mat-icon-button class="m-r-8 m-b-3 d-flex align-center j-center" style="z-index:1500!important">
-                    <i class="fa fa-ellipsis-h f-s-22 primary-color-alt dot c-pointer m-b-10 p-b-2 m-r-10 p-r-5"
-                ></i> 
-                  </button>
+
+            <button [matMenuTriggerFor]="routemenu" mat-icon-button class="m-r-8 m-b-2 d-flex align-center j-center"
+                style="z-index:1500!important">
+                <i class="fa fa-ellipsis-h f-s-22 primary-color-alt dot c-pointer m-b-10 p-b-2 m-r-10 p-r-5"></i>
+            </button>
             <mat-menu #routemenu="matMenu">
-                <div mat-menu-item [disabled]="selectedLocations.length<=0"  (click)="clearAllWaypoints()">
-                    <span >Clear all</span>
+                <div mat-menu-item [disabled]="initialLoaderMaps" (click)="clearAllWaypoints()">
+                    <span>Clear all</span>
                 </div>
             </mat-menu>
         </div>
         <div *ngIf="showRoutes && (selectedViewMode != 'zonesview')">
-            <!-- <i class="fa fa-ellipsis-v f-s-15  primary-color dot m-r-20   p-t-10 c-pointer"
-                [matMenuTriggerFor]="routebuildmenu"></i> -->
-                <button [matMenuTriggerFor]="routebuildmenu" mat-icon-button class="m-r-8 m-b-3 d-flex align-center j-center" style="z-index:1500!important">
-                    <i class="fa fa-ellipsis-h f-s-22 primary-color-alt dot c-pointer m-b-10 p-b-2 m-r-10 p-r-5"
-                ></i> 
-                  </button>
+
+            <button [matMenuTriggerFor]="routebuildmenu" mat-icon-button
+                class="m-r-8 m-b-2 d-flex align-center j-center" style="z-index:1500!important">
+                <i class="fa fa-ellipsis-h f-s-22 primary-color-alt dot c-pointer m-b-10 p-b-2 m-r-10 p-r-5"></i>
+            </button>
             <mat-menu #routebuildmenu="matMenu">
                 <button mat-menu-item [disabled]="selectedLocations.length<=0" (click)="deleteAllWaypoints()">
                     <span>Clear route</span>
@@ -75,8 +74,9 @@
     </div>
 
     <ng-container *ngIf="routesModeView">
-        <div *ngIf="initialLoaderMaps " style="z-index:1200!important;height:40vh!important" class="d-flex flex-column align-center flex-1 j-center">
-            <mat-spinner  diameter="45">
+        <div *ngIf="initialLoaderMaps " style="z-index:1200!important;height:40vh!important"
+            class="d-flex flex-column align-center flex-1 j-center">
+            <mat-spinner diameter="45">
             </mat-spinner>
             <div class="f-s-11 f-w-500 p-t-10">Please Wait</div>
         </div>
@@ -86,7 +86,7 @@
             <p *ngIf="showRoutes" class="f-s-12 p-l-15 d-flex m-0 m-b-20">
                 {{(totalDuration)}},
                 ({{(totalDistance).toFixed(2)}} mi)</p>
-            <div *ngIf="showRoutes" class="right-content-show-routes flex-column m-b-20 p-l-5">    
+            <div *ngIf="showRoutes" class="right-content-show-routes flex-column m-b-20 p-l-5">
                 <div class="f-s-13  m-b-2" style="height:'fit-content'" *ngFor="let leg of data?.Route;let i=index">
                     <div class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5">
                         <div *ngIf="i==0" class="d-flex align-center m-r-10">
@@ -97,15 +97,14 @@
                             <div class="location-number f-s-10 f-w-400  m-r-10 p-2" #ln>{{i}}</div>
                             <div class="f-s-13 flex-column d-flex" [style.width]="'calc(100% - ' + 18 + 'px)'">
                                 {{leg?.Location_Name}}
-                                <div class="p-r-10 f-w-400 f-s-12 d-flex j-space align-center flex-wrap c-gr-light  p-t-5 ">
+                                <div
+                                    class="p-r-10 f-w-400 f-s-12 d-flex j-space align-center flex-wrap c-gr-light  p-t-5 ">
                                     {{leg?.Address}}
                                 </div>
                             </div>
                         </div>
                     </div>
-    
-    
-    
+
                     <div *ngIf=" i!=0 && i!=data?.Route.length-1" class="d-flex gap-2 align-center p-t-10 p-b-5">
                         <img src="assets/log-in.png" width="22px" height="20px" alt="" srcset="">
                         <div class="f-s-12">{{addbyMoment(leg?.cummulativeWithNoInterval)}} </div>
@@ -116,7 +115,7 @@
                         <img src="assets/log-out.png" width="24px" height="22px" alt="" srcset="">
                         <div class="f-s-12">{{ addbyMoment(leg?.cummulative)}}</div>
                     </div>
-    
+
                     <div *ngIf="i==0" class="d-flex align-center gap-2 p-t-10 p-b-5"><img src="assets/log-out.png"
                             width="22px" height="20px" alt="" srcset="">
                         <div class="f-s-12">{{ displayTime}}</div>
@@ -141,32 +140,37 @@
                     </div>
                 </div>
             </div>
-    
+
             <div *ngIf="!showRoutes" class="m-t-10 m-b-20">
                 <div class="d-flex align-baseline j-center gap-2 w-100 ">
-                    <div [style.width]="20 + 'px'" class="date-arrow-btns p-l-15" ><i [ngClass]="(currentDate.getTime()<displayDate.getTime()) ? '': 'date-arrow-btns-disabled'" [style.width]="50 + '%'" class="fa fa-chevron-left f-s-14  m-l-5 c-pointer " aria-hidden="true"
-                        (click)="leftDateClick()"></i></div>
-                    
-                        <div class="d-flex gap-2 j-center flex-wrap flex-1" >
-                            <span class="f-w-600 c-pointer primary-color f-s-14" (click)="picker1.open()">{{displayDate | date:
-                                'dd/MM/YY'}}</span>
-                            <span class="c-gr f-w-500 f-s-14 ">Departing</span>
-                            <span class="f-w-600 c-pointer primary-color f-s-14" (click)="openTimePicker()">{{ displayTime  }}</span>
-    
-                        </div>
-                   <div [style.width]="20 + 'px'" class="date-arrow-btns p-r-15"> <i [style.width]="50 + '%'" class="fa fa-chevron-right f-s-14  f-s-600  c-pointer " aria-hidden="true"
-                    (click)="rightDateClick()"></i></div>
-                   
+                    <div [style.width]="20 + 'px'" class="date-arrow-btns p-l-15"><i
+                            [ngClass]="(currentDate.getTime()<displayDate.getTime()) ? '': 'date-arrow-btns-disabled'"
+                            [style.width]="50 + '%'" class="fa fa-chevron-left f-s-14  m-l-5 c-pointer "
+                            aria-hidden="true" (click)="leftDateClick()"></i></div>
+
+                    <div class="d-flex gap-2 j-center flex-wrap flex-1">
+                        <span class="f-w-600 c-pointer primary-color f-s-14" (click)="picker1?.open()">{{displayDate |
+                            date:
+                            'dd/MM/YY'}}</span>
+                        <span class="c-gr f-w-500 f-s-14 ">Departing</span>
+                        <span class="f-w-600 c-pointer primary-color f-s-14" (click)="openTimePicker()">{{ displayTime
+                            }}</span>
+
+                    </div>
+                    <div [style.width]="20 + 'px'" class="date-arrow-btns p-r-15"> <i [style.width]="50 + '%'"
+                            class="fa fa-chevron-right f-s-14  f-s-600  c-pointer " aria-hidden="true"
+                            (click)="rightDateClick()"></i></div>
+
                 </div>
-    
+
                 <div class="calendar-parent" style="position:relative">
                     <input matInput [min]="currentDate" [matDatepicker]="picker1" (dateChange)="dateChange($event)">
                     <mat-datepicker #picker1></mat-datepicker>
-                    <input matInput [ngxTimepicker]="timepicker"  [ngModel]="displayTime" >
-                    <ngx-material-timepicker #timepicker (timeSet)="onTimeset($event)" ></ngx-material-timepicker>
+                    <input matInput [ngxTimepicker]="timepicker" [ngModel]="displayTime">
+                    <ngx-material-timepicker #timepicker (timeSet)="onTimeset($event)"></ngx-material-timepicker>
                 </div>
             </div>
-    
+
             <div *ngIf="!showRoutes" class="right-content flex-column  ">
                 <div class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5 bg-gr  p-t-20 p-b-20">
                     <div class="d-flex align-center p-l-10">
@@ -178,15 +182,18 @@
                             <img class="p-6 c-pointer" [ngClass]="isHomesetasFavourite ? 'selected': ''" width="20px" height="20px"  src="assets/star.png" alt="" title="Favourite Locations">
                             <img class="p-6 c-pointer" [ngClass]="isHomesetasEditedLocation ? 'selected': ''"  width="20px" height="20px"  src="assets/edit.png" alt="" title="Enter Home Location Manually">
                         </div> -->
-                            <div class="p-t-5 p-b-5 f-s-14 c-gr flex-wrap" *ngIf="origin">{{this.origin?.Address_Line_1}}, {{this.origin?.City}}, {{this.origin?.Province}}, {{this.origin?.Postal_Code}}, {{this.origin?.Country}}</div>
+                            <div class="p-t-5 p-b-5 f-s-14 c-gr flex-wrap" *ngIf="origin">
+                                {{this.origin?.Address_Line_1}}, {{this.origin?.City}}, {{this.origin?.Province}},
+                                {{this.origin?.Postal_Code}}, {{this.origin?.Country}}</div>
                         </div>
                     </div>
                 </div>
-    
-                <p *ngIf="selectedLocations?.length<=0" class="c-gr d-flex j-center m-t-30 m-b-30 f-s-13">No Points in the
+
+                <p *ngIf="selectedLocations?.length<=0" class="c-gr d-flex j-center m-t-30 m-b-30 f-s-13">No Points in
+                    the
                     Route
                 </p>
-    
+
                 <div class="f-s-14 p-b-10 " *ngFor="let loc of selectedLocations;let i=index;">
                     <div class="p-r-10 f-w-500 d-flex  align-center flex-wrap gap-5 p-l-10">
                         <div class="d-flex flex-1">
@@ -199,7 +206,8 @@
                             </div>
                             <div class="flex-column flex-1 ">
                                 <div class="f-s-13">{{loc?.Location_Name}}</div>
-                                <div class=" f-w-400 f-s-12 d-flex j-space align-center flex-wrap c-gr-light w-90 p-t-5">
+                                <div
+                                    class=" f-w-400 f-s-12 d-flex j-space align-center flex-wrap c-gr-light w-90 p-t-5">
                                     {{loc?.Location_Name}}</div>
                             </div>
                         </div>
@@ -209,7 +217,7 @@
                         </div>
                     </div>
                 </div>
-    
+
                 <div class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5 bg-gr  p-t-20 p-b-20">
                     <div class="d-flex align-center p-l-10">
                         <i class="fa fa-flag-checkered m-r-10 f-s-20"></i>
@@ -220,78 +228,102 @@
                             <img class="p-6 c-pointer" [ngClass]="isEndsetasFavourite ? 'selected': ''" width="20px" height="20px"  src="assets/star.png" alt="" title="Favourite Locations">
                             <img class="p-6 c-pointer" [ngClass]="isEndsetasEditedLocation ? 'selected': ''"  width="20px" height="20px"  src="assets/edit.png" alt="" title="Enter End Location Manually">
                         </div> -->
-                            <div class="p-t-5 p-b-5 p-r-10 f-s-14 c-gr flex-wrap word-wrap">{{this.destination?.Address_Line_1}}, {{this.destination?.City}}, {{this.destination.Province}}, {{this.destination?.Postal_Code}}, {{this.destination?.Country}}</div>
+                            <div class="p-t-5 p-b-5 p-r-10 f-s-14 c-gr flex-wrap word-wrap">
+                                {{this.destination?.Address_Line_1}}, {{this.destination?.City}},
+                                {{this.destination.Province}}, {{this.destination?.Postal_Code}},
+                                {{this.destination?.Country}}</div>
                         </div>
                     </div>
                 </div>
                 <div class="flex-1 align-end j-center t-a-center d-flex ">
-                    <div class="w-100 t-a-center c-gr-light f-s-13 d-flex p-r-20 j-center"><mat-icon matTooltip="Add Location from Locations Table found at the bottom." class="f-s-14 c-gr">info</mat-icon> Add locations from table to build route</div>
-    
+                    <div class="w-100 t-a-center c-gr-light f-s-13 d-flex p-r-20 j-center">
+                        <mat-icon matTooltip="Add Location from Locations Table found at the bottom."
+                            class="f-s-14 c-gr">info</mat-icon> Add locations from table to build route
+                    </div>
                 </div>
-             
-    
             </div>
-            
             <div *ngIf="!showRoutes" class="j-center align-center d-flex w-100 m-t-10 m-b-20 m-l-5 m-r-10">
-                
-                <button mat-raised-button [disabled]="selectedLocations.length==0" (click)="buildRoute()"
+                <button mat-raised-button [disabled]="selectedLocations?.length==0" (click)="buildRoute()"
                     class=" w-100  f-s-14 m-r-20 m-l-10 m-b-30" color="primary">BUILD ROUTE</button>
             </div>
-
         </div>
-        
-
     </ng-container>
 
     <ng-container *ngIf="zonesModeView">
-        <div *ngIf="initialLoaderMaps" style="z-index:1200!important;height:40vh!important" class="d-flex flex-column align-center flex-1 j-center">
-            <mat-spinner  diameter="45">
+        <div *ngIf="initialLoaderMaps" style="z-index:1200!important;height:40vh!important"
+            class="d-flex flex-column align-center flex-1 j-center">
+            <mat-spinner diameter="45">
             </mat-spinner>
             <div class="f-s-11 f-w-500 p-t-10">Updating Territories</div>
         </div>
-        <div *ngIf="!initialLoaderMaps" [ngClass]="((end - start)<=5) ? 'list-zones-min' : 'list-zones-max'" >
+        <div *ngIf="!initialLoaderMaps" style="height:90vh;overflow-y:auto!important;overflow-x: hidden;">
             <!-- <div class="zone-edit-page m-t-10"> -->
-                <div class="d-flex p-l-15 p-r-15 p-5 m-t-5">
-                    <div class="m-r-10 m-r-5 f-s-13 primary-color show-all-zones c-pointer" (click)="showAllZones()">Show all</div>
-                    <div class="m-r-10 m-l-5 f-s-13 primary-color hide-all-zones c-pointer" (click)="hideAllZones()">Hide all</div>
-                </div>
-                <p class="t-a-center f-s-12 flex-wrap c-gr p-l-15 p-r-15 p-10 p-t-5">Click territory name to jump to the
-                    territory region. To edit or delete territory, point at the territory and select action on the right.</p>
-                
-                <div class="p-l-15 p-r-15 " >
-                    <mat-selection-list #list [ngModel]="selectedTerritories" [disableRipple]="true"  >
-                        <!-- <div  class="f-s-14 primary-color d-flex align-center j-space p-4 p-l-0 p-r-0" >
-                            <div class="d-flex gap-5 flex-1 text-overflow-ellipsis c-gr f-s-12  territory-head">TERRITORY</div>
-                            <div class="d-flex j-center gap-12 c-gr ">
-                                <div class="f-s-12 m-l-2 p-r-4">EDIT</div>
-                                <div class="f-s-12">DELETE</div>
-                            </div>
-        
-                        </div> -->
-                        <div *ngFor="let zone of polygonsatDb?.slice(start,end);let i = index" 
-                            class="f-s-14 primary-color d-flex align-center j-space p-3 zone-item"   >
-                            <div class="d-flex gap-5 flex-1 text-overflow-ellipsis">
-                                <mat-checkbox [(ngModel)]="zone.checked" [style.height]="'50%'" class="d-flex align-center m-t-2 c-pointer"
-                            (ngModelChange)="territorylistChange($event,zone)">
-                                </mat-checkbox>
-                                <div (click)="polygonClicktoJump($event,zone)"  class="m-t-2 c-pointer text-overflow-ellipsis" >{{zone?.name }}</div> 
-                            </div>
-                            
-                            <div class="d-flex j-center gap-10 c-gr ">
-                                <i  matTooltip="Edit Territory Polygon" class="fa fa-draw-polygon edit-icon c-gr c-pointer" (click)="editTerritory(zone)"></i>
-                                <mat-icon  matTooltip="Delete Polygon" class="delete-icon c-pointer m-l-6" (click)="deleteTerritory(zone)" >delete</mat-icon>
-                            </div>
-                           
-                        </div>
-                    </mat-selection-list>
-                    <mat-paginator [length]="polygonsatDb?.length" [hidePageSize]="true"
-                        [pageSize]="pageSize" 
-                        [pageSizeOptions]="pageSizeOptions"
-                        (page)="OnPageChange($event)" class="mat-paginator zone-edit-page2">
-                    </mat-paginator>
-                </div>
-            <!-- </div> -->
+            <div class="d-flex p-l-15 p-r-15 p-5 m-t-5 m-b-5">
+                <div class="m-r-10 m-r-5 f-s-13 primary-color show-all-zones c-pointer" (click)="showAllZones()">Show
+                    all</div>
+                <div class="m-r-10 m-l-5 f-s-13 primary-color hide-all-zones c-pointer" (click)="hideAllZones()">Hide
+                    all</div>
+            </div>
+            <p class="t-a-center f-s-12 flex-wrap info-text p-l-15 p-r-15 p-10 p-t-5 p-b-5 ">Click territory name to
+                jump to the
+                territory region. To edit or delete territory, point at the territory and select action on the right.
+            </p>
 
+            <div class="empty-space m-t-5 m-b-5 p-10"></div>
+
+            <div class="p-l-15 p-r-15 m-t-5">
+
+                <div class="p-l-5 p-r-5 d-flex align-center gap-5">
+                    <mat-icon class="p-0 f-s-26">search</mat-icon>
+                    <mat-form-field class="text-overflow-ellipsis f-s-14" floatLabel="always">
+                        <mat-label class="f-w-400">Search Territories</mat-label>
+                        <input matInput class="f-s-14" (keyup)="applyFilter($event,'name')"
+                            placeholder="Start typing to see search results" #filterZoneName>
+                    </mat-form-field>
+
+                </div>
+
+                <div #matTab *ngIf="displayedColumns_?.length>0" class="inner-mat-tbl">
+                    <mat-table matSort [dataSource]="dataSource_" class="mat-table m-b-5 w-100">
+                        <ng-container *ngFor="let col of displayedColumns_" [matColumnDef]="col">
+
+                            <ng-container *ngIf="col=='select'">
+                                <mat-cell *matCellDef="let row">
+                                    <mat-checkbox [disableRipple]="true" style="margin-left:25%!important"
+                                        (click)="$event.stopPropagation()" (change)="territorylistChange($event,row)"
+                                        [checked]="row?.checked">
+                                    </mat-checkbox>
+                                </mat-cell>
+                            </ng-container>
+                            <ng-container *ngIf="col=='name'">
+
+                                <mat-cell *matCellDef="let element"
+                                    class="p-relative f-s-14 primary-color d-flex align-center j-space  zone-item">
+                                    <span (click)="polygonClicktoJump($event,element)" class="ellipsis p-t-5 c-pointer"
+                                        matTooltip={{element[col]}}>{{element?.name}}</span>
+                                    <div class="d-flex align-center c-gr">
+                                        <i matTooltip="Edit Territory Polygon"
+                                            class="fa fa-draw-polygon edit-icon c-gr c-pointer"
+                                            (click)="editTerritory(element)"></i>
+                                        <mat-icon matTooltip="Delete Polygon" class="delete-icon c-pointer m-l-6"
+                                            (click)="deleteTerritory(element)">delete</mat-icon>
+                                    </div>
+                                </mat-cell>
+                            </ng-container>
+                            <mat-cell *matCellDef="let element" class="p-relative"
+                                style="white-space: nowrap; text-overflow:ellipsis; overflow: hidden; "
+                                matTooltip={{element[col]}}> {{ element[col] }}
+                            </mat-cell>
+                        </ng-container>
+                        <!-- <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row> -->
+                        <mat-row *matRowDef="let row; columns: displayedColumns_;"></mat-row>
+                    </mat-table>
+                </div>
+            </div>
+
+            <mat-paginator #paginator_ [pageSize]="pageSizeperPage_" [pageSizeOptions]="[5,10,20,50,70]" [hidePageSize]="true"
+                showFirstLastButtons [pageIndex]="pgIndex_" (page)='onChangedPage($event)' class="pgntr">
+            </mat-paginator>
         </div>
 
     </ng-container>
