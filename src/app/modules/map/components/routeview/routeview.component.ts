@@ -780,7 +780,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
 
     var service_callback = (response: any, status: any) => {
       if (status != 'OK') {
-        this.toastr.warning('Directions request failed due to ' + status);
+        this.toastr.error('Failed to build route');
         this.locationService.clearSelectionModel();
         this.addClusters.emit();
         this.clearWaypointMkrs();
