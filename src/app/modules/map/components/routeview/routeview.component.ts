@@ -658,7 +658,8 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
         this.wypntMarkers?.push(waypoint);
 
       } else {
-        this.toastr.warning('Geocode was not successful for the following reason: ' + status);
+        // this.toastr.warning('Geocode was not successful for the following reason: ' + status);
+        console.warn("Geocoder was not successful")
       }
     });
   }
@@ -689,7 +690,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
     if (this.selectedLocations.length > 0) {
       this.clearWaypointMkrs();
       this.clearOriginDestinationMkrs();
-      this.clearClusters.emit();
+      // this.clearClusters.emit();
       this.enableInitialLoader.emit();
       this.selectedPoints = [...this.selectedLocations]
       this.selectedPoints.unshift(this.origin);
@@ -703,7 +704,6 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
             item = this.omit(item, ['Route_ID', 'Location_ID']);
             return item;
           })
-          // this.data.Route.splice(-1);
           this.data?.Route.map((item: any, idx: any) => {
             item["distance_text"] = this.data?.Route_Details[idx]?.Distance_Text;
             item["distance_value"] = this.data?.Route_Details[idx]?.Distance_Value;
@@ -721,29 +721,36 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
           this.displayRoute(this.data);
           this.disableInitialLoader.emit();
         }
+        else this.disableInitialLoader.emit();
+      },
+      (error:any)=>{
+        if(error?.error?.text=='Error'){
+          this.toastr.error('Couldnt build Route because the locations were associated to undefined Route.');
+          this.disableInitialLoader.emit();
+        } 
       });
     }
     else {
       this.disableInitialLoader.emit();
-      this.toastr.warning("Select Add atleast One Location from the Table")
+      this.toastr.warning("Select or add atleast one location from the table")
     }
   }
 
   displayRoute(locs: any) {
     this.wayPoints = [];
     locs?.Route.map((loc: any, index: any) => {
-      // if(parseFloat(loc?.Latitude)==0 || parseFloat(loc?.Longitude) == 0 || loc?.Latitude=="0" || loc?.Longitude=="0") {
-      //   this.wayPoints.push(loc?.Address)
-      // }
-      // else{
-      //   let obj = { lat: parseFloat(loc?.Latitude), lng: parseFloat(loc.Longitude) };
-      //   this.wayPoints.push(obj)
-      // }
-      if (loc?.Address) this.wayPoints.push(loc?.Location_Name + ', ' + loc?.Address);
-      else {
+      if(parseFloat(loc?.Latitude)==0 || parseFloat(loc?.Longitude) == 0 || loc?.Latitude=="0" || loc?.Longitude=="0") {
+        this.wayPoints.push(loc?.Location_Name + ', ' + loc?.Address)
+      }
+      else{
         let obj = { lat: parseFloat(loc?.Latitude), lng: parseFloat(loc.Longitude) };
         this.wayPoints.push(obj)
       }
+      // if (loc?.Address) this.wayPoints.push(loc?.Location_Name + ', ' + loc?.Address);
+      // else {
+      //   let obj = { lat: parseFloat(loc?.Latitude), lng: parseFloat(loc.Longitude) };
+      //   this.wayPoints.push(obj)
+      // }
 
     });
     locs?.Route.map((item: any, i: any) => {
@@ -780,7 +787,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
 
     var service_callback = (response: any, status: any) => {
       if (status != 'OK') {
-        this.toastr.error('Failed to build route');
+        this.toastr.error('Location addresses are not provided correctly, so we could not determine the best route.');
         this.locationService.clearSelectionModel();
         this.addClusters.emit();
         this.clearWaypointMkrs();
@@ -799,7 +806,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
         this.disableTerritoriesViewMode = true;
         this.showBuildRoute.emit(this.showRoutes);
       }
-      var renderer = new google.maps.DirectionsRenderer();
+      let renderer = new google.maps.DirectionsRenderer();
       renderer.setMap(map);
       renderer.setOptions({ suppressMarkers: true, preserveViewport: true });
       renderer.setDirections(response);
