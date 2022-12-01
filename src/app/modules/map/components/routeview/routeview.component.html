@@ -78,7 +78,7 @@
             class="d-flex flex-column align-center flex-1 j-center">
             <mat-spinner diameter="45">
             </mat-spinner>
-            <div class="f-s-11 f-w-500 p-t-10">Please Wait</div>
+            <div class="f-s-11 f-w-500 p-t-10">Please Wait{{(isBuildingRoute ? ', while we are finding the optimal path' : '')}}</div>
         </div>
         <div *ngIf="!initialLoaderMaps">
             <p *ngIf="showRoutes" class="f-s-12 p-l-15 d-flex m-0 m-b-5 m-t-10">Travel Mode : Driving : fastest (optimal

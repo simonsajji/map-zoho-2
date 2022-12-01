@@ -140,7 +140,8 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   isFilterActive_:boolean = false;
   enableZoneFilter_:boolean = false;
   @ViewChild('filterZoneName') filterZoneName_ :any;
-  pgIndex_:any = 0; 
+  pgIndex_:any = 0;
+  isBuildingRoute:boolean = false; 
 
   @Output('clearClusters') clearClusters = new EventEmitter();
   @Output('addClusters') addClusters = new EventEmitter();
@@ -692,6 +693,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
       this.clearOriginDestinationMkrs();
       // this.clearClusters.emit();
       this.enableInitialLoader.emit();
+      this.isBuildingRoute = true;
       this.selectedPoints = [...this.selectedLocations]
       this.selectedPoints.unshift(this.origin);
       this.apiService.post(`${environment?.coreApiUrl}/build_route`, this.selectedPoints).subscribe(data => {
@@ -720,18 +722,24 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
           })
           this.displayRoute(this.data);
           this.disableInitialLoader.emit();
+          this.isBuildingRoute = false;
         }
-        else this.disableInitialLoader.emit();
+        else{
+          this.disableInitialLoader.emit();
+          this.isBuildingRoute = false;
+        }
       },
       (error:any)=>{
         if(error?.error?.text=='Error'){
           this.toastr.error('Couldnt build Route because the locations were associated to undefined Route.');
           this.disableInitialLoader.emit();
+          this.isBuildingRoute = false;
         } 
       });
     }
     else {
       this.disableInitialLoader.emit();
+      this.isBuildingRoute = false;
       this.toastr.warning("Select or add atleast one location from the table")
     }
   }
