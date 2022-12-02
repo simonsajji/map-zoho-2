@@ -24,11 +24,11 @@ import { MaphomeComponent } from './components/maphome/maphome.component';
 
 const routes: Routes = [
   {
-    path: '', component: MaphomeComponent, canActivate: [AuthGuard], data: { role: ['admin', 'receiver'] },
+    path: '', component: MaphomeComponent,  data: { role: ['admin'] },
     children: [
-      { path: '', component: StoreMapComponent, canActivate: [AuthGuard], data: { role: ['admin', 'receiver'] } },
-      { path: '', component: TableviewComponent, canActivate: [AuthGuard], data: { role: ['admin', 'receiver'] } },
-      { path: '', component: RouteviewComponent, canActivate: [AuthGuard], data: { role: ['admin', 'receiver'] } },
+      { path: '', component: StoreMapComponent,  data: { role: ['admin'] } },
+      { path: '', component: TableviewComponent,  data: { role: ['admin'] } },
+      { path: '', component: RouteviewComponent, data: { role: ['admin'] } },
     ]
   },
  
