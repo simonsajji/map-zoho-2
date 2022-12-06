@@ -245,7 +245,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   initMap() {
     this.fetched_locations?.data?.map((location: any) => {
-      if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_ID), location?.Route)
+      if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_ID), location?.Route,location?.Address_Line_1,location?.Address_Line_2,location?.Dryers,location?.Washers,location?.Location_Name,location?.City,location?.Country)
     });
     // this.initialLoader = false;
   }
@@ -1210,7 +1210,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.dateChange(daysAgo);
   }
 
-  makemkrs(position: any, title: any, loc_id: any, route_name: any) {
+  makemkrs(position: any, title: any, loc_id: any, route_name: any,Address_Line_1:any,Address_Line_2:any,Dryers:any,Washers:any, Location_Name:any,City:any,Country:any) {
     let label = title + "";
     let markerIcon = {
       url: 'assets/pin.png',
@@ -1227,8 +1227,20 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     });
     marker['location_id'] = loc_id;
     google.maps.event.addListener(marker, 'click', (evt: any) => {
-      this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${title} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route_name} </i> </p>
-      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>
+      this.infoWin.setContent(`<div class="grid-container-mkr" style="padding:10px;display: grid;
+      grid-template-columns: auto auto;
+      gap: 10px;
+      padding: 10px;font-weight:400">
+      <div>Location Number :</div>
+      <div>${loc_id}</div>
+      <div>Address :</div>
+      <div>${(Address_Line_1) ? Address_Line_1 : ''} ${(Address_Line_2) ? Address_Line_2 : ''}, ${(City) ? City : ''}, ${Country ? Country : ''}</div>
+      <div>Route :</div>  
+      <div>${(route_name) ? route_name : 'Empty'} </div>
+      <div>Dryers :</div>
+      <div>${Dryers}</div>
+      <div>Washers :</div>
+      <div>${Washers}</div>
     </div>`);
       this.infoWin.open(this.map, marker);
     })

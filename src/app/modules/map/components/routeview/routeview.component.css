@@ -979,3 +979,16 @@ mat-header-row, mat-row{
   color:rgb(124, 111, 111);
 
 }
+
+
+.grid-container-mkr {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 10px;
+  padding: 10px;
+}
+
+.grid-container-mkr > div {
+  text-align: left;
+  font-size: 18px;
+}
