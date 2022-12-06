@@ -612,10 +612,19 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
       title: label
     });
     google.maps.event.addListener(waypoint, 'click', (evt: any) => {
-      this.infoWin.setContent(`<div style= "padding:10px">  <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${Address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${Route_Name} </i> </p>
-                    <p style="font-weight:400;font-size:13px"> Washers  &emsp;: &emsp; ${washers} </p> <p style="font-weight:400;font-size:13px"> Dryers  &emsp;&emsp;  : &emsp; ${dryers} </p>
-                      <div style="display:flex;flex-direction:column;flex-wrap:wrap; gap:5%;font-weight:400;font-size:12px" > <div>
-                    </div>`);
+      this.infoWin.setContent(`<div class="grid-container-mkr" style="padding:10px;display: grid;
+      grid-template-columns: auto auto;
+      gap: 10px;
+      padding: 10px;font-weight:400">
+      <div>Address :</div>
+      <div>${Address}</div>
+      <div>Route :</div>  
+      <div>${(Route_Name) ? Route_Name : 'Empty'} </div>
+      <div>Dryers :</div>
+      <div>${dryers}</div>
+      <div>Washers :</div>
+      <div>${washers}</div>
+    </div>`);
       this.infoWin.open(this.map, waypoint);
     });
 
@@ -648,10 +657,19 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
           title: label
         });
         google.maps.event.addListener(waypoint, 'click', (evt: any) => {
-          this.infoWin.setContent(`<div style= "padding:10px">  <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${Address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${Route_Name} </i> </p>
-                        <p style="font-weight:400;font-size:13px"> Washers  &emsp;: &emsp; ${washers} </p> <p style="font-weight:400;font-size:13px"> Dryers  &emsp;&emsp;  : &emsp; ${dryers} </p>
-                          <div style="display:flex;flex-direction:column;flex-wrap:wrap; gap:5%;font-weight:400;font-size:12px" > <div>
-                        </div>`);
+          this.infoWin.setContent(`<div class="grid-container-mkr" style="padding:10px;display: grid;
+          grid-template-columns: auto auto;
+          gap: 10px;
+          padding: 10px;font-weight:400">
+          <div>Address :</div>
+          <div>${Address}</div>
+          <div>Route :</div>  
+          <div>${(Route_Name) ? Route_Name : 'Empty'} </div>
+          <div>Dryers :</div>
+          <div>${dryers}</div>
+          <div>Washers :</div>
+          <div>${washers}</div>
+        </div>`);
           this.infoWin.open(this.map, waypoint);
         });
 
