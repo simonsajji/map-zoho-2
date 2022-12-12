@@ -44,9 +44,9 @@
 
         <div *ngIf="!showRoutes && (selectedViewMode != 'zonesview')">
 
-            <button [matMenuTriggerFor]="routemenu" mat-icon-button class="m-r-8 m-b-2 d-flex align-center j-center"
+            <button [matMenuTriggerFor]="routemenu" mat-icon-button class="m-r-0 m-b-2 d-flex align-center j-center"
                 style="z-index:1500!important">
-                <i class="fa fa-ellipsis-h f-s-22 primary-color-alt dot c-pointer m-b-10 p-b-2 m-r-10 p-r-5"></i>
+                <i class="fa fa-ellipsis-h f-s-22 primary-color-alt dot c-pointer m-b-10 p-b-2 m-r-5 p-r-5"></i>
             </button>
             <mat-menu #routemenu="matMenu">
                 <div mat-menu-item [disabled]="initialLoaderMaps" (click)="clearAllWaypoints()">
@@ -57,8 +57,8 @@
         <div *ngIf="showRoutes && (selectedViewMode != 'zonesview')">
 
             <button [matMenuTriggerFor]="routebuildmenu" mat-icon-button
-                class="m-r-8 m-b-2 d-flex align-center j-center" style="z-index:1500!important">
-                <i class="fa fa-ellipsis-h f-s-22 primary-color-alt dot c-pointer m-b-10 p-b-2 m-r-10 p-r-5"></i>
+                class="m-r-0 m-b-2 d-flex align-center j-center" style="z-index:1500!important">
+                <i class="fa fa-ellipsis-h f-s-22 primary-color-alt dot c-pointer m-b-10 p-b-2 m-r-5 p-r-5"></i>
             </button>
             <mat-menu #routebuildmenu="matMenu">
                 <button mat-menu-item [disabled]="selectedLocations.length<=0" (click)="deleteAllWaypoints()">

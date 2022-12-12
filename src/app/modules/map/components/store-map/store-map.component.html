@@ -45,7 +45,7 @@
         <button matTooltip="UPDATE TERRITORY"  class="c-pointer zone-update-btn f-s-16 f-w-600 p-5 d-flex align-center j-center" (click)="updateAllTerritories()"><mat-icon >check</mat-icon></button>          
      </div>
 
-    <div class="searchArea d-flex align-center ">
+    <div class="searchArea d-flex align-center " *ngIf="!initialLoader">
         <!-- <div class="menu-backdrop map-menu-ctn">
             <i class="menu-backdrop fa fa-bars f-s-20 primary-color m-l-10 c-pointer" aria-hidden="true" (click)="isMenuOpen=!isMenuOpen" ></i>
             <div *ngIf="isMenuOpen" class="menu-backdrop map-menu">
@@ -58,7 +58,7 @@
         <input type="text" ngx-google-places-autocomplete [options]="options" (onAddressChange)="AddressChange($event)"
             placeholder="Search for Location Name or Address" class="f-s-15 w-100 p-l-10" #sarea>  
            
-        <i *ngIf="sarea.value!=''" class="fa fa-times f-s-14 c-gr-light m-r-10 c-pointer"
+        <i *ngIf="sarea?.value!=''" class="fa fa-times f-s-14 c-gr-light m-r-10 c-pointer"
             (click)="clearSearchArea()"></i>
         <div class="d-flex align-center m-r-5"  matTooltip="Map Properties">
             <div [matMenuTriggerFor]="mapprops" class="d-flex align-center ">
@@ -90,13 +90,11 @@
                 </div>
             </mat-menu>
         </div> 
-        <!-- <img class="p-6 c-pointer  m-l-5 m-r-10" width="22px" height="22px" src="assets/current_loc.png" alt=""
-        matTooltip="Jump to Current Location" (click)="navigateCurrentLocation()"> -->
     </div>
 
     <app-routeview (enableInitialLoader)="enableLoader()"  (disableInitialLoader)="disableLoader()" [origin]="origin"
         [destination]="destination" [fetched_locations]="fetched_locations" [map]="map" (addClusters)="makeClusters()" [fetchedZones]="fetchedZones" [polygonsatDb]="fetchedPolygons" (viewSinglePolygon)="showPolygon($event)" (viewSinglePolygonWithoutBounds)="showPolygonWithoutBounds($event)"
-        (hideSinglePolygon)="hidePolygon($event)" [initialLoaderZones]="initialLoader"
+        (hideSinglePolygon)="hidePolygon($event)" [initialLoaderZones]="initialLoader" (hideTempMarkers)="clearSearchArea()"
         (clearClusters)="clearCluster()"  (initZoneCreation)="setCanvas($event)" (showZones)=" viewAllZonesinCanvas()" (deleteZoneEvent)="deleteZone($event)" (editZoneEvent)="editZone($event)" (hideZones)=" hideAllZonesinCanvas()" (jumpPolygonEvent)="jumptoPolygon($event)"
         [allTerritoriesLoaded]="allTerritoriesLoaded" #menuchild>
     </app-routeview>

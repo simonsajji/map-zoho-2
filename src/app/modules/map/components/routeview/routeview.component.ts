@@ -8,16 +8,14 @@ import { TooltipPosition } from '@angular/material/tooltip';
 import { ApiService } from 'src/app/services/api.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LocationService } from '../../../../services/location.service';
-import { isThisSecond } from 'date-fns';
 import { environment } from 'src/environments/environment';
 import { animate, animation, style, transition, trigger, useAnimation, state, keyframes } from '@angular/animations';
 import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, Input, Output, ViewChild, AfterViewInit, ChangeDetectorRef, EventEmitter, ViewEncapsulation, SimpleChanges, HostListener, OnDestroy } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { DrawingService } from '../../../../services/drawing.service';
-import { NewterritoryformComponent } from '../newterritoryform/newterritoryform.component'
-import { AnyCatcher } from 'rxjs/internal/AnyCatcher';
-import {MatPaginator} from '@angular/material/paginator';
-import {MatTableDataSource} from '@angular/material/table';
+import { NewterritoryformComponent } from '../newterritoryform/newterritoryform.component';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 
 interface ViewObj {
   value: string;
@@ -44,7 +42,7 @@ interface ViewObj {
 
   ]
 })
-export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
+export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
   navigation: boolean = false;
   showOverlay: boolean = false;
   showRoutes: boolean = false;
@@ -114,35 +112,33 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   enableDrawingMode: boolean = false;
   selectedTerritories: any = [];
   length: number = 0;
-  pageSize: number = 5;  
+  pageSize: number = 5;
   pageSizeOptions: number[] = [3, 6, 5, 9, 10, 12, 26];
   start: any;
   end: any;
   newTerritoryData: any;
   checkedZonesList: any = [];
   previousPolygonsatDB: any = [];
-  disableTerritoriesViewMode:boolean = false;
-  fetchTimeInterval:any;
-  currentTimeUTC:any;
-  displayTimeUTC:any;
-
-  zoneSelectionModel_:any = new SelectionModel<any>(true,[]);;
-  dataSource_:any;
-  pageSizeperPage_:any;
-  displayedColumns_:any;
-  masterCheckbox_:any;
-  private paginator_:MatPaginator|any;
-  @ViewChild(MatPaginator) set matPaginator(mp:MatPaginator){
+  disableTerritoriesViewMode: boolean = false;
+  fetchTimeInterval: any;
+  currentTimeUTC: any;
+  displayTimeUTC: any;
+  zoneSelectionModel_: any = new SelectionModel<any>(true, []);;
+  dataSource_: any;
+  pageSizeperPage_: any;
+  displayedColumns_: any;
+  masterCheckbox_: any;
+  private paginator_: MatPaginator | any;
+  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
     this.paginator_ = mp;
     this.setDataSourceAttributes()
   }
-  filteredColumns_:any = [];
-  isFilterActive_:boolean = false;
-  enableZoneFilter_:boolean = false;
-  @ViewChild('filterZoneName') filterZoneName_ :any;
-  pgIndex_:any = 0;
-  isBuildingRoute:boolean = false; 
-
+  filteredColumns_: any = [];
+  isFilterActive_: boolean = false;
+  enableZoneFilter_: boolean = false;
+  @ViewChild('filterZoneName') filterZoneName_: any;
+  pgIndex_: any = 0;
+  isBuildingRoute: boolean = false;
   @Output('clearClusters') clearClusters = new EventEmitter();
   @Output('addClusters') addClusters = new EventEmitter();
   @Output('enableInitialLoader') enableInitialLoader = new EventEmitter();
@@ -157,8 +153,9 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   @Output('deleteZoneEvent') deleteZoneEvent = new EventEmitter();
   @Output('editZoneEvent') editZoneEvent = new EventEmitter();
   @Output('viewSinglePolygonWithoutBounds') viewSinglePolygonWithoutBounds = new EventEmitter();
+  @Output('hideTempMarkers') hideTempMarkers = new EventEmitter();
 
-  constructor(private locationService: LocationService,private cdr:ChangeDetectorRef, private drawingService: DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) {   }
+  constructor(private locationService: LocationService, private cdr: ChangeDetectorRef, private drawingService: DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) { }
 
   ngOnInit(): void {
     this.pageSizeperPage_ = 5;
@@ -190,61 +187,58 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.displayedColumns_ = ['select','name'];
+    this.displayedColumns_ = ['select', 'name'];
     this.selection = this.locationService.getSelectionModel();
-    if (changes['polygonsatDb']){
+    if (changes['polygonsatDb']) {
       this.savedCheckedZonesList();
-      if(this.previousPolygonsatDB.length>0) this.addNewZonetoCheckList();
+      if (this.previousPolygonsatDB.length > 0) this.addNewZonetoCheckList();
       this.previousPolygonsatDB = [...this.polygonsatDb];
-      this.dataSource_ = new MatTableDataSource<any>(this.polygonsatDb);   
+      this.dataSource_ = new MatTableDataSource<any>(this.polygonsatDb);
     }
-    if(changes['initialLoaderZones']) this.clearAllFilters();
+    if (changes['initialLoaderZones']) this.clearAllFilters();
   }
 
-  setDataSourceAttributes(){
+  setDataSourceAttributes() {
     this.dataSource_.paginator = this.paginator_;
-    if(this.paginator_){
-      this.applyFilter('','');
+    if (this.paginator_) {
+      this.applyFilter('', '');
     }
   }
 
-  applyFilter(filterValue: any,column:any) { 
+  applyFilter(filterValue: any, column: any) {
     // this.selection_.deselect(...this.getPageData())  // needs to clear the checked locations before filtering
-    if(filterValue.target?.value == ''){
+    if (filterValue.target?.value == '') {
       this.isFilterActive_ = false;
-      this.filteredColumns_.map((item:any,idx:any)=>{
-        if(item==column) this.filteredColumns_.splice(idx,1)
+      this.filteredColumns_.map((item: any, idx: any) => {
+        if (item == column) this.filteredColumns_.splice(idx, 1)
       });
       this.clearAllFilters();
       // this.zoneService.clearSelectionModel();
-    } 
-    else { 
-      if(column=='name') this.enableZoneFilter_ = true;
+    }
+    else {
+      if (column == 'name') this.enableZoneFilter_ = true;
       this.isFilterActive_ = true;
       this.filteredColumns_.push(column);
-      this.dataSource_.filterPredicate = function(data:any, filter: string): any {
-      if(column == 'name') return data?.name?.toLowerCase().includes(filter);   
+      this.dataSource_.filterPredicate = function (data: any, filter: string): any {
+        if (column == 'name') return data?.name?.toLowerCase().includes(filter);
       };
-    if(filterValue?.target?.value) filterValue = filterValue.target?.value?.trim().toLowerCase();
-    else filterValue = filterValue;
+      if (filterValue?.target?.value) filterValue = filterValue.target?.value?.trim().toLowerCase();
+      else filterValue = filterValue;
       this.dataSource_.filter = filterValue;
       this.cdr.detectChanges();
-   }
+    }
   }
 
-  clearAllFilters(){
-    this.applyFilter('','');
+  clearAllFilters() {
+    this.applyFilter('', '');
     this.enableZoneFilter_ = true;
-    if(this.filterZoneName_?.nativeElement) this.filterZoneName_.nativeElement.value = '';
+    if (this.filterZoneName_?.nativeElement) this.filterZoneName_.nativeElement.value = '';
     this.isFilterActive_ = false;
   }
 
- 
-
-  onChangedPage(event:any){
+  onChangedPage(event: any) {
     this.pageSizeperPage_ = event?.pageSize;
     // this.masterCheckbox_ = false;
-   
   }
 
   navigationDrawer() {
@@ -252,8 +246,8 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
     this.showOverlay = !this.showOverlay;
   }
 
-  openTimePicker():any{
-      this.timepicker.open();
+  openTimePicker(): any {
+    this.timepicker.open();
   }
 
   deleteWaypoint(loc: any) {
@@ -269,7 +263,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
       data: {
         locations: `${this.selectedLocations?.length}`,
         destinationRoute: null,
-        clearRoute:true
+        clearRoute: true
       }
     });
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
@@ -291,13 +285,13 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   }
 
   clearAllWaypoints() {
-    if(this.selectedLocations.length>0 || (this.wypntMarkers && this.wypntMarkers.length>0)){
+    if (this.selectedLocations.length > 0 || (this.wypntMarkers && this.wypntMarkers.length > 0)) {
       const dialogRef = this.dialog.open(ConfirmBoxComponent, {
         data: {
           locations: `${this.selectedLocations?.length}`,
           destinationRoute: null,
-          clearRoute:false,
-          isExistingRoute:(this.wypntMarkers && this.wypntMarkers.length>0) ? true : false
+          clearRoute: false,
+          isExistingRoute: (this.wypntMarkers && this.wypntMarkers.length > 0) ? true : false
         }
       });
       dialogRef.afterClosed().subscribe((confirmed: boolean) => {
@@ -326,7 +320,6 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
       });
       renderer?.setMap(null);
     });
-
   };
 
   editRoute() {
@@ -344,7 +337,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
       this.csvData.map((item: any, idx: any) => {
         let values = Object.values(item);
         values = values.map((value: any, index) => {
-          return String(value).replace('#', '');
+          return String(value).replace('#', '').split(',')[0];
         });
         rows.push(values)
       })
@@ -388,7 +381,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
       document.body.appendChild(link); // Required for FF
       link.click();
     }
-    else this.toastr.warning("There are no selected Locations for current Route")
+    else this.toastr.warning("There are no selected Locations for current Route");
 
   }
 
@@ -483,14 +476,12 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
     let month2 = new Date(d2).getMonth();
     let year1 = new Date(d1).getFullYear();
     let year2 = new Date(d2).getFullYear();
-
     this.currentTime = this.formatAMPM(new Date());
     if (date1 < date2 || month1 < month2 || year1 < year2) this.minTime = '0:00'
     else if (date1 > date2 || month1 > month2 || year1 > year2) this.minTime = '0:00'
     else {
       this.displayTime = this.currentTime;
       this.minTime = this.currentTime;
-
     }
   };
 
@@ -612,19 +603,13 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
       title: label
     });
     google.maps.event.addListener(waypoint, 'click', (evt: any) => {
-      this.infoWin.setContent(`<div class="grid-container-mkr" style="padding:10px;display: grid;
-      grid-template-columns: auto auto;
-      gap: 10px;
-      padding: 10px;font-weight:400">
-      <div>Address :</div>
-      <div>${Address}</div>
-      <div>Route :</div>  
-      <div>${(Route_Name) ? Route_Name : 'Empty'} </div>
-      <div>Dryers :</div>
-      <div>${dryers}</div>
-      <div>Washers :</div>
-      <div>${washers}</div>
-    </div>`);
+      this.infoWin.setContent(`<div class="grid-container-mkr" style="padding:10px;display: grid;grid-template-columns: auto auto;gap: 10px;padding: 10px;font-weight:400">
+                                <div>Address :</div> <div>${Address}</div>
+                                <div>Route :</div> <div>${(Route_Name) ? Route_Name : 'Empty'} </div>
+                                <div>Dryers :</div> <div>${dryers}</div>
+                                <div>Washers :</div><div>${washers}</div>
+                              </div>`
+      );
       this.infoWin.open(this.map, waypoint);
     });
 
@@ -657,19 +642,13 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
           title: label
         });
         google.maps.event.addListener(waypoint, 'click', (evt: any) => {
-          this.infoWin.setContent(`<div class="grid-container-mkr" style="padding:10px;display: grid;
-          grid-template-columns: auto auto;
-          gap: 10px;
-          padding: 10px;font-weight:400">
-          <div>Address :</div>
-          <div>${Address}</div>
-          <div>Route :</div>  
-          <div>${(Route_Name) ? Route_Name : 'Empty'} </div>
-          <div>Dryers :</div>
-          <div>${dryers}</div>
-          <div>Washers :</div>
-          <div>${washers}</div>
-        </div>`);
+          this.infoWin.setContent(`<div class="grid-container-mkr" style="padding:10px;display: grid;grid-template-columns: auto auto;gap: 10px;padding: 10px;font-weight:400">
+                                    <div>Address :</div> <div>${Address}</div>
+                                    <div>Route :</div> <div>${(Route_Name) ? Route_Name : 'Empty'} </div>
+                                    <div>Dryers :</div> <div>${dryers}</div>
+                                    <div>Washers :</div> <div>${washers}</div>
+                                  </div>`
+          );
           this.infoWin.open(this.map, waypoint);
         });
 
@@ -707,6 +686,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
 
   buildRoute() {
     if (this.selectedLocations.length > 0) {
+      this.hideTempMarkers.emit();
       this.clearWaypointMkrs();
       this.clearOriginDestinationMkrs();
       // this.clearClusters.emit();
@@ -721,9 +701,10 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
           this.computeTotalDistance(data);
           this.csvData = [...data?.Route];
           this.csvData = this.csvData.map((item: any, idx: any) => {
-            item = this.omit(item, ['Route_ID', 'Location_ID']);
+            item = this.omit(item, ['Route_ID']);
             return item;
-          })
+          }
+          );
           this.data?.Route.map((item: any, idx: any) => {
             item["distance_text"] = this.data?.Route_Details[idx]?.Distance_Text;
             item["distance_value"] = this.data?.Route_Details[idx]?.Distance_Value;
@@ -742,18 +723,18 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
           this.disableInitialLoader.emit();
           this.isBuildingRoute = false;
         }
-        else{
+        else {
           this.disableInitialLoader.emit();
           this.isBuildingRoute = false;
         }
       },
-      (error:any)=>{
-        if(error?.error?.text=='Error'){
-          this.toastr.error('Couldnt build Route because the locations were associated to undefined Route.');
-          this.disableInitialLoader.emit();
-          this.isBuildingRoute = false;
-        } 
-      });
+        (error: any) => {
+          if (error?.error?.text == 'Error') {
+            this.toastr.error('Couldnt build Route because the locations were associated to undefined Route.');
+            this.disableInitialLoader.emit();
+            this.isBuildingRoute = false;
+          }
+        });
     }
     else {
       this.disableInitialLoader.emit();
@@ -765,10 +746,10 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   displayRoute(locs: any) {
     this.wayPoints = [];
     locs?.Route.map((loc: any, index: any) => {
-      if(parseFloat(loc?.Latitude)==0 || parseFloat(loc?.Longitude) == 0 || loc?.Latitude=="0" || loc?.Longitude=="0") {
+      if (parseFloat(loc?.Latitude) == 0 || parseFloat(loc?.Longitude) == 0 || loc?.Latitude == "0" || loc?.Longitude == "0") {
         this.wayPoints.push(loc?.Location_Name + ', ' + loc?.Address)
       }
-      else{
+      else {
         let obj = { lat: parseFloat(loc?.Latitude), lng: parseFloat(loc.Longitude) };
         this.wayPoints.push(obj)
       }
@@ -795,10 +776,10 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
     var lngs = locs?.Route.map(function (location: any) { return parseFloat(location.Longitude); });
     var lats = locs?.Route.map(function (location: any) { return parseFloat(location.Latitude); });
     lngs = lngs.filter((element: any) => {
-      if (element !== undefined && element !== null && element != NaN && !isNaN(element)) return element;
+      if (element !== undefined && element !== null && !Number.isNaN(element) && !isNaN(element)) return element;
     });
     lats = lats.filter((element: any) => {
-      if (element !== undefined && element !== null && element != NaN && !isNaN(element)) return element;
+      if (element !== undefined && element !== null && !Number.isNaN(element) && !isNaN(element)) return element;
     });
 
     map.fitBounds({
@@ -856,7 +837,7 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
       };
       service.route(service_options, service_callback);
     }
-    
+
   }
 
   markLocations() {
@@ -977,26 +958,26 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
 
   }
 
-  compareArrayFunction(a:any,b:any){
+  compareArrayFunction(a: any, b: any) {
     return a.zoneid === b.zoneid;
   }
 
-  onlyInLeft(left:any[], right:any[]){
-   return left.filter(leftValue =>
-      !right.some(rightValue => 
+  onlyInLeft(left: any[], right: any[]) {
+    return left.filter(leftValue =>
+      !right.some(rightValue =>
         this.compareArrayFunction(leftValue, rightValue)));
 
   }
- 
 
-  addNewZonetoCheckList(){
-    if(this.previousPolygonsatDB.length<this.polygonsatDb.length && this.previousPolygonsatDB){
+
+  addNewZonetoCheckList() {
+    if (this.previousPolygonsatDB.length < this.polygonsatDb.length && this.previousPolygonsatDB) {
       const onlyInA = this.onlyInLeft(this.polygonsatDb, this.previousPolygonsatDB);
       const result: any[] = [...onlyInA];
-      if(result.length>0){
-        this.polygonsatDb.map((zone:any)=>{
-          result.map((item:any)=>{
-            if(item && item?.zoneid == zone?.zoneid) {
+      if (result.length > 0) {
+        this.polygonsatDb.map((zone: any) => {
+          result.map((item: any) => {
+            if (item && item?.zoneid == zone?.zoneid) {
               this.checkedZonesList.push(zone);
               zone.checked = true;
               this.viewSinglePolygon.emit(zone)
@@ -1064,10 +1045,10 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   editTerritory(zone: any) {
     this.previousPolygonsatDB = [...this.polygonsatDb];
     this.viewSinglePolygon.emit(zone);
-      this.polygonsatDb.map((item: any, idx: any) => {
-        if (zone?.zoneid == item?.zoneid) item.checked = true;
-      });
-      this.updateCheckedZonesList();
+    this.polygonsatDb.map((item: any, idx: any) => {
+      if (zone?.zoneid == item?.zoneid) item.checked = true;
+    });
+    this.updateCheckedZonesList();
 
     this.editZoneEvent.emit(zone);
   }
@@ -1075,5 +1056,5 @@ export class RouteviewComponent implements OnInit, OnChanges,OnDestroy {
   ngOnDestroy(): void {
     // clearInterval(this.fetchTimeInterval);
   }
-  
+
 }

@@ -98,7 +98,7 @@ export class TableviewComponent implements OnInit, OnChanges {
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService) { }
 
   ngOnInit(): void {
-    this.pageSizeperPage = 20;
+    this.pageSizeperPage = 70;
     this.locationService.getSelectedPoints().subscribe((item: any) => {
       this.selectedLocations = item;
     });
