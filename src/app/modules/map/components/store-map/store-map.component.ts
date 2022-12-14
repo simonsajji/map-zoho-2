@@ -201,11 +201,12 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     else {
         let z = google.maps.event.addListener(map, 'zoom_changed', (event:any)=>{
             google.maps.event.removeListener(z);
-            this.smoothZoom(map, max, cnt + 1);
+            this.smoothZoom(map, max, cnt + 4);
         });
-        setTimeout(function(){map.setZoom(cnt)}, 100); // 80ms is what I found to work well on my system -- it might not work well on all systems
-    }
-} 
+        setTimeout(function(){map.setZoom(cnt)
+        }, 10); 
+      }
+  } 
 
   ngOnInit() {
     this.transparencyValue = 2;
@@ -1276,8 +1277,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   makemkrs(position: any, title: any, loc_id: any, route_name: any,Address_Line_1:any,Address_Line_2:any,Dryers:any,Washers:any, Location_Name:any,City:any,Country:any) {
     let label = title + "";
     let markerIcon = {
-      url: 'assets/pin.png',
-      scaledSize: new google.maps.Size(30, 30),
+      url: 'assets/building3.png',
+      scaledSize: new google.maps.Size(25, 25),
       labelOrigin: new google.maps.Point(-30, 10),
     };
     let obj = position;
@@ -1285,7 +1286,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       position: obj,
       map: this.map,
       icon: markerIcon,
-      label: { text: title, color: "#1440de", fontSize: "11px", fontWeight: '600', className: 'marker-position' },
+      label: { text: title, color: "#1440de", fontSize: "13px", fontWeight: '600', className: 'marker-position' },
 
     });
     marker['location_id'] = loc_id;
@@ -1301,12 +1302,23 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       <div>Route :</div>  
       <div>${(route_name) ? route_name : 'Empty'} </div>
       <div>Dryers :</div>
-      <div>${Dryers}</div>
+      <div>${(Dryers) ? Dryers : 0}</div>
       <div>Washers :</div>
-      <div>${Washers}</div>
+      <div>${(Washers) ? Washers : 0}</div>
     </div>`);
       this.infoWin.open(this.map, marker);
-    })
+    });
+    google.maps.event.addListener(this.map, 'zoom_changed', ()=> {
+      let zoom = this.map.getZoom();
+      if(zoom<=14) {
+       if(zoom>12 && zoom<=14)  marker.setLabel({ text: title, color: "#1440de", fontSize: `${zoom}px`, fontWeight: '600', className: 'marker-position' });
+       else if(zoom>=7 && zoom<=12)  marker.setLabel({ text: title, color: "#1440de", fontSize: "13px", fontWeight: '600', className: 'marker-position' });
+       else if(zoom<7)  marker.setLabel({ text: title, color: "#1440de", fontSize: "12px", fontWeight: '600', className: 'marker-position' });
+      }
+      else {
+       marker.setLabel({ text: title, color: "#1440de", fontSize: "14px", fontWeight: '600', className: 'marker-position' })
+      }
+  });
     this.mkrs.push(marker);
   }
 

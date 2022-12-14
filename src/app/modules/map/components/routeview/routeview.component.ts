@@ -348,23 +348,32 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
       keys = keys.map((key, index) => {
         return key.replace(/_/g, ' ');
       });
-      rows.unshift(keys);
+      rows.unshift([`${String(this.data?.Route?.[1]?.Route).split(',')[0]}`," "," "," "," ","Amount"]);
+      rows.unshift([" "," ","This Run Has Readings"]);
+      rows.unshift([" "," "," ","User"]);
+      let dat = new Date();
+      let day = dat?.getDate();
+      let mnth = dat?.toLocaleString('default', { month: 'long' });
+      let weekday = dat?.toLocaleString('default', { weekday: 'long' });
+      let dispDate = `${weekday} ${mnth} ${day}`;
+      rows.unshift([" "," "," "," "," ",`${dispDate}`]);
       let csvContent = "data:text/csv;charset=utf-8,";
-      rows[0].push("Amount");
-      //
-      let summaryData = this.findOcc(this.csvData, "Coin_Card_Location");
-      rows.push([" ", " ", " "]);
-      rows.push(["Summary"]);
-      rows.push([" ", " ", " "]);
-      rows.push(["Coin/Card Location", "Count"]);
-      summaryData.map((item: any, idx: any) => {
-        if (summaryData.length == 1) {
-          rows.push(Object.values(item))
-          rows.push([' ', ' ']);
-        }
-        else rows.push(Object.values(item))
+      // let summaryData = this.findOcc(this.csvData, "Coin_Card_Location");
+      // rows.push([" ", " ", " "]);
+      // rows.push(["Summary"]);
+      // rows.push([" ", " ", " "]);
+      // rows.push(["Coin/Card Location", "Count"]);
+      // summaryData.map((item: any, idx: any) => {
+      //   if (summaryData.length == 1) {
+      //     rows.push(Object.values(item))
+      //     rows.push([' ', ' ']);
+      //   }
+      //   else rows.push(Object.values(item))
 
-      })
+      // })
+      rows.push(["K_____________","C______________"," ","S_____________"]);
+      rows.push([" ", " ", " "]);
+      rows.push(["Authorized PersonnelX____________________________","CollectorX____________________________"])
       rows.forEach(function (rowArray: any) {
         let row = rowArray.join(",");
         csvContent += row + "\r\n";
@@ -377,7 +386,7 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
       var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
       var yyyy = today.getFullYear();
       today = mm + '-' + dd + '-' + yyyy;
-      link.setAttribute("download", `${this.csvData?.[1]?.Route}-${today}.csv`);
+      link.setAttribute("download", `${(this.data?.Route?.[1]?.Route)? this.data?.Route?.[1]?.Route : this.csvData?.[1]?.Route}-${today}.csv`);
       document.body.appendChild(link); // Required for FF
       link.click();
     }
@@ -561,6 +570,7 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   makemkrs(position: any, title: any, loc_id: any, route_name: any) {
+    // inactive fn
     let label = title + "";
     let markerIcon = {
       url: 'assets/pin.png',
@@ -595,9 +605,9 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
         path: google.maps.SymbolPath.CIRCLE,
         scale: 14,
         fillOpacity: 1,
-        strokeWeight: 2,
-        fillColor: '#5384ED',
-        strokeColor: '#ffffff',
+        strokeWeight: 3,
+        fillColor: '#3b6edb',
+        strokeColor: '#9db6ed',
       },
       label: { text: label, color: "#ffffff", fontSize: "16px", fontWeight: '600' },
       title: label
@@ -634,9 +644,9 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
             path: google.maps.SymbolPath.CIRCLE,
             scale: 14,
             fillOpacity: 1,
-            strokeWeight: 2,
-            fillColor: '#5384ED',
-            strokeColor: '#ffffff',
+            strokeWeight: 3,
+            fillColor: '#3b6edb',
+            strokeColor: '#9db6ed',
           },
           label: { text: label, color: "#ffffff", fontSize: "16px", fontWeight: '600' },
           title: label
@@ -701,8 +711,15 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
           this.computeTotalDistance(data);
           this.csvData = [...data?.Route];
           this.csvData = this.csvData.map((item: any, idx: any) => {
-            item = this.omit(item, ['Route_ID']);
-            return item;
+            item = this.omit(item, ['Route_ID','Location_Name','Latitude','Longitude','Dryers','Washers']);
+            let item_ = {
+              Address:String(item?.Address).split(',')[0],
+              City:item?.City,
+              Route:(item?.Route) ? String(item?.Route).split('-')[0] : '',
+              Location_ID:item?.Location_ID,
+              Coin_Card_Location:item?.Coin_Card_Location
+            }
+            return item_;
           }
           );
           this.data?.Route.map((item: any, idx: any) => {
