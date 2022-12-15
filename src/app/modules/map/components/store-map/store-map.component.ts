@@ -1277,7 +1277,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   makemkrs(position: any, title: any, loc_id: any, route_name: any,Address_Line_1:any,Address_Line_2:any,Dryers:any,Washers:any, Location_Name:any,City:any,Country:any) {
     let label = title + "";
     let markerIcon = {
-      url: 'assets/building3.png',
+      url: 'assets/building4.png',
       scaledSize: new google.maps.Size(25, 25),
       labelOrigin: new google.maps.Point(-30, 10),
     };
@@ -1316,7 +1316,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
        else if(zoom<7)  marker.setLabel({ text: title, color: "#1440de", fontSize: "12px", fontWeight: '600', className: 'marker-position' });
       }
       else {
-       marker.setLabel({ text: title, color: "#1440de", fontSize: "14px", fontWeight: '600', className: 'marker-position' })
+       marker.setLabel({ text: title, color: "#1440de", fontSize: "13px", fontWeight: '600', className: 'marker-position' })
       }
   });
     this.mkrs.push(marker);
