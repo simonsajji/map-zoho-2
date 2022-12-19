@@ -76,6 +76,7 @@ export class TableviewComponent implements OnInit, OnChanges {
   filteredColumns: any = [];
   enabledAddressFilter: boolean = true;
   enabledLocationNameFilter: boolean = true;
+  enabledAddressLine1Filter:boolean = true;
   enabledRouteFilter: boolean = true;
   enabledOnRouteFilter: boolean = true;
   orderedColumns: any;
@@ -84,6 +85,7 @@ export class TableviewComponent implements OnInit, OnChanges {
   @ViewChild("sarea") sarea: any;
   @ViewChild("mastercheck") mastercheck: any;
   @ViewChild('filterName') filterName: any;
+  @ViewChild('filterAddressLine1') filterAddressLine1: any;
   @ViewChild('filterRouteName') filterRouteName: any;
   @ViewChild('filterAddress') filterAddress: any;
   @ViewChild('filterOnRoute') filterOnRoute: any;
@@ -288,11 +290,18 @@ export class TableviewComponent implements OnInit, OnChanges {
     else {
       if (column == 'Location_Name') {
         this.enabledRouteFilter = false;
+        this.enabledAddressLine1Filter = false;
         this.enabledLocationNameFilter = true;
       }
       if (column == 'Route') {
         this.enabledLocationNameFilter = false;
+        this.enabledAddressLine1Filter = false;
         this.enabledRouteFilter = true;
+      }
+      if(column == 'Address_Line_1'){
+        this.enabledLocationNameFilter = false;
+        this.enabledRouteFilter = false;
+        this.enabledAddressLine1Filter = true;
       }
 
       this.isFilterActive = true;
@@ -314,9 +323,11 @@ export class TableviewComponent implements OnInit, OnChanges {
     this.applyFilter('', '');
     this.enabledRouteFilter = true;
     this.enabledLocationNameFilter = true;
+    this.enabledAddressLine1Filter = true;
     if (this.filterName?.nativeElement) this.filterName.nativeElement.value = '';
     if (this.filterAddress?.nativeElement) this.filterAddress.nativeElement.value = '';
     if (this.filterRouteName?.nativeElement) this.filterRouteName.nativeElement.value = '';
+    if (this.filterAddressLine1?.nativeElement) this.filterAddressLine1.nativeElement.value = '';
     if (this.filterOnRoute?.value) this.filterOnRoute.value = '';
     this.isFilterActive = false;
   }

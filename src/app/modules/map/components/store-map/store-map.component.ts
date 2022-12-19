@@ -263,7 +263,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   initMap() {
     this.fetched_locations?.data?.map((location: any) => {
-      if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_ID), location?.Route,location?.Address_Line_1,location?.Address_Line_2,location?.Dryers,location?.Washers,location?.Location_Name,location?.City,location?.Country)
+      if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Address_Line_1, parseFloat(location?.Location_ID), location?.Route,location?.Address_Line_1,location?.Address_Line_2,location?.Dryers,location?.Washers,location?.Location_Name,location?.City,location?.Country)
     });
     // this.initialLoader = false;
     
@@ -1279,7 +1279,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     let markerIcon = {
       url: 'assets/building4.png',
       scaledSize: new google.maps.Size(25, 25),
-      labelOrigin: new google.maps.Point(-30, 10),
+      labelOrigin: new google.maps.Point(-30, 2),
     };
     let obj = position;
     let marker: any = new google.maps.Marker({

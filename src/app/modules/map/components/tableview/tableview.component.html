@@ -138,9 +138,9 @@
               <mat-header-cell *matHeaderCellDef mat-sort-header class="f-s-14 d-flex flex-column c-dark"
                 style="justify-content:flex-start!important;align-items:flex-start!important;min-width: 160px;">
                 <div class="t-a-left d-flex "> Address Line 1</div>
-                <!-- <mat-form-field *ngIf="col == 'Location_Name'" style="height:45px!important;width: 100%!important;" >
-                  <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..." #filterName   >
-                </mat-form-field> -->
+                  <mat-form-field *ngIf="col == 'Address_Line_1'" style="height:45px!important;width: 100%!important;" >
+                  <input matInput (keyup)="applyFilter($event,col)" placeholder="Filter..." #filterAddressLine1   [disabled]="!enabledAddressLine1Filter" >
+                </mat-form-field>
               </mat-header-cell>
               <mat-cell *matCellDef="let element" class="p-relative"
                 style="white-space: nowrap; text-overflow:ellipsis; overflow: hidden; "
