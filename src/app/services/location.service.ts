@@ -6,10 +6,12 @@ import { SelectionModel } from '@angular/cdk/collections';
   providedIn: 'root'
 })
 export class LocationService {
-
   selectedPoints = new BehaviorSubject<any>([]);
   selection = new SelectionModel<any>(true, []);
   showRoutes:any = new BehaviorSubject<any>(false);
+  builtRouteExists:any = new BehaviorSubject<any>(false);
+  isFirstChangebyMutipleRts:any = new BehaviorSubject<any>(true);
+  
 
   constructor() { }
 
@@ -37,12 +39,6 @@ export class LocationService {
     return this.selection.deselect(temp);
   }
 
-  // getShowRoutes(){
-  //   return this.showRoutes;
-  // }
-  // setShowRoutes(temp:boolean){
-  //    this.showRoutes = temp;
-  // }
 
   setShowRoutes(temp: any): void {
     return this.showRoutes.next(temp);
@@ -50,6 +46,22 @@ export class LocationService {
 
   getShowRoutes() {
     return this.showRoutes.asObservable();
+  }
+ 
+  setBuiltRouteExists(temp: any): void {
+    return this.builtRouteExists.next(temp);
+  }
+
+  checkBuiltRouteExists() {
+    return this.builtRouteExists.asObservable();
+  }
+
+  setIsFirstChangebyMutipleRts(temp: any): void {
+    return this.isFirstChangebyMutipleRts.next(temp);
+  }
+
+  getIsFirstChangebyMutipleRts(){
+    return this.isFirstChangebyMutipleRts.asObservable();
   }
  
 

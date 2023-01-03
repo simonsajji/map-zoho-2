@@ -117,6 +117,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   currentEditZone: any;
   isMenuOpen: boolean = false;
   timeOutApiRequest: any;
+  tempMarker:any;
+  firstChangeFromMultipleRtes:any;
   constructor(private renderer: Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService, private router: Router) { }
 
   ngOnChanges() { }
@@ -131,12 +133,14 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         this.callZonesApi();
         if (!dat) {
           this.toastr.warning("Error occured in fetching locations");
+       
           this.initialLoader = false;
         }
       },
       (error) => {
         if (error?.status !== 200) {
           this.toastr.error("Error occured in fetching locations");
+       
           this.initialLoader = false;
         }
       }
@@ -179,18 +183,31 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         unique = list_ids.filter((v: any, i: any, a: any) => a.indexOf(v) === i);
         this.unSetAllZonesfromMap() // resets the whole zones overlay exclding the newly drawn
         this.setDrawingManager();
+        this.smoothZoom(this.map, 12, this.map.getZoom());
         // this.unSetCanvas();
       },
       (error: any) => {
         if (error?.status != 200) {
           this.toastr.error('Error occured while fetching the updated zones');
+          this.smoothZoom(this.map, 12, this.map.getZoom());
           this.initialLoader = false;
           this.unSetCanvas();
         }
       }
     )
-
   }
+
+  smoothZoom (map:any, max:any, cnt:any) {
+    if (cnt >= max) return;
+    else {
+        let z = google.maps.event.addListener(map, 'zoom_changed', (event:any)=>{
+            google.maps.event.removeListener(z);
+            this.smoothZoom(map, max, cnt + 4);
+        });
+        setTimeout(function(){map.setZoom(cnt)
+        }, 10); 
+      }
+  } 
 
   ngOnInit() {
     this.transparencyValue = 2;
@@ -214,12 +231,14 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     loader.load().then(() => {
       this.infoWin = new google.maps.InfoWindow();
       this.map = new google.maps.Map(document.getElementById("map") as HTMLElement, {
-        zoom: 12,
+        zoom: 4,
         center: { lat: 43.651070, lng: -79.347015 },
         gestureHandling: 'greedy',
         streetViewControl: false,
         fullscreenControl: false,
+        mapTypeControl: false,
       });
+      
     });
 
 
@@ -237,7 +256,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   initTable() {
     this.dataSource = new MatTableDataSource<any>(this.fetched_locations?.data);
-    this.displayedColumns = ['Location_Name', 'Route', 'On_Route', 'Billable', 'Location_Type', 'On_Hold', 'Rental', 'Washers', 'Dryers', 'Coin_Card_Location', 'Address_Line_1',
+    this.displayedColumns = ['Address_Line_1', 'Location_Name', 'Route', 'On_Route', 'Billable', 'Location_Type', 'On_Hold', 'Rental', 'Washers', 'Dryers', 'Coin_Card_Location',
       'Address_Line_2', 'City', 'Distance'];
     // this.displayedColumns.unshift('op','select');
     this.displayedColumns.unshift('select');
@@ -245,9 +264,10 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   initMap() {
     this.fetched_locations?.data?.map((location: any) => {
-      if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Location_Name, parseFloat(location?.Location_ID), location?.Route,location?.Address_Line_1,location?.Address_Line_2,location?.Dryers,location?.Washers,location?.Location_Name,location?.City,location?.Country)
+      if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Address_Line_1, parseFloat(location?.Location_ID), location?.Route,location?.Address_Line_1,location?.Address_Line_2,location?.Dryers,location?.Washers,location?.Location_Name,location?.City,location?.Country)
     });
     // this.initialLoader = false;
+    
   }
 
   transparencyChange(ev: any) {
@@ -372,7 +392,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   }
 
   setEditCanvasMode() {
-    // only editing mode here
     this.canvasMode = false;
     this.drawingService.setDrawMode(true);
     this.editCanvasMode = true;
@@ -399,6 +418,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           ]
 
         },
+        drawingControl: false,
         polygonOptions: {
           clickable: true,
           draggable: false,
@@ -535,9 +555,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         }
       }
     })
-
     // fetchedPolygons need to be added to listener events
-
     if (this.fetchedPolygons.length > 0) {
       this.fetchedPolygons.forEach((poly: any, idx: any) => {
         if (poly?.polygon) {
@@ -555,7 +573,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           poly.polygon?.setEditable(true);
           google.maps.event.addListener(poly?.polygon, 'dragend', this.getPolygonCoords)
           google.maps.event.addListener(poly?.polygon?.getPath(), 'insert_at', () => {
-            // this.coordinates.splice(0,this.coordinates?.length);
             let len = poly?.polygon?.getPath().getLength();
             let location_ids_array: any = []
             for (var i = 0; i < this.mkrs.length; i++) {
@@ -567,7 +584,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
           })
           google.maps.event.addListener(poly?.polygon.getPath(), 'set_at', () => {
-            // this.coordinates.splice(0,this.coordinates?.length);
             let len = poly?.polygon.getPath().getLength();
             let location_ids_array: any = []
             for (var i = 0; i < this.mkrs.length; i++) {
@@ -678,7 +694,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           item?.polygon.getPath().forEach((element: any, index: any) => { bounds.extend(element); })
           this.map.fitBounds(bounds);
         }
-        // set bounds here only for current edit zone
       }
     });
     this.enableEditMode = true;
@@ -1115,7 +1130,9 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   }
 
   public AddressChange(address: any) {
+    if(this.tempMarker) this.tempMarker.setMap(null)
     this.formattedaddress = address.formatted_address;
+    let displayAddress = (this.sarea  && this.sarea?.nativeElement?.value!='' && this.sarea?.nativeElement?.value!=' ') ? this.sarea?.nativeElement?.value : this.formattedaddress;
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode(
       {
@@ -1131,16 +1148,64 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
             bounds.extend(firstResult.location);
           }
           this.map.fitBounds(bounds);
+          let pos = {lat:results[0].geometry.location.lat(),lng:results[0].geometry.location.lng()};
+          this.showSearchedLocation(pos,displayAddress);
         }
         else if (status != "OK") this.toastr.error('Could not fetch the Location')
       }
     );
   }
 
+  showSearchedLocation(position:any,address:any){
+    let markerIcon = {
+      url: 'assets/search-location5.png',
+      scaledSize: new google.maps.Size(40, 40),
+      labelOrigin: new google.maps.Point(-30, 10),
+    };
+    let obj = position;
+    this.tempMarker = new google.maps.Marker({
+      position: obj,
+      map: this.map,
+      icon: markerIcon,
+    });
+    this.infoWin.setContent(`<div  style="padding: 5px;font-weight:400;word-wrap: break-word!important;width:150px">
+                          <div>${address}</div>
+                      </div>`);
+    
+    google.maps.event.addListener(this.tempMarker, 'click', (evt: any) => {
+     
+      this.infoWin.open(this.map, this.tempMarker);
+    });
+    this.infoWin.open(this.map, this.tempMarker);
+    this.tempMarker.setMap(this.map);
+    google.maps.event.addListener(this.map, 'zoom_changed', ()=> {
+      let zoom = this.map.getZoom();
+      // let markerWidth = (zoom/9)*20
+      // let markerHeight = (zoom/9)*34
+      if(zoom<13) {
+        this.tempMarker.setIcon({
+          position: obj,
+          map: this.map,
+          url: 'assets/search-location5.png',
+            scaledSize: new google.maps.Size(20,20)
+        });
+
+      }
+      else {
+        this.tempMarker.setIcon({
+          position: obj,
+          map: this.map,
+          url: 'assets/search-location5.png',
+          scaledSize: new google.maps.Size(40, 40)
+        })
+      }
+  });
+  }
+
   clearSearchArea() {
-    this.sarea.nativeElement.value = "";
-    this.map.setCenter(new google.maps.LatLng(43.651070, -79.347015));
-    this.map.setZoom(13);
+    if(this.sarea?.nativeElement?.value && this.sarea)this.sarea.nativeElement.value = "";
+    if(this.infoWin) this.infoWin.close();
+    if(this.tempMarker) this.tempMarker.setMap(null);
   }
 
 
@@ -1213,16 +1278,16 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   makemkrs(position: any, title: any, loc_id: any, route_name: any,Address_Line_1:any,Address_Line_2:any,Dryers:any,Washers:any, Location_Name:any,City:any,Country:any) {
     let label = title + "";
     let markerIcon = {
-      url: 'assets/pin.png',
-      scaledSize: new google.maps.Size(30, 30),
-      labelOrigin: new google.maps.Point(-30, 10),
+      url: 'assets/building4.png',
+      scaledSize: new google.maps.Size(25, 25),
+      labelOrigin: new google.maps.Point(-30, 2),
     };
     let obj = position;
     let marker: any = new google.maps.Marker({
       position: obj,
       map: this.map,
       icon: markerIcon,
-      label: { text: title, color: "#1440de", fontSize: "11px", fontWeight: '600', className: 'marker-position' },
+      label: { text: title, color: "#1440de", fontSize: "13px", fontWeight: '600', className: 'marker-position' },
 
     });
     marker['location_id'] = loc_id;
@@ -1238,12 +1303,23 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       <div>Route :</div>  
       <div>${(route_name) ? route_name : 'Empty'} </div>
       <div>Dryers :</div>
-      <div>${Dryers}</div>
+      <div>${(Dryers) ? Dryers : 0}</div>
       <div>Washers :</div>
-      <div>${Washers}</div>
+      <div>${(Washers) ? Washers : 0}</div>
     </div>`);
       this.infoWin.open(this.map, marker);
-    })
+    });
+    google.maps.event.addListener(this.map, 'zoom_changed', ()=> {
+      let zoom = this.map.getZoom();
+      if(zoom<=14) {
+       if(zoom>12 && zoom<=14)  marker.setLabel({ text: title, color: "#1440de", fontSize: `${zoom}px`, fontWeight: '600', className: 'marker-position' });
+       else if(zoom>=7 && zoom<=12)  marker.setLabel({ text: title, color: "#1440de", fontSize: "13px", fontWeight: '600', className: 'marker-position' });
+       else if(zoom<7)  marker.setLabel({ text: title, color: "#1440de", fontSize: "12px", fontWeight: '600', className: 'marker-position' });
+      }
+      else {
+       marker.setLabel({ text: title, color: "#1440de", fontSize: "13px", fontWeight: '600', className: 'marker-position' })
+      }
+  });
     this.mkrs.push(marker);
   }
 
@@ -1312,6 +1388,10 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     if (!event.target.classList.contains('menu-backdrop')) {
       this.isMenuOpen = false;
     }
+  }
+
+  getFirstChangeFromMultipleRtes(ev:any){
+    this.firstChangeFromMultipleRtes = ev;
   }
 
 }

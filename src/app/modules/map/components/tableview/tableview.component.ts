@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, Output, ElementRef, OnChanges, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef, SimpleChanges, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, Output, ElementRef, OnChanges, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef, SimpleChanges, HostListener, EventEmitter } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { animate, animation, style, transition, trigger, useAnimation, state, keyframes } from '@angular/animations';
 import { MatPaginator } from '@angular/material/paginator';
@@ -76,14 +76,18 @@ export class TableviewComponent implements OnInit, OnChanges {
   filteredColumns: any = [];
   enabledAddressFilter: boolean = true;
   enabledLocationNameFilter: boolean = true;
+  enabledAddressLine1Filter: boolean = true;
   enabledRouteFilter: boolean = true;
   enabledOnRouteFilter: boolean = true;
   orderedColumns: any;
   enableDrawingMode: boolean = false;
+  firstChangefromMultipleRoutes: boolean = true;
+  isBuiltRouteExists: boolean = false;
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
   @ViewChild("sarea") sarea: any;
   @ViewChild("mastercheck") mastercheck: any;
   @ViewChild('filterName') filterName: any;
+  @ViewChild('filterAddressLine1') filterAddressLine1: any;
   @ViewChild('filterRouteName') filterRouteName: any;
   @ViewChild('filterAddress') filterAddress: any;
   @ViewChild('filterOnRoute') filterOnRoute: any;
@@ -93,17 +97,28 @@ export class TableviewComponent implements OnInit, OnChanges {
   @Input('displayedColumns') displayedColumns: string[] = [];
   @Input('showRoutes') showRoutes: boolean = false;
   @Input('initialLoaderTable') initialLoaderTable: boolean = false;
+  @Output('firstChangeAddMultipleRouteEvent') firstChangeAddMultipleRouteEvent = new EventEmitter();
 
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService) { }
 
   ngOnInit(): void {
-    this.pageSizeperPage = 20;
+    this.pageSizeperPage = 70;
     this.locationService.getSelectedPoints().subscribe((item: any) => {
       this.selectedLocations = item;
     });
     this.drawingService.getDrawMode().subscribe((item: any) => {
       this.enableDrawingMode = item;
+    });
+    this.locationService.checkBuiltRouteExists().subscribe((item: any) => {
+      this.isBuiltRouteExists = item;
+      if (!this.isBuiltRouteExists) this.firstChangefromMultipleRoutes = true;
+      this.firstChangeAddMultipleRouteEvent.emit(this.firstChangefromMultipleRoutes)
+
+    });
+    this.locationService.getIsFirstChangebyMutipleRts().subscribe((item: any) => {
+      this.firstChangefromMultipleRoutes = item;
+
     })
   }
 
@@ -156,22 +171,134 @@ export class TableviewComponent implements OnInit, OnChanges {
   }
 
   logSelection() {
+    let unselectedItems = this.selection.selected;
+    let totalSelectedLocs = this.selectedLocations.concat(this.selection?.selected);
+    let arr = totalSelectedLocs.map((item: any) => {
+      return item?.Route;
+    })
+    let uniqueSelectedLocations = Array.from(new Set(arr));
     let count_addedLocations = 0;
     if (this.selectedLocations.length == 0) this.initiatedRoute = false;
     this.locationService.setShowRoutes(false);
-    this.selection.selected.forEach((s: any) => {
-      if (s?.Route == '' || s?.Route == null || s?.Route == ' ' || s?.Route == undefined ) this.toastr.warning(`The Locations have undefined Route and cannot be added to build the route `);
+    if (uniqueSelectedLocations?.length > 1) {
+      // Locations from Multiple Routes
+      if (this.selectedLocations.length == 0) {
+        unselectedItems.map((item: any, idx: any) => {
+          if (item?.Location_ID == this.origin?.Location_ID && item?.Location_ID == this.destination?.Location_ID) {
+            this.toastr.warning(`The Location ${item?.Location_Name} is either Origin or Destination`)
+            unselectedItems.splice(idx, 1)
+          }
+        })
+        if (this.firstChangefromMultipleRoutes) {
+          const dialogRef = this.dialog.open(ConfirmBoxComponent, {
+            data: {
+              locations: `${this.selection?.selected?.length}`,
+              destinationRoute: `${this.fetched_locations?.data[0]?.Route}`,
+              isMultipleRoutes: true
+            }
+          });
+          dialogRef.afterClosed().subscribe(confirmed => {
+            if (confirmed == true) {
+              this.selectedLocations.concat(unselectedItems);
+              count_addedLocations = unselectedItems.length;
+              this.addNewLocationstoList(unselectedItems, count_addedLocations);
+            }
+            else {
+              this.locationService.clearSelectionModel();
+              this.masterCheckbox = false;
+              this.initiatedRoute = true;
+            }
+          });
+        }
+        else {
+          this.selectedLocations.concat(unselectedItems);
+          count_addedLocations = unselectedItems.length;
+          this.addNewLocationstoList(unselectedItems, count_addedLocations);
+        }
+
+      }
+      else {
+        if (this.firstChangefromMultipleRoutes) {
+          const dialogRef = this.dialog.open(ConfirmBoxComponent, {
+            data: {
+              locations: `${this.selection?.selected?.length}`,
+              destinationRoute: `${this.fetched_locations?.data[0]?.Route}`,
+              isMultipleRoutes: true
+            }
+          });
+          dialogRef.afterClosed().subscribe(confirmed => {
+            if (confirmed == true) {
+              this.addLocationstoExistingfromMultipleRoutes(unselectedItems, count_addedLocations);
+            }
+            else {
+              this.locationService.clearSelectionModel();
+              this.masterCheckbox = false;
+              this.initiatedRoute = true;
+            }
+          });
+        }
+        else this.addLocationstoExistingfromMultipleRoutes(unselectedItems, count_addedLocations);
+      }
+      this.firstChangefromMultipleRoutes = false;
+      this.locationService.setIsFirstChangebyMutipleRts(false);
+      // this.firstChangeAddMultipleRouteEvent.emit(this.firstChangefromMultipleRoutes)
+    }
+    else {
+      this.selection.selected.forEach((s: any) => {
+        if (s?.Route == '' || s?.Route == null || s?.Route == ' ' || s?.Route == undefined) this.toastr.warning(`The Locations have undefined Route and cannot be added to build the route `);
+        else {
+          if (s?.Location_ID != this.origin?.Location_ID && s?.Location_ID != this.destination?.Location_ID) {
+            const index = this.selectedLocations.findIndex((object: any) => (object?.Location_ID === s?.Location_ID));
+            if (index === -1) {
+              if (this.selectedLocations.length > 0) {
+                if (this.selectedLocations[0]?.Route == s?.Route) {
+                  this.selectedLocations.push(s);
+                  this.locationService.setSelectedPoints(this.selectedLocations);
+                  count_addedLocations++;
+                }
+                else this.toastr.warning(`The Location (s) are part of a different Route`);
+              }
+              else {
+                this.selectedLocations.push(s);
+                this.locationService.setSelectedPoints(this.selectedLocations);
+                count_addedLocations++;
+              }
+            }
+            else this.toastr.warning(`Location ${s?.Location_Name} already exists in route`)
+          }
+          else this.toastr.warning(`The Location ${s?.Location_Name} is either Origin or Destination`)
+        }
+      });
+
+      if (count_addedLocations == 1 && count_addedLocations > 0) ((this.initiatedRoute == true) ? this.toastr.success(`Added ${count_addedLocations} more location to Route`) : this.toastr.success(`Added ${count_addedLocations} location to Route`));
+      else if (count_addedLocations > 1 && count_addedLocations > 0) ((this.initiatedRoute == true) ? this.toastr.success(`Added ${count_addedLocations} more locations to Route`) : this.toastr.success(`Added ${count_addedLocations} locations to Route`));
+      this.locationService.clearSelectionModel();
+      this.masterCheckbox = false;
+      this.initiatedRoute = true;
+    }
+
+  }
+
+  addNewLocationstoList(items: any, count_addedLocations: any) {
+    this.locationService.setSelectedPoints(items);
+    if (count_addedLocations == 1 && count_addedLocations > 0) ((this.initiatedRoute == true) ? this.toastr.success(`Added ${count_addedLocations} more location to Route`) : this.toastr.success(`Added ${count_addedLocations} location to Route`));
+    else if (count_addedLocations > 1 && count_addedLocations > 0) ((this.initiatedRoute == true) ? this.toastr.success(`Added ${count_addedLocations} more locations to Route`) : this.toastr.success(`Added ${count_addedLocations} locations to Route`));
+    this.locationService.clearSelectionModel();
+    this.masterCheckbox = false;
+    this.initiatedRoute = true;
+  }
+  addLocationstoExistingfromMultipleRoutes(items: any, count_addedLocations: any) {
+    items.forEach((s: any) => {
+      if (s?.Route == '' || s?.Route == null || s?.Route == ' ' || s?.Route == undefined) this.toastr.warning(`The Locations have undefined Route and cannot be added to build the route `);
       else {
         if (s?.Location_ID != this.origin?.Location_ID && s?.Location_ID != this.destination?.Location_ID) {
           const index = this.selectedLocations.findIndex((object: any) => (object?.Location_ID === s?.Location_ID));
           if (index === -1) {
             if (this.selectedLocations.length > 0) {
-              if (this.selectedLocations[0]?.Route == s?.Route) {
-                this.selectedLocations.push(s);
-                this.locationService.setSelectedPoints(this.selectedLocations);
-                count_addedLocations++;
-              }
-              else this.toastr.warning(`The Location (s) are part of a different Route`);
+              this.selectedLocations.push(s);
+              this.locationService.setSelectedPoints(this.selectedLocations);
+              count_addedLocations++;
+
             }
             else {
               this.selectedLocations.push(s);
@@ -187,17 +314,12 @@ export class TableviewComponent implements OnInit, OnChanges {
 
     if (count_addedLocations == 1 && count_addedLocations > 0) ((this.initiatedRoute == true) ? this.toastr.success(`Added ${count_addedLocations} more location to Route`) : this.toastr.success(`Added ${count_addedLocations} location to Route`));
     else if (count_addedLocations > 1 && count_addedLocations > 0) ((this.initiatedRoute == true) ? this.toastr.success(`Added ${count_addedLocations} more locations to Route`) : this.toastr.success(`Added ${count_addedLocations} locations to Route`));
-    // this.selection.clear();
     this.locationService.clearSelectionModel();
     this.masterCheckbox = false;
     this.initiatedRoute = true;
+
   }
 
-  // masterToggle(event:any) {
-  //   this.isSelectedPage() ?
-  //   this.locationService.clearSelectionModel() :
-  //      this.selectRows();
-  //  }
 
   selectRows() {
     let endIndex: number;
@@ -288,11 +410,18 @@ export class TableviewComponent implements OnInit, OnChanges {
     else {
       if (column == 'Location_Name') {
         this.enabledRouteFilter = false;
+        this.enabledAddressLine1Filter = false;
         this.enabledLocationNameFilter = true;
       }
       if (column == 'Route') {
         this.enabledLocationNameFilter = false;
+        this.enabledAddressLine1Filter = false;
         this.enabledRouteFilter = true;
+      }
+      if (column == 'Address_Line_1') {
+        this.enabledLocationNameFilter = false;
+        this.enabledRouteFilter = false;
+        this.enabledAddressLine1Filter = true;
       }
 
       this.isFilterActive = true;
@@ -314,9 +443,11 @@ export class TableviewComponent implements OnInit, OnChanges {
     this.applyFilter('', '');
     this.enabledRouteFilter = true;
     this.enabledLocationNameFilter = true;
+    this.enabledAddressLine1Filter = true;
     if (this.filterName?.nativeElement) this.filterName.nativeElement.value = '';
     if (this.filterAddress?.nativeElement) this.filterAddress.nativeElement.value = '';
     if (this.filterRouteName?.nativeElement) this.filterRouteName.nativeElement.value = '';
+    if (this.filterAddressLine1?.nativeElement) this.filterAddressLine1.nativeElement.value = '';
     if (this.filterOnRoute?.value) this.filterOnRoute.value = '';
     this.isFilterActive = false;
   }
