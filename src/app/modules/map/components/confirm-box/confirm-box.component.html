@@ -1,76 +1,76 @@
 
 <div *ngIf="datanew?.logout" class="mat-parent flex-column ">
-    <p class="f-s-18 p-l-10 f-w-500">Logout</p>
+    <p class="f-s-16 p-l-10 f-w-500">Logout</p>
     <div class="f-s-15 p-l-10 p-r-10 w-100 d-flex gap-10">
-        <div class=" f-s-15 m-b-5 f-w-400 ">Are you sure you want to Logout from Zoftmap ? </div>
+        <div class=" f-s-14 m-b-5 f-w-400 ">Are you sure you want to Logout from Zoftmap ? </div>
     </div>
     <div class="btn-parent text-center d-flex align-center j-end w-100 t-a-right">
-        <button mat-button class="  f-s-13 bg-primary-color btn-ok  f-w-500" style="border-radius:5px!important"
+        <button mat-button class="  f-s-12 bg-primary-color btn-ok  f-w-500" style="border-radius:5px!important"
             (click)="okClick()">LOGOUT</button>
-        <button mat-button class="btn-cancel f-s-13 p-5  m-r-5 f-w-500" 
+        <button  class="btn-cancel f-s-12 p-2 p-r-10 p-l-10  m-r-5 f-w-600" 
             (click)="cancelClick()">CANCEL</button>
     </div>
 </div>
 
 <div *ngIf="datanew?.destinationRoute && !datanew?.logout && !datanew?.isMultipleRoutes" class="mat-parent flex-column ">
-    <p class="f-s-18 p-l-10 f-w-500">Add Locations</p>
+    <p class="f-s-16 p-l-10 f-w-500">Add Locations</p>
     <div class="f-s-15 p-l-10 p-r-10 w-100 d-flex gap-10">
-        <div class=" f-s-15 m-b-5 f-w-400 ">Are you sure to <span class="c-purple f-w-500"> add </span> all selected  <span class="f-w-500"> {{datanew?.locations}} locations </span> ? </div>
+        <div class=" f-s-14 m-b-5 f-w-400 ">Are you sure to <span class=" f-w-500"> add </span> all selected  <span class="f-w-500"> {{datanew?.locations}} locations </span> ? </div>
     </div>
     <div class="btn-parent text-center d-flex align-center j-end w-100 t-a-right">
-        <button mat-button class="  f-s-13 bg-primary-color btn-ok  f-w-500" style="border-radius:5px!important"
+        <button mat-button class="  f-s-12 bg-primary-color btn-ok  f-w-500" style="border-radius:5px!important"
             (click)="okClick()">ADD</button>
-        <button mat-button class="btn-cancel f-s-13 p-5  m-r-5 f-w-500" 
+         <button  class="btn-cancel f-s-12 p-2 p-r-10 p-l-10  m-r-5 f-w-600" 
             (click)="cancelClick()">CANCEL</button>
     </div>
 </div> 
 <div *ngIf="datanew?.destinationRoute && datanew?.isMultipleRoutes" class="mat-parent flex-column ">
-    <p class="f-s-18 p-l-10 f-w-500">Add Locations from Multiple Routes</p>
+    <p class="f-s-16 p-l-10 f-w-500">Add Locations from Multiple Routes</p>
     <div class="f-s-15 p-l-10 p-r-10 w-100 d-flex gap-10">
-        <div class=" f-s-15 m-b-5 f-w-400 ">Are you sure to <span class="c-purple f-w-500"> add </span> all selected  <span class="f-w-500"> {{datanew?.locations}} locations </span> from multiple Routes ? </div>
+        <div class=" f-s-14 m-b-5 f-w-400 ">Are you sure to <span class=" f-w-500"> add </span> all selected  <span class="f-w-500"> {{datanew?.locations}} locations </span> from Multiple Routes ? </div>
     </div>
     <div class="btn-parent text-center d-flex align-center j-end w-100 t-a-right">
-        <button mat-button class="  f-s-13 bg-primary-color btn-ok  f-w-500" style="border-radius:5px!important"
+        <button mat-button class="  f-s-12 bg-primary-color btn-ok  f-w-500" style="border-radius:5px!important"
             (click)="okClick()">ADD</button>
-        <button mat-button class="btn-cancel f-s-13 p-5  m-r-5 f-w-500" 
+        <button  class="btn-cancel f-s-12 p-2 p-r-10 p-l-10  m-r-5 f-w-600" 
             (click)="cancelClick()">CANCEL</button>
     </div>
 </div> 
 <div *ngIf="!datanew?.destinationRoute && !datanew?.logout" class="mat-parent flex-column">
    <ng-container *ngIf="datanew?.clearRoute">
-        <p class="f-s-18 p-l-10 f-w-500">Clear Route</p>
+        <p class="f-s-16 p-l-10 f-w-500">Clear Route</p>
         <div class="f-s-15 p-l-10 p-r-10 w-100 d-flex gap-10">
-            <div class=" f-s-15 m-b-5 f-w-400 ">Are you sure you want to <span class="c-red f-w-500"> clear route</span> containing<span class="f-w-500"> {{datanew?.locations}} locations </span> ? </div>
+            <div class=" f-s-14 m-b-5 f-w-400 ">Are you sure you want to <span class=" f-w-500"> clear route</span> containing<span class="f-w-500"> {{datanew?.locations}} locations </span> ? </div>
         </div>
         <div class="btn-parent text-center d-flex align-center j-end w-100 t-a-right">
-            <button mat-button class="f-s-13  btn-ok  f-w-500" style="border-radius:5px!important"
+            <button mat-button class="  f-s-12  btn-ok  f-w-500" style="border-radius:5px!important"
                 (click)="okClick()">CLEAR</button>
-            <button mat-button class="btn-cancel f-s-13 p-5  m-r-5 f-w-500" 
+            <button  class="btn-cancel f-s-12 p-2 p-r-10 p-l-10  m-r-5 f-w-600" 
                 (click)="cancelClick()">CANCEL</button>
         </div>
    </ng-container>
    <ng-container *ngIf="!datanew?.clearRoute">
     <ng-container *ngIf="!datanew?.isExistingRoute">
-        <p class="f-s-18 p-l-10 f-w-500">Clear Selected Locations</p>
+        <p class="f-s-16 p-l-10 f-w-500">Clear Selected Locations</p>
         <div class="f-s-15 p-l-10 p-r-10 w-100 d-flex gap-10">
-            <div class=" f-s-15 m-b-5 f-w-400 ">Are you sure you want to <span class="c-red f-w-500"> clear </span> all selected<span class="f-w-500"> {{datanew?.locations}} locations </span> ? </div>
+            <div class=" f-s-14 m-b-5 f-w-400 ">Are you sure you want to <span class=" f-w-500"> clear </span> all selected<span class="f-w-500"> {{datanew?.locations}} locations </span> ? </div>
         </div>
         <div class="btn-parent text-center d-flex align-center j-end w-100 t-a-right">
-            <button mat-button class="  f-s-13  btn-ok  f-w-500" style="border-radius:5px!important"
+            <button mat-button class="  f-s-12  btn-ok  f-w-500" style="border-radius:5px!important"
                 (click)="okClick()">CLEAR</button>
-            <button mat-button class="btn-cancel f-s-13 p-5  m-r-5 f-w-500" 
+            <button  class="btn-cancel f-s-12 p-2 p-r-10 p-l-10  m-r-5 f-w-600" 
                 (click)="cancelClick()">CANCEL</button>
         </div>
     </ng-container>
     <ng-container *ngIf="datanew?.isExistingRoute">
-        <p class="f-s-18 p-l-10 f-w-500">Clear Route</p>
+        <p class="f-s-16 p-l-10 f-w-500">Clear Route</p>
         <div class="f-s-15 p-l-10 p-r-10 w-100 d-flex gap-10 word-wrap">
-            <div class=" f-s-15 m-b-5 f-w-400 word-wrap">Are you sure you want to <span class="c-red f-w-500"> clear </span>the currently built route ? </div>
+            <div class=" f-s-14 m-b-5 f-w-400 word-wrap">Are you sure you want to <span class=" f-w-500"> clear </span>the currently built route ? </div>
         </div>
         <div class="btn-parent text-center d-flex align-center j-end w-100 t-a-right">
-            <button mat-button class="  f-s-13  btn-ok  f-w-500" style="border-radius:5px!important"
+            <button mat-button class="  f-s-12  btn-ok  f-w-500" style="border-radius:5px!important"
                 (click)="okClick()">CLEAR</button>
-            <button mat-button class="btn-cancel f-s-13 p-5  m-r-5 f-w-500" 
+            <button  class="btn-cancel f-s-12 p-2 p-r-10 p-l-10  m-r-5 f-w-600" 
                 (click)="cancelClick()">CANCEL</button>
         </div>
     </ng-container>

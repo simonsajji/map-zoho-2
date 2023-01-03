@@ -17,16 +17,19 @@
     margin-top: 20px;
 }
 
+
+
 .btn-ok {
     /* margin-right: 10px;
     padding: 6px 20px; */
     border-radius: 4px !important;
-    background-color: rgb(221, 91, 91);
+    background-color: rgb(221, 69, 69);
     color: white;
     margin-right: 10px;
-    padding: 2px 20px !important;
+    padding: 1px 20px !important;
     border-radius: 4px !important;
 }
+
 
 
 .mat-parent {
@@ -58,6 +61,8 @@ button:focus {
 .btn-cancel {
     background-color: transparent !important;
     color: rgb(72, 72, 72) !important;
+    font-weight: 600;
+    padding: 1px 10px !important;
 
 }
 
