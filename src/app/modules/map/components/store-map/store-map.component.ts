@@ -118,6 +118,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   isMenuOpen: boolean = false;
   timeOutApiRequest: any;
   tempMarker:any;
+  firstChangeFromMultipleRtes:any;
   constructor(private renderer: Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService, private router: Router) { }
 
   ngOnChanges() { }
@@ -1387,6 +1388,10 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     if (!event.target.classList.contains('menu-backdrop')) {
       this.isMenuOpen = false;
     }
+  }
+
+  getFirstChangeFromMultipleRtes(ev:any){
+    this.firstChangeFromMultipleRtes = ev;
   }
 
 }

@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmBoxComponent } from '../confirm-box/confirm-box.component';
 import MarkerClusterer from '@googlemaps/markerclustererplus';
 import * as moment from 'moment';
-import { FormControl } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { TooltipPosition } from '@angular/material/tooltip';
 import { ApiService } from 'src/app/services/api.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -16,6 +16,7 @@ import { DrawingService } from '../../../../services/drawing.service';
 import { NewterritoryformComponent } from '../newterritoryform/newterritoryform.component';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
+import { debounceTime } from 'rxjs';
 
 interface ViewObj {
   value: string;
@@ -99,7 +100,9 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
   @Input('polygonsatDb') polygonsatDb: any;
   @Input('fetchedZones') fetchedZones: any;
   @Input('initialLoaderZones') initialLoaderMaps: any;
+  // @Input('firstChangeFromMultipleRtes') firstChangeFromMultipleRtes: any;
   @ViewChild('timepicker') timepicker: any;
+  @ViewChild('searchedLoc') searchedLoc: any;
   initialLoader: boolean = false;
   wypntMarkers: any;
   routesModeView: boolean = true;
@@ -139,6 +142,11 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('filterZoneName') filterZoneName_: any;
   pgIndex_: any = 0;
   isBuildingRoute: boolean = false;
+  filteredLocOptions: any;
+  formGroup!: FormGroup;
+  firstChangeFromMultipleRtes: boolean = true;
+  Searchservice: any = new google.maps.places.AutocompleteService();
+  googleLocationSuggestions: any = [];
   @Output('clearClusters') clearClusters = new EventEmitter();
   @Output('addClusters') addClusters = new EventEmitter();
   @Output('enableInitialLoader') enableInitialLoader = new EventEmitter();
@@ -155,9 +163,10 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
   @Output('viewSinglePolygonWithoutBounds') viewSinglePolygonWithoutBounds = new EventEmitter();
   @Output('hideTempMarkers') hideTempMarkers = new EventEmitter();
 
-  constructor(private locationService: LocationService, private cdr: ChangeDetectorRef, private drawingService: DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) { }
+  constructor(private locationService: LocationService, private fb: FormBuilder, private cdr: ChangeDetectorRef, private drawingService: DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) { }
 
   ngOnInit(): void {
+    this.initForm();
     this.pageSizeperPage_ = 5;
     this.routesModeView = true;
     this.zonesModeView = false;
@@ -172,10 +181,14 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
     this.locationService.getShowRoutes().subscribe((item: any) => {
       this.showRoutes = item;
     })
+    this.locationService.getIsFirstChangebyMutipleRts().subscribe((item: any) => {
+      this.firstChangeFromMultipleRtes = item;
+    })
     this.drawingService.getDrawMode().subscribe((item: any) => {
       this.enableDrawingMode = item;
 
-    })
+    });
+
     this.directionsRenderer = new google.maps.DirectionsRenderer({ map: this.map, suppressMarkers: true });
     this.currentDate = new Date();
     this.currentTime = this.formatAMPM(new Date());
@@ -184,6 +197,144 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
     this.displayDate = new Date();
     this.initMap();
     this.makeClusters();
+  }
+
+  initForm() {
+    this.formGroup = this.fb.group({
+      'sLocations': ['']
+    });
+    let googlesuggestions: any = [];
+    this.formGroup.get('sLocations')?.valueChanges
+      .pipe(debounceTime(10))
+      .subscribe((response: any) => {
+        if (response && response?.length) {
+          this.Searchservice.getPlacePredictions({
+            input: response,
+            componentRestrictions: { country: 'CA' }
+          }, (predictions: any, status: any) => {
+            if (status != google.maps.places.PlacesServiceStatus.OK) {
+              console.warn(status);
+              return;
+            }
+            googlesuggestions = predictions;
+            this.googleLocationSuggestions = predictions;
+          });
+        } else {
+          this.filteredLocOptions = [];
+        }
+        this.filterLocationList(response, this.googleLocationSuggestions);
+      })
+  }
+
+
+  filterLocationList(enteredData: any, googlesuggestions: any[]) {
+    let suggestions: any = [];
+    if (enteredData) {
+      this.filteredLocOptions = this.fetched_locations?.data?.filter((item: any) => {
+        return item?.Address_Line_1?.toLowerCase().indexOf(enteredData.toLowerCase()) > -1;
+      });
+
+    }
+    googlesuggestions.map((item: any, idx: any) => {
+      let obj = {
+        Address: item?.description,
+        Address_Line_1: item?.description,
+        Flag: 1,
+        Latitude: 0,
+        Location_ID: 0,
+        Location_Name: item?.description,
+        Location_Number: "0",
+        Longitude: 0,
+        Route: 0,
+        Route_ID: 0
+      }
+      suggestions.push(obj);
+    });
+    this.filteredLocOptions = this.filteredLocOptions.concat(suggestions);
+  }
+
+  addSearchedLocationtoRoute(item: any) {
+    this.searchedLoc.nativeElement.value = "";
+    this.formGroup.reset();
+    let isduplicateExists = false;
+    let isMultipleRouteExists = false;
+    if (item?.Flag == 1) {
+      this.findLatLngByGeocoder(item?.Address, item);
+      this.searchedLoc.nativeElement.value = "";
+      return;
+    }
+    for (let i = 0; i < this.selectedLocations.length; i++) {
+      if (item?.Location_ID == this.selectedLocations[i]?.Location_ID) {
+        isduplicateExists = true;
+        break;
+      }
+      else isduplicateExists = false;
+    };
+    for (let i = 0; i < this.selectedLocations.length; i++) {
+      if (item?.Route != this.selectedLocations[i]?.Route) {
+        isMultipleRouteExists = true;
+        break;
+      }
+      else isMultipleRouteExists = false;
+    };
+    if (!isduplicateExists) {
+      if (this.firstChangeFromMultipleRtes && this.selectedLocations.length > 0 && isMultipleRouteExists) {
+        const dialogRef = this.dialog.open(ConfirmBoxComponent, {
+          data: {
+            locations: `${1}`,
+            destinationRoute: `${this.fetched_locations?.data[0]?.Route}`,
+            isMultipleRoutes: true
+          }
+        });
+        dialogRef.afterClosed().subscribe(confirmed => {
+          if (confirmed == true) {
+            this.addLocationsByMultipleRoutes(item)
+
+          }
+        });
+        this.firstChangeFromMultipleRtes = false;
+        this.locationService.setIsFirstChangebyMutipleRts(false);
+      }
+      else {
+        this.selectedLocations.push(item);
+        this.locationService.setSelectedPoints(this.selectedLocations);
+        if (this.selectedLocations.length > 1) this.toastr.success("Added 1 more Location to Route");
+        else this.toastr.success("Added 1 Location to Route");
+      }
+    }
+    else this.toastr.warning("The Location already exists in the Route");
+
+  }
+
+  findLatLngByGeocoder(formatted_address: any, random_loc: any) {
+    const geocoder = new google.maps.Geocoder();
+    let LatLng: any;
+    LatLng = geocoder.geocode(
+      {
+        address: formatted_address
+      },
+      (results: any, status: any): any => {
+        if (status === "OK" && results.length > 0) {
+          const firstResult = results[0].geometry;
+          let pos = { lat: results[0].geometry.location.lat(), lng: results[0].geometry.location.lng() };
+          random_loc.Latitude = pos?.lat;
+          random_loc.Longitude = pos?.lng;
+          this.addLocationsByMultipleRoutes(random_loc);
+        }
+        else if (status != "OK") {
+          this.toastr.error('Could not fetch the Location');
+
+        }
+      }
+    );
+    this.searchedLoc.nativeElement.value = "";
+  }
+
+  addLocationsByMultipleRoutes(items: any) {
+    this.selectedLocations.push(items);
+    this.locationService.setSelectedPoints(this.selectedLocations);
+    if (this.selectedLocations.length > 1) this.toastr.success("Added 1 more Location to Route");
+    else this.toastr.success("Added 1 Location to Route");
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -279,6 +430,8 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
         this.clearWaypointMkrs();
         this.removeRoute();
         this.clearOriginDestinationMkrs();
+        this.locationService.setIsFirstChangebyMutipleRts(true);
+
       }
       else this.locationService.clearSelectionModel();
     });
@@ -307,6 +460,8 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
           this.clearOriginDestinationMkrs();
           this.removeRoute();
           this.locationService.clearSelectionModel();
+          this.locationService.setIsFirstChangebyMutipleRts(true);
+
         }
         else this.locationService.clearSelectionModel();
       });
@@ -320,6 +475,7 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
       });
       renderer?.setMap(null);
     });
+    this.locationService.setBuiltRouteExists(false);
   };
 
   editRoute() {
@@ -348,15 +504,15 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
       keys = keys.map((key, index) => {
         return key.replace(/_/g, ' ');
       });
-      rows.unshift([`${String(this.data?.Route?.[1]?.Route).split(',')[0]}`," "," "," "," ","Amount"]);
-      rows.unshift([" "," ","This Run Has Readings"]);
-      rows.unshift([" "," "," ","User"]);
+      rows.unshift([`${String(this.data?.Route?.[1]?.Route).split(',')[0]}`, " ", " ", " ", " ", "Amount"]);
+      rows.unshift([" ", " ", "This Run Has Readings"]);
+      rows.unshift([" ", " ", " ", "User"]);
       let dat = new Date();
       let day = dat?.getDate();
       let mnth = dat?.toLocaleString('default', { month: 'long' });
       let weekday = dat?.toLocaleString('default', { weekday: 'long' });
       let dispDate = `${weekday} ${mnth} ${day}`;
-      rows.unshift([" "," "," "," "," ",`${dispDate}`]);
+      rows.unshift([" ", " ", " ", " ", " ", `${dispDate}`]);
       let csvContent = "data:text/csv;charset=utf-8,";
       // let summaryData = this.findOcc(this.csvData, "Coin_Card_Location");
       // rows.push([" ", " ", " "]);
@@ -371,9 +527,9 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
       //   else rows.push(Object.values(item))
 
       // })
-      rows.push(["K_____________","C______________"," ","S_____________"]);
+      rows.push(["K_____________", "C______________", " ", "S_____________"]);
       rows.push([" ", " ", " "]);
-      rows.push(["Authorized PersonnelX____________________________","CollectorX____________________________"])
+      rows.push(["Authorized PersonnelX____________________________", "CollectorX____________________________"])
       rows.forEach(function (rowArray: any) {
         let row = rowArray.join(",");
         csvContent += row + "\r\n";
@@ -386,7 +542,7 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
       var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
       var yyyy = today.getFullYear();
       today = mm + '-' + dd + '-' + yyyy;
-      link.setAttribute("download", `${(this.data?.Route?.[1]?.Route)? this.data?.Route?.[1]?.Route : this.csvData?.[1]?.Route}-${today}.csv`);
+      link.setAttribute("download", `${(this.data?.Route?.[1]?.Route) ? this.data?.Route?.[1]?.Route : this.csvData?.[1]?.Route}-${today}.csv`);
       document.body.appendChild(link); // Required for FF
       link.click();
     }
@@ -704,20 +860,28 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
       this.isBuildingRoute = true;
       this.selectedPoints = [...this.selectedLocations]
       this.selectedPoints.unshift(this.origin);
-      this.apiService.post(`${environment?.coreApiUrl}/build_route`, this.selectedPoints).subscribe(data => {
+      let isRandomLocationExists: any = false;
+      this.selectedPoints.map((item: any, idx: any) => {
+        if (item?.Flag) {
+          item.Location_ID = - (idx + 1);
+          isRandomLocationExists = true;
+        }
+      });
+      let endPoint = (isRandomLocationExists) ? 'random_route' : 'build_route';
+      this.apiService.post(`${environment?.coreApiUrl}/${endPoint}`, this.selectedPoints).subscribe(data => {
         if (data) {
           this.data = data;
           this.clearClusters.emit();
           this.computeTotalDistance(data);
           this.csvData = [...data?.Route];
           this.csvData = this.csvData.map((item: any, idx: any) => {
-            item = this.omit(item, ['Route_ID','Location_Name','Latitude','Longitude','Dryers','Washers']);
+            item = this.omit(item, ['Route_ID', 'Location_Name', 'Latitude', 'Longitude', 'Dryers', 'Washers']);
             let item_ = {
-              Address:String(item?.Address).split(',')[0],
-              City:item?.City,
-              Route:(item?.Route) ? String(item?.Route).split('-')[0] : '',
-              Location_ID:item?.Location_ID,
-              Coin_Card_Location:item?.Coin_Card_Location
+              Address: String(item?.Address).split(',')[0],
+              City: item?.City,
+              Route: (item?.Route) ? String(item?.Route).split('-')[0] : '',
+              Location_ID: item?.Location_ID,
+              Coin_Card_Location: item?.Coin_Card_Location
             }
             return item_;
           }
@@ -837,6 +1001,7 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
       this.rendererArray.push(renderer)
       this.showRoutes = true;
       this.showBuildRoute.emit(this.showRoutes);
+      this.locationService.setBuiltRouteExists(true);
     };
 
     // Send requests to service to get route (for stations count <= 25 only one request will be sent)

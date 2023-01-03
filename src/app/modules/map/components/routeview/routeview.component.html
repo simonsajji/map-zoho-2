@@ -171,77 +171,106 @@
                 </div>
             </div>
 
-            <div *ngIf="!showRoutes" class="right-content flex-column  ">
-                <div class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5 bg-gr  p-t-20 p-b-20">
-                    <div class="d-flex align-center p-l-10">
-                        <i class="fa fa-home f-s-20 m-r-10 flex-1"></i>
-                        <div [style.width]="'calc(100% - ' + 18 + 'px)'" class="flex-column">
-                            <!-- <div class="d-flex gap-5 align-center">
-                            <img class="p-6 c-pointer" [ngClass]="isHomesetasCurrent ? 'selected': ''" width="20px" height="20px" src="assets/current_loc.png" alt="" title="Set Current Location as Home Location" (click)="setHomeasCurrentLoc()" >
-                            <img class="p-6 c-pointer " [ngClass]="isHomesetasDefault ? 'selected': ''" width="20px" height="20px" src="assets/home2.png" alt="" title="Home Location">
-                            <img class="p-6 c-pointer" [ngClass]="isHomesetasFavourite ? 'selected': ''" width="20px" height="20px"  src="assets/star.png" alt="" title="Favourite Locations">
-                            <img class="p-6 c-pointer" [ngClass]="isHomesetasEditedLocation ? 'selected': ''"  width="20px" height="20px"  src="assets/edit.png" alt="" title="Enter Home Location Manually">
-                        </div> -->
-                            <div class="p-t-5 p-b-5 f-s-14 c-gr flex-wrap" *ngIf="origin">
-                                {{this.origin?.Address_Line_1}}, {{this.origin?.City}}, {{this.origin?.Province}},
-                                {{this.origin?.Postal_Code}}, {{this.origin?.Country}}</div>
-                        </div>
-                    </div>
+            <div *ngIf="!showRoutes" class="flex-column">
+                <div class="p-l-15  d-flex align-center gap-5 ">
+                    <form [formGroup]="formGroup" class="flex-1 m-r-15">
+                        <mat-form-field class="text-overflow-ellipsis f-s-13 m-r-10 p-r-5 " floatLabel="always">
+                            <mat-label class="f-w-400">Add Location</mat-label>
+                            <input matInput class="f-s-14" formControlName="sLocations" [matAutocomplete]="auto"
+                                placeholder="Type your new location" class="f-s-13" #searchedLoc>
+                                <mat-autocomplete #auto="matAutocomplete" class="m-t-5">
+                                    <mat-option *ngFor="let item of filteredLocOptions" (click)="addSearchedLocationtoRoute(item)" [value]="item?.Address_Line_1" class="f-s-13 p-t-3 p-b-3 text-overflow-ellipsis ">
+                                      {{(item?.Address_Line_1 ) ? item?.Address_Line_1 : item?.Address}}
+                                    </mat-option>
+                                  </mat-autocomplete>
+                        </mat-form-field>
+                    </form>
                 </div>
-
-                <p *ngIf="selectedLocations?.length<=0" class="c-gr d-flex j-center m-t-30 m-b-30 f-s-13">No Points in
-                    the
-                    Route
-                </p>
-
-                <div class="f-s-14 p-b-10 " *ngFor="let loc of selectedLocations;let i=index;">
-                    <div class="p-r-10 f-w-500 d-flex  align-center flex-wrap gap-5 p-l-10">
-                        <div class="d-flex flex-1">
-                            <div class="flex-column">
-                                <div class="location-number f-s-10 f-w-400  m-r-10 p-2" #ln>{{i+1}}</div>
-                                <!-- <div class="d-flex dot-container c-pointer align-center p-6 p-t-0">
-                                <i class="fa fa-ellipsis-v f-s-12 dot  "></i>
-                                <i class="fa fa-ellipsis-v f-s-12 dot "></i>
+                <div class="right-content flex-column  ">
+                    <div class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5 bg-gr  p-t-20 p-b-20">
+                        <div class="d-flex align-center p-l-10">
+                            <i class="fa fa-home f-s-20 m-r-10 flex-1"></i>
+                            <div [style.width]="'calc(100% - ' + 18 + 'px)'" class="flex-column">
+                                <!-- <div class="d-flex gap-5 align-center">
+                                <img class="p-6 c-pointer" [ngClass]="isHomesetasCurrent ? 'selected': ''" width="20px" height="20px" src="assets/current_loc.png" alt="" title="Set Current Location as Home Location" (click)="setHomeasCurrentLoc()" >
+                                <img class="p-6 c-pointer " [ngClass]="isHomesetasDefault ? 'selected': ''" width="20px" height="20px" src="assets/home2.png" alt="" title="Home Location">
+                                <img class="p-6 c-pointer" [ngClass]="isHomesetasFavourite ? 'selected': ''" width="20px" height="20px"  src="assets/star.png" alt="" title="Favourite Locations">
+                                <img class="p-6 c-pointer" [ngClass]="isHomesetasEditedLocation ? 'selected': ''"  width="20px" height="20px"  src="assets/edit.png" alt="" title="Enter Home Location Manually">
                             </div> -->
-                            </div>
-                            <div class="flex-column flex-1 ">
-                                <div class="f-s-13">{{loc?.Address_Line_1}}</div>
-                                <div
-                                    class=" f-w-400 f-s-12 d-flex j-space align-center flex-wrap c-gr-light w-90 p-t-5">
-                                    {{loc?.Address_Line_1}}</div>
+                                <div class="p-t-5 p-b-5 f-s-14 c-gr flex-wrap" *ngIf="origin">
+                                    {{this.origin?.Address_Line_1}}, {{this.origin?.City}}, {{this.origin?.Province}},
+                                    {{this.origin?.Postal_Code}}, {{this.origin?.Country}}</div>
                             </div>
                         </div>
-                        <div class="d-flex j-end flex-end align-center m-r-10">
-                            <i class="fa fa-times f-s-14 c-pointer c-gr-light" title="Remove location"
-                                (click)="deleteWaypoint(loc)"></i>
+                    </div>
+    
+                    <p *ngIf="selectedLocations?.length<=0" class="c-gr d-flex j-center m-t-30 m-b-30 f-s-12">No Locations in
+                        the
+                        Route
+                    </p>
+    
+                    <div class="f-s-14 p-b-10 " *ngFor="let loc of selectedLocations;let i=index;">
+                        <div class="p-r-10 f-w-500 d-flex  align-center flex-wrap gap-5 p-l-10">
+                            <div class="d-flex flex-1">
+                                <div class="flex-column">
+                                    <div class="location-number f-s-10 f-w-400  m-r-10 p-2" #ln>{{i+1}}</div>
+                                    <!-- <div class="d-flex dot-container c-pointer align-center p-6 p-t-0">
+                                    <i class="fa fa-ellipsis-v f-s-12 dot  "></i>
+                                    <i class="fa fa-ellipsis-v f-s-12 dot "></i>
+                                </div> -->
+                                </div>
+                                <div class="flex-column flex-1 ">
+                                    <div class="f-s-13">{{loc?.Address_Line_1}}</div>
+                                    <div
+                                        class=" f-w-400 f-s-12 d-flex j-space align-center flex-wrap c-gr-light w-90 p-t-5">
+                                        {{loc?.Address_Line_1}}</div>
+                                </div>
+                            </div>
+                            <div class="d-flex j-end flex-end align-center m-r-10">
+                                <i class="fa fa-times f-s-14 c-pointer c-gr-light" title="Remove location"
+                                    (click)="deleteWaypoint(loc)"></i>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5 bg-gr  p-t-20 p-b-20">
+                        <div class="d-flex align-center p-l-10">
+                            <i class="fa fa-flag-checkered m-r-10 f-s-20"></i>
+                            <div [style.width]="'calc(100% - ' + 18 + 'px)'" class="flex-column">
+                                <!-- <div class="d-flex gap-5 align-center">
+                                <img class="p-6 c-pointer" [ngClass]="isEndsetasCurrent ? 'selected': ''" width="20px" height="20px" src="assets/current_loc.png" alt="" title="Set Current Location as End Location" (click)="setEndasCurrentLoc()" >
+                                <i class="fa fa-flag-checkered  f-s-20 p-6  primary-color" [ngClass]="isEndsetasDefault ? 'selected': ''" title="End Location"></i>
+                                <img class="p-6 c-pointer" [ngClass]="isEndsetasFavourite ? 'selected': ''" width="20px" height="20px"  src="assets/star.png" alt="" title="Favourite Locations">
+                                <img class="p-6 c-pointer" [ngClass]="isEndsetasEditedLocation ? 'selected': ''"  width="20px" height="20px"  src="assets/edit.png" alt="" title="Enter End Location Manually">
+                            </div> -->
+                                <div class="p-t-5 p-b-5 p-r-10 f-s-14 c-gr flex-wrap word-wrap">
+                                    {{this.destination?.Address_Line_1}}, {{this.destination?.City}},
+                                    {{this.destination.Province}}, {{this.destination?.Postal_Code}},
+                                    {{this.destination?.Country}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 d-flex align-end t-a-center  ">
+                        <!-- <div class="p-l-5 p-r-5 d-flex align-center gap-5 w-92">
+                            <mat-form-field class="text-overflow-ellipsis f-s-14" floatLabel="always">
+                                <mat-label class="f-w-400">Add Location</mat-label>
+                                <input matInput class="f-s-14" 
+                                    placeholder="Address" >
+                            </mat-form-field>
+        
+                        </div> -->
+                        <div class="w-100 t-a-center c-gr-light f-s-12 d-flex p-r-20 j-center">
+                            <mat-icon matTooltip="Add Location from Locations Table found at the bottom."
+                                class="f-s-13 c-gr">info</mat-icon> Add locations from table to build route
                         </div>
                     </div>
                 </div>
 
-                <div class="p-r-10 f-w-500 d-flex j-space align-center flex-wrap gap-5 bg-gr  p-t-20 p-b-20">
-                    <div class="d-flex align-center p-l-10">
-                        <i class="fa fa-flag-checkered m-r-10 f-s-20"></i>
-                        <div [style.width]="'calc(100% - ' + 18 + 'px)'" class="flex-column">
-                            <!-- <div class="d-flex gap-5 align-center">
-                            <img class="p-6 c-pointer" [ngClass]="isEndsetasCurrent ? 'selected': ''" width="20px" height="20px" src="assets/current_loc.png" alt="" title="Set Current Location as End Location" (click)="setEndasCurrentLoc()" >
-                            <i class="fa fa-flag-checkered  f-s-20 p-6  primary-color" [ngClass]="isEndsetasDefault ? 'selected': ''" title="End Location"></i>
-                            <img class="p-6 c-pointer" [ngClass]="isEndsetasFavourite ? 'selected': ''" width="20px" height="20px"  src="assets/star.png" alt="" title="Favourite Locations">
-                            <img class="p-6 c-pointer" [ngClass]="isEndsetasEditedLocation ? 'selected': ''"  width="20px" height="20px"  src="assets/edit.png" alt="" title="Enter End Location Manually">
-                        </div> -->
-                            <div class="p-t-5 p-b-5 p-r-10 f-s-14 c-gr flex-wrap word-wrap">
-                                {{this.destination?.Address_Line_1}}, {{this.destination?.City}},
-                                {{this.destination.Province}}, {{this.destination?.Postal_Code}},
-                                {{this.destination?.Country}}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex-1 align-end j-center t-a-center d-flex ">
-                    <div class="w-100 t-a-center c-gr-light f-s-13 d-flex p-r-20 j-center">
-                        <mat-icon matTooltip="Add Location from Locations Table found at the bottom."
-                            class="f-s-14 c-gr">info</mat-icon> Add locations from table to build route
-                    </div>
-                </div>
+
             </div>
+
+            
             <div *ngIf="!showRoutes" class="j-center align-center d-flex w-100 m-t-10 m-b-20 m-l-5 m-r-10">
                 <button mat-raised-button [disabled]="selectedLocations?.length==0" (click)="buildRoute()"
                     class=" w-100  f-s-14 m-r-20 m-l-10 m-b-30" color="primary">BUILD ROUTE</button>

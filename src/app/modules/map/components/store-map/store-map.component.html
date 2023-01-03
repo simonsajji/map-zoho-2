@@ -96,12 +96,12 @@
         [destination]="destination" [fetched_locations]="fetched_locations" [map]="map" (addClusters)="makeClusters()" [fetchedZones]="fetchedZones" [polygonsatDb]="fetchedPolygons" (viewSinglePolygon)="showPolygon($event)" (viewSinglePolygonWithoutBounds)="showPolygonWithoutBounds($event)"
         (hideSinglePolygon)="hidePolygon($event)" [initialLoaderZones]="initialLoader" (hideTempMarkers)="clearSearchArea()"
         (clearClusters)="clearCluster()"  (initZoneCreation)="setCanvas($event)" (showZones)=" viewAllZonesinCanvas()" (deleteZoneEvent)="deleteZone($event)" (editZoneEvent)="editZone($event)" (hideZones)=" hideAllZonesinCanvas()" (jumpPolygonEvent)="jumptoPolygon($event)"
-        [allTerritoriesLoaded]="allTerritoriesLoaded" #menuchild>
+        [allTerritoriesLoaded]="allTerritoriesLoaded"   #menuchild>
     </app-routeview>
 
 
     <app-tableview [fetched_locations]="fetched_locations" [origin]="origin" [destination]="destination" [initialLoaderTable]="initialLoader"
-        [displayedColumns]="displayedColumns"  ></app-tableview>
+        [displayedColumns]="displayedColumns"  (firstChangeAddMultipleRouteEvent)="getFirstChangeFromMultipleRtes($event)" ></app-tableview>
 
 
 </div>
