@@ -5,13 +5,24 @@
 ::-webkit-scrollbar-track {
     -webkit-border-radius: 5px;
     border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb {
+    background: rgb(227, 227, 227);
+  }
+  
+  ::-webkit-scrollbar-thumb {
     -webkit-border-radius: 5px;
     border-radius: 5px;
-    background: rgb(227, 227, 227);
-}
+    background: rgb(175, 175, 175);
+  }
+  /* Handle on hover */
+  ::-webkit-scrollbar-track:hover {
+    background: white;
+    border: 0.1rem solid rgb(228, 228, 228);
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(167, 167, 167);
+    border: 0.1rem solid rgb(194, 194, 194);
+  }
 
 .btn-parent {
     margin-top: 20px;

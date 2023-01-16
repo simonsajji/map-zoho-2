@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   coreApiUrl : "https://zoftmap.azurewebsites.net",
+  testApiUrl: "https://zoftmap-api-test.azurewebsites.net",
   org : {
     "Account_ID": 4693269000024893259,
     "Address_Line_1": "100 Courtland Ave",
@@ -67,6 +68,7 @@ export const environment = {
     "Washers": 3,
     "Zones": null
 },
+token : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDg4MDQ5ODksImlhdCI6MTY0ODc5Nzc4OSwic3ViIjoiZjUxYjQ2YjQtZjc2ZC00OTExLThhMWQtMjU3MDAxNGI0NzYzIiwidXNlcklkIjoxLCJyb2xlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiR1MxIn0.DjkxJRpUTdV8-3dYYfHaG9rsKpgASR0U1nPji1TeL7k"
 };
 
 /*

@@ -11,8 +11,8 @@ export class LocationService {
   showRoutes:any = new BehaviorSubject<any>(false);
   builtRouteExists:any = new BehaviorSubject<any>(false);
   isFirstChangebyMutipleRts:any = new BehaviorSubject<any>(true);
+  isUserAccessRoute:any = new BehaviorSubject<any>(true);
   
-
   constructor() { }
 
   setSelectedPoints(temp: any): void {
@@ -62,6 +62,16 @@ export class LocationService {
 
   getIsFirstChangebyMutipleRts(){
     return this.isFirstChangebyMutipleRts.asObservable();
+  }
+
+ 
+
+  setisUserAccessRoute(temp: any): void {
+    return this.isUserAccessRoute.next(temp);
+  }
+
+  getisUserAccessRoute() {
+    return this.isUserAccessRoute.asObservable();
   }
  
 

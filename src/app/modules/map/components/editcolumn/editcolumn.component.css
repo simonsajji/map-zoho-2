@@ -3,19 +3,30 @@
     width: 7px;
   }
   
-::-webkit-scrollbar-track {
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-  }
-  
-::-webkit-scrollbar-thumb {
+  ::-webkit-scrollbar-track {
     -webkit-border-radius: 5px;
     border-radius: 5px;
     background: rgb(227, 227, 227);
   }
+  
+  ::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background: rgb(175, 175, 175);
+  }
+  /* Handle on hover */
+  ::-webkit-scrollbar-track:hover {
+    background: white;
+    border: 0.1rem solid rgb(228, 228, 228);
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(167, 167, 167);
+    border: 0.1rem solid rgb(194, 194, 194);
+  }
 
 .btn-parent{
-    margin-top: 30px;
+    margin-top: 10px;
 }
 
 .btn-ok{
@@ -33,11 +44,12 @@
 .mat-parent{
     padding: 0px 0px;
     width: fit-content;
+    height: fit-content;
   
 }
 
 .column-list{
-    height: 60vh;
+    height: 50vh;
     width: 35vw;
     overflow-y: auto;
 }
@@ -109,6 +121,8 @@ button:focus {
     font-weight: 500!important;
 }
 
+
+
 .mat-list-option:hover{
     background-color: transparent!important;
 }
@@ -123,6 +137,8 @@ button:focus {
     background-color: #3668cc !important;
 }
 
+
+
 .mat-dialog-container {
     padding: 5px !important;
   }
@@ -130,3 +146,13 @@ button:focus {
     color: #0b4ed5!important
 }
   
+ mat-icon {
+    width: 14px!important;
+    height: 16px !important;
+    color:rgb(100, 100, 100)!important;
+  }
+
+.mat-list-item{
+    height: 36px!important;
+}
+

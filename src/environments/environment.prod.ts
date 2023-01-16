@@ -62,5 +62,6 @@ export const environment = {
     "Washer_Coinage": "0.00",
     "Washers": 3,
     "Zones": null
-  }
+  },
+  token : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDg4MDQ5ODksImlhdCI6MTY0ODc5Nzc4OSwic3ViIjoiZjUxYjQ2YjQtZjc2ZC00OTExLThhMWQtMjU3MDAxNGI0NzYzIiwidXNlcklkIjoxLCJyb2xlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiR1MxIn0.DjkxJRpUTdV8-3dYYfHaG9rsKpgASR0U1nPji1TeL7k"
 };

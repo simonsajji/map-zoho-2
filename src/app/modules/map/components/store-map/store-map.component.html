@@ -5,7 +5,7 @@
         </mat-spinner>
     </div>
 
-    <div  class="btn-group "  *ngIf="canvasMode && !editCanvasMode" style="z-index:1000!important;position: absolute!important;top:50%;right:0.55%;opacity: 1!important;">
+    <div class="btn-group "  *ngIf="canvasMode && !editCanvasMode" style="z-index:1000!important;position: absolute!important;top:50%;right:0.55%;opacity: 1!important;">
         <div class="p-relative">
             <button  [disabled]="maxLimitReached" mat-mini-fab color="basic"  class="custom-mat-mini-fab " (click)="setPolygonDrawingMode()" >
                 <i class="fa fa-draw-polygon f-s-18 w-100 h-100" [ngClass]="enableDrawingMode ? 'glow-icon-poly' : ''" ></i>
@@ -35,7 +35,6 @@
         </div>        
     </div>
 
-
     <div  *ngIf="canvasMode && !editCanvasMode" class="d-flex gap-5 j-center align-center p-t-10" style="z-index:1000!important;position: absolute!important;top:0%;left:42%;width:250px">
         <button matTooltip="CANCEL"  class="c-pointer zone-cancel-btn f-s-18 f-w-400 m-r-10"  (click)="unSetCanvas()">X</button>
         <button *ngIf="listOfPolygons.length>0" matTooltip="SAVE TERRITORY"  class="c-pointer zone-save-btn f-s-16 f-w-600 p-5 d-flex align-center j-center" (click)="saveZones()"><mat-icon >check</mat-icon></button>          
@@ -53,11 +52,9 @@
                     <span class="menu-backdrop">Logout</span>
                 </button>
             </div>
-        </div> -->
-        
+        </div> -->     
         <input type="text" ngx-google-places-autocomplete [options]="options" (onAddressChange)="AddressChange($event)"
-            placeholder="Search for Location Name or Address" class="f-s-15 w-100 p-l-10" #sarea>  
-           
+            placeholder="Search for Location Name or Address" class="f-s-15 w-100 p-l-10" #sarea>        
         <i *ngIf="sarea?.value!=''" class="fa fa-times f-s-14 c-gr-light m-r-10 c-pointer"
             (click)="clearSearchArea()"></i>
         <div class="d-flex align-center m-r-5"  matTooltip="Map Properties">
@@ -65,8 +62,7 @@
                 <img src="assets/svgs/map-marked-alt.svg"  style="opacity:0.75" class="p-6 c-pointer m-l-10" width="28px" height="26px" alt="" srcset="">
                 <i class="fa fa-angle-down  f-s-18 primary-color m-t-4 p-4" ></i>
 
-            </div>
-            
+            </div>     
             <mat-menu #mapprops="matMenu" class="matpanel">
                 <div (click) ="$event.stopPropagation()" class=" d-flex j-center gap-10 align-center  tranparency-form" >
                     <div class="f-s-14 c-gr" >Map Transparency:</div>
@@ -86,7 +82,6 @@
                         </mat-slider>
                         <mat-label class="f-s-14 c-gr-light">100%</mat-label>
                     </div>
-                    
                 </div>
             </mat-menu>
         </div> 
@@ -94,14 +89,14 @@
 
     <app-routeview (enableInitialLoader)="enableLoader()"  (disableInitialLoader)="disableLoader()" [origin]="origin"
         [destination]="destination" [fetched_locations]="fetched_locations" [map]="map" (addClusters)="makeClusters()" [fetchedZones]="fetchedZones" [polygonsatDb]="fetchedPolygons" (viewSinglePolygon)="showPolygon($event)" (viewSinglePolygonWithoutBounds)="showPolygonWithoutBounds($event)"
-        (hideSinglePolygon)="hidePolygon($event)" [initialLoaderZones]="initialLoader" (hideTempMarkers)="clearSearchArea()"
+        (hideSinglePolygon)="hidePolygon($event)" [initialLoaderZones]="initialLoader" (hideTempMarkers)="clearSearchArea()" 
         (clearClusters)="clearCluster()"  (initZoneCreation)="setCanvas($event)" (showZones)=" viewAllZonesinCanvas()" (deleteZoneEvent)="deleteZone($event)" (editZoneEvent)="editZone($event)" (hideZones)=" hideAllZonesinCanvas()" (jumpPolygonEvent)="jumptoPolygon($event)"
         [allTerritoriesLoaded]="allTerritoriesLoaded"   #menuchild>
     </app-routeview>
 
 
     <app-tableview [fetched_locations]="fetched_locations" [origin]="origin" [destination]="destination" [initialLoaderTable]="initialLoader"
-        [displayedColumns]="displayedColumns"  (firstChangeAddMultipleRouteEvent)="getFirstChangeFromMultipleRtes($event)" ></app-tableview>
-
+        [displayedColumns]="displayedColumns"  (firstChangeAddMultipleRouteEvent)="getFirstChangeFromMultipleRtes($event)"  >
+    </app-tableview>
 
 </div>

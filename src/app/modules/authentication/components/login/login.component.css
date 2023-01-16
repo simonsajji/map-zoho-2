@@ -186,9 +186,13 @@ section {
   .p-55-1rem{
     padding: 0.5rem 55px;
   }
+  .p-55-0rem{
+    padding: 0 55px;
+  }
+
   mat-card {
-      /* max-width: 600px;
-      width: 35vw; */
+      max-width: 600px;
+      width: 35vw;
       margin: 2em auto;
       text-align: center;
       /* max-height: 600px; */
@@ -230,13 +234,24 @@ section {
       display: flex;
       justify-content: center;
       align-items: center;
+      
     }
 
     .pass-field{
       width: calc(80%);
-     
     }
-    
+
+    .pass-field .mat-form-field-wrapper{
+      padding-bottom: 0!important;
+    }
+    ::ng-deep .mat-form-field-wrapper{
+      margin-bottom: -1.25em;
+   }
+
+   .pass-field  .mat-form-field-wrapper {
+    margin-bottom: -1.25em;
+    padding-bottom: -1.25em;
+}
     .contentBody {
       padding: 60px 1rem;
       background :#1b6ca8;
@@ -252,19 +267,52 @@ section {
     .mat-form-field-appearance-outline .mat-form-field-outline-thick {
       color: rgb(210, 210, 210);
   }
+
+  .btn-outer{
+    display: flex!important;
+    align-items: center!important;
+    justify-content: center!important;
+  }
   
   .login-btn{
-    width: 80px;
+    /* max-width: 600px; */
+    width: 28vw!important;
     border-radius: 6px!important;
-    background-color: #49a1c9;
+    /* background-color: #49a1c9; */
+    background-color: #2b59b5;
     color:white;
-  }
-  
-  .login-btn:hover{
-    background-color: #438ec7;
-    color:white;
+    font-family: 'Jakarta-semi-bold'!important;
     
   }
+  
+  
+  .reset-btn{
+     /* max-width: 600px; */
+     width: 28vw!important;
+     border-radius: 6px!important;
+     /* background-color: #49a1c9; */
+     background-color: #2b59b5;
+     color:white;
+     font-family: 'Jakarta-semi-bold'!important;
+    
+  }
+ 
+  .cancel-btn{
+    width: 90px;
+    border-radius: 6px!important;
+    /* background-color: #49a1c9; */
+    background-color: transparent;
+    color:rgb(72, 72, 72);
+    border: 0!important;
+    padding: 4px;
+    font-family: 'Jakarta-semi-bold'!important;
+    
+  }
+
+  .cancel-btn:hover{
+    background-color: whitesmoke;
+  }
+
   
   .basic-color{
     color:#438ec7!important;
@@ -281,4 +329,53 @@ section {
     border: 0!important;
     outline: none!important;
     padding: 0!important;
+    
   }
+
+  .c-drk{
+    color:rgb(45, 45, 45);
+  }
+
+  .zmap-header{
+   font-family: 'Jakarta-semi-bold'!important;
+  }
+
+  .change-pass{
+   color:#073ba1;
+   padding-left: 0!important;
+  }
+
+  ::ng-deep  .mat-form-field-appearance-outline .mat-form-field-infix{
+    padding-top: 0.8rem!important;
+    padding-bottom: 0.8rem!important;
+
+  }
+
+  ::ng-deep .mat-form-field-appearance-outline .mat-form-field-subscript-wrapper{
+    padding-left: 0!important;
+  }
+
+  ::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+    color: rgb(218, 218, 218)!important;
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+  color: #2a5dc4;
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-form-field-invalid.mat-form-field-invalid .mat-form-field-outline-thick{
+  color: rgb(218, 218, 218)!important;
+  opacity: 0.8!important;
+}
+
+
+::ng-deep .mat-form-field-invalid .mat-input-element, .mat-warn .mat-input-element {
+    caret-color: rgb(174, 174, 174)!important;
+}
+
+
+
+.go-back{
+  color:#1253d4;
+  font-family:'Jakarta-semi-bold'!important;
+}

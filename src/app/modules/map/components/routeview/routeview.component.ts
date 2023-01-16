@@ -147,6 +147,9 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
   firstChangeFromMultipleRtes: boolean = true;
   Searchservice: any = new google.maps.places.AutocompleteService();
   googleLocationSuggestions: any = [];
+  currentUserViews:any;
+  user_restricted_columns:any;
+
   @Output('clearClusters') clearClusters = new EventEmitter();
   @Output('addClusters') addClusters = new EventEmitter();
   @Output('enableInitialLoader') enableInitialLoader = new EventEmitter();
@@ -196,8 +199,11 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
     this.displayTime = this.formatAMPM(new Date());
     this.displayDate = new Date();
     this.initMap();
+    this.assignUserPrevileges();
     this.makeClusters();
   }
+
+
 
   initForm() {
     this.formGroup = this.fb.group({
@@ -514,19 +520,6 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
       let dispDate = `${weekday} ${mnth} ${day}`;
       rows.unshift([" ", " ", " ", " ", " ", `${dispDate}`]);
       let csvContent = "data:text/csv;charset=utf-8,";
-      // let summaryData = this.findOcc(this.csvData, "Coin_Card_Location");
-      // rows.push([" ", " ", " "]);
-      // rows.push(["Summary"]);
-      // rows.push([" ", " ", " "]);
-      // rows.push(["Coin/Card Location", "Count"]);
-      // summaryData.map((item: any, idx: any) => {
-      //   if (summaryData.length == 1) {
-      //     rows.push(Object.values(item))
-      //     rows.push([' ', ' ']);
-      //   }
-      //   else rows.push(Object.values(item))
-
-      // })
       rows.push(["K_____________", "C______________", " ", "S_____________"]);
       rows.push([" ", " ", " "]);
       rows.push(["Authorized PersonnelX____________________________", "CollectorX____________________________"])
@@ -685,7 +678,7 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  makeMarker(position: any, icon: any, address: any, route: any, loc_id: any) {
+  makeMarker(position: any, icon: any, address: any, route: any, loc_id: any,item:any) {
     let label = address + "";
     let obj = { lat: parseFloat(position.lat), lng: parseFloat(position.lng) };
     if (icon == "start") {
@@ -697,9 +690,9 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
         title: label
       });
       google.maps.event.addListener(this.originMkr, 'click', (evt: any) => {
-        this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${loc_id}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route} </i> </p>
-                      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" ><div>
-                    </div>`);
+        this.infoWin.setContent(`<div class="grid-container-mkr" style="padding:10px;display: grid;grid-template-columns: auto auto;gap: 10px;padding: 10px;font-weight:400">
+        ${this.renderInfoDetailsasHTMLforEndPoints(item)}
+      </div>`);
         this.infoWin.open(this.map, this.originMkr);
       });
       this.originMkr?.setMap(this.map)
@@ -715,9 +708,9 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
       });
 
       google.maps.event.addListener(this.destMkr, 'click', (evt: any) => {
-        this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${loc_id}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${address} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route} </i> </p>
-                      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" ><div>
-                    </div>`);
+        this.infoWin.setContent(`<div class="grid-container-mkr" style="padding:10px;display: grid;grid-template-columns: auto auto;gap: 10px;padding: 10px;font-weight:400">
+        ${this.renderInfoDetailsasHTMLforEndPoints(item)}
+      </div>`);
         this.infoWin.open(this.map, this.destMkr);
       })
       this.destMkr?.setMap(this.map);
@@ -727,29 +720,29 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
 
   makemkrs(position: any, title: any, loc_id: any, route_name: any) {
     // inactive fn
-    let label = title + "";
-    let markerIcon = {
-      url: 'assets/pin.png',
-      scaledSize: new google.maps.Size(30, 30),
-      labelOrigin: new google.maps.Point(-30, 10),
-    };
-    let obj = position;
-    let marker = new google.maps.Marker({
-      position: obj,
-      map: this.map,
-      icon: markerIcon,
-      label: { text: label, color: "#1440de", fontSize: "11px", fontWeight: '600', className: 'marker-position' },
-    });
-    google.maps.event.addListener(marker, 'click', (evt: any) => {
-      this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${loc_id}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${title} </p> <p style="font-weight:400;font-size:13px"> Route  &emsp;&emsp;  : &emsp;  <i> ${route_name} </i> </p>
-      <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>
-    </div>`);
-      this.infoWin.open(this.map, marker);
-    })
-    this.mkrs.push(marker);
+    // let label = title + "";
+    // let markerIcon = {
+    //   url: 'assets/pin.png',
+    //   scaledSize: new google.maps.Size(30, 30),
+    //   labelOrigin: new google.maps.Point(-30, 10),
+    // };
+    // let obj = position;
+    // let marker = new google.maps.Marker({
+    //   position: obj,
+    //   map: this.map,
+    //   icon: markerIcon,
+    //   label: { text: label, color: "#1440de", fontSize: "11px", fontWeight: '600', className: 'marker-position' },
+    // });
+    // google.maps.event.addListener(marker, 'click', (evt: any) => {
+    //   this.infoWin.setContent(`<div style= "padding:10px"> <p style="font-weight:400;font-size:13px">Location &emsp;  : &emsp; ${loc_id}  <p> <p style="font-weight:400;font-size:13px"> Address  &emsp;  : &emsp; ${title} </p> 
+    //   <div style="display:flex;align-items:center; justify-content:center;flex-wrap:wrap; gap:5%; color:rgb(62, 95, 214);font-weight:400;font-size:12px" > <div>
+    // </div>`);
+    //   this.infoWin.open(this.map, marker);
+    // })
+    // this.mkrs.push(marker);
   }
 
-  makeWaypointMarkersbyLatLng(position: any, Address: any, Route_Name: any, i: any, Location_ID: any, washers: any, dryers: any) {
+  makeWaypointMarkersbyLatLng(position: any, Address: any, Route_Name: any, i: any, Location_ID: any, washers: any, dryers: any,item:any) {
     let label = i + "";
     let obj = { lat: position?.lat, lng: position?.lng };
     washers = (washers === null) ? 0 : washers;
@@ -770,10 +763,7 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
     });
     google.maps.event.addListener(waypoint, 'click', (evt: any) => {
       this.infoWin.setContent(`<div class="grid-container-mkr" style="padding:10px;display: grid;grid-template-columns: auto auto;gap: 10px;padding: 10px;font-weight:400">
-                                <div>Address :</div> <div>${Address}</div>
-                                <div>Route :</div> <div>${(Route_Name) ? Route_Name : 'Empty'} </div>
-                                <div>Dryers :</div> <div>${dryers}</div>
-                                <div>Washers :</div><div>${washers}</div>
+                                ${this.renderInfoDetailsasHTML(item)}
                               </div>`
       );
       this.infoWin.open(this.map, waypoint);
@@ -783,7 +773,7 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
     this.wypntMarkers?.push(waypoint);
   }
 
-  makeWaypointMarkers(position: any, Address: any, Route_Name: any, i: any, Location_ID: any, washers: any, dryers: any) {
+  makeWaypointMarkers(position: any, Address: any, Route_Name: any, i: any, Location_ID: any, washers: any, dryers: any,item:any) {
     let label = i + "";
     let pos;
     let geocoder = new google.maps.Geocoder();
@@ -809,23 +799,51 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
         });
         google.maps.event.addListener(waypoint, 'click', (evt: any) => {
           this.infoWin.setContent(`<div class="grid-container-mkr" style="padding:10px;display: grid;grid-template-columns: auto auto;gap: 10px;padding: 10px;font-weight:400">
-                                    <div>Address :</div> <div>${Address}</div>
-                                    <div>Route :</div> <div>${(Route_Name) ? Route_Name : 'Empty'} </div>
-                                    <div>Dryers :</div> <div>${dryers}</div>
-                                    <div>Washers :</div> <div>${washers}</div>
+                                    ${this.renderInfoDetailsasHTML(item)}
                                   </div>`
           );
           this.infoWin.open(this.map, waypoint);
         });
-
         waypoint.setMap(this.map)
         this.wypntMarkers?.push(waypoint);
-
-      } else {
-        // this.toastr.warning('Geocode was not successful for the following reason: ' + status);
-        console.warn("Geocoder was not successful")
-      }
+      } else console.warn("Geocoder was not successful")
     });
+  }
+
+  renderInfoDetailsasHTML(location:any){
+    let popup_infoString = this.currentUserViews?.[0]?.location_popup_info;
+    let popup_columns = popup_infoString?.substring(1, popup_infoString?.length-1).split(" ");
+    return `${(function fun() {
+      let tot = '';
+      for(let i=0;i<popup_columns.length;i++){
+        for (const [key, value] of Object.entries(location)) {
+         if(popup_columns[i] == key){
+           tot= tot + `<div>${key.replace(/_/," ")} :</div><div>${(value)? value : '<i>Empty</i>'}</div>`;
+         }
+        }
+      }
+      return tot;
+    })()}`;
+  }
+
+  renderInfoDetailsasHTMLforEndPoints(location:any){
+    let popup_infoString = this.currentUserViews?.[0]?.location_popup_info;
+    let popup_columns = popup_infoString.substring(1, popup_infoString.length-1).split(" ");
+    return `${(function fun() {
+      let tot = '';
+      for(let i=0;i<popup_columns.length;i++){
+        for (const [key, value] of Object.entries(location)) {
+         if(popup_columns[i] == key){
+           if(key != 'Address') tot= tot + `<div>${key.replace(/_/," ")} :</div><div>${(value)? value : '<i>Empty</i>'}</div>`;
+         }
+         else if(popup_columns[i]=='Address') {
+          tot = tot + `<div>Address :</div><div>${(location?.Address_Line_1) ? location?.Address_Line_1 : ''} ${(location?.Address_Line_2) ? location?.Address_Line_2 : ''}, ${(location?.City) ? location?.City : ''}, ${location?.Country ? location?.Country : ''}</div>`;
+          break;
+         }
+        }
+      }
+      return tot;
+    })()}`;
   }
 
   clearWaypointMkrs() {
@@ -944,12 +962,12 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
     locs?.Route.map((item: any, i: any) => {
       if (i != 0 && i != locs?.Route.length - 1) {
         let loc_obj = { lat: parseFloat(item?.Latitude), lng: parseFloat(item?.Longitude) };
-        if ((parseFloat(item?.Latitude) == parseFloat(locs?.Route[i - 1]?.Latitude) && parseFloat(item?.Longitude) == parseFloat(locs?.Route[i - 1]?.Longitude) && locs?.Route[i - 1]?.Latitude) || (parseFloat(item?.Longitude) == 0 && parseFloat(item?.Latitude) == 0) || (parseFloat(item?.Latitude) == parseFloat(locs?.Route[i + 1]?.Latitude) && parseFloat(item?.Longitude) == parseFloat(locs?.Route[i + 1]?.Longitude) && locs?.Route[i + 1]?.Latitude)) this.makeWaypointMarkers(loc_obj, item?.Location_Name + ', ' + item.Address, item?.Route, i, item?.Location_ID, item?.Washers, item?.Dryers)
-        else this.makeWaypointMarkersbyLatLng(loc_obj, item?.Location_Name + ', ' + item.Address, item?.Route, i, item?.Location_ID, item?.Washers, item?.Dryers)
+        if ((parseFloat(item?.Latitude) == parseFloat(locs?.Route[i - 1]?.Latitude) && parseFloat(item?.Longitude) == parseFloat(locs?.Route[i - 1]?.Longitude) && locs?.Route[i - 1]?.Latitude) || (parseFloat(item?.Longitude) == 0 && parseFloat(item?.Latitude) == 0) || (parseFloat(item?.Latitude) == parseFloat(locs?.Route[i + 1]?.Latitude) && parseFloat(item?.Longitude) == parseFloat(locs?.Route[i + 1]?.Longitude) && locs?.Route[i + 1]?.Latitude)) this.makeWaypointMarkers(loc_obj, item?.Location_Name + ', ' + item.Address, item?.Route, i, item?.Location_ID, item?.Washers, item?.Dryers,item)
+        else this.makeWaypointMarkersbyLatLng(loc_obj, item?.Location_Name + ', ' + item.Address, item?.Route, i, item?.Location_ID, item?.Washers, item?.Dryers,item)
       }
     });
-    this.makeMarker({ lat: this.origin.Latitude, lng: this.origin.Longitude }, "start", this.origin.Address_Line_1, this.origin.Route, this.origin.Location_ID);
-    this.makeMarker({ lat: this.destination.Latitude, lng: this.destination.Longitude }, "end", this.destination.Address_Line_1, this.destination.Route, this.destination.Location_ID);
+    this.makeMarker({ lat: this.origin.Latitude, lng: this.origin.Longitude }, "start", this.origin.Address_Line_1, this.origin.Route, this.origin.Location_ID,this.origin);
+    this.makeMarker({ lat: this.destination.Latitude, lng: this.destination.Longitude }, "end", this.destination.Address_Line_1, this.destination.Route, this.destination.Location_ID,this.destination);
     var stations = this.wayPoints;
     let service = new google.maps.DirectionsService();
     var map = this.map;
@@ -1234,6 +1252,23 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
 
     this.editZoneEvent.emit(zone);
   }
+
+  assignUserPrevileges(){
+    let payload = {
+     "Email":sessionStorage.getItem('userToken')
+    }
+    this.apiService.post(`${environment.testApiUrl}/user_views/${payload?.Email}`,payload).subscribe(
+     (data:any)=>{
+       this.currentUserViews = data;
+       let user_restricted_columnsString = this.currentUserViews[0]?.user_restricted_columns;
+       let user_restricted_columns = user_restricted_columnsString?.substring(1, user_restricted_columnsString?.length-1).split(" ");
+       this.user_restricted_columns = user_restricted_columns;
+     },
+     (error)=>{
+       this.toastr.error("Error in fetching User Previleges")
+     }
+   );
+ }
 
   ngOnDestroy(): void {
     // clearInterval(this.fetchTimeInterval);

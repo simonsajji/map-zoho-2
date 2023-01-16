@@ -98,12 +98,16 @@ export class TableviewComponent implements OnInit, OnChanges {
   @Input('showRoutes') showRoutes: boolean = false;
   @Input('initialLoaderTable') initialLoaderTable: boolean = false;
   @Output('firstChangeAddMultipleRouteEvent') firstChangeAddMultipleRouteEvent = new EventEmitter();
-
+  // new code for User Access Based Columns (ORder is important)
+  shownColumns:any = ['Address_Line_1','Location_Name'];
+  accessibleColumns:any = [];
+  currentUserViews:any;
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService) { }
 
   ngOnInit(): void {
     this.pageSizeperPage = 70;
+    this.getTableColumnViews();
     this.locationService.getSelectedPoints().subscribe((item: any) => {
       this.selectedLocations = item;
     });
@@ -118,7 +122,6 @@ export class TableviewComponent implements OnInit, OnChanges {
     });
     this.locationService.getIsFirstChangebyMutipleRts().subscribe((item: any) => {
       this.firstChangefromMultipleRoutes = item;
-
     })
   }
 
@@ -128,11 +131,10 @@ export class TableviewComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-
     this.selection = this.locationService.getSelectionModel();
     this.dataSource = new MatTableDataSource<any>(this.fetched_locations?.data);
     if (this.fetched_locations?.data) this.dataBaseColumns = Object.keys(this.fetched_locations?.data[0]);
-    this.orderedColumns = [...this.displayedColumns];
+    this.orderedColumns = [...this.shownColumns];
     if (this.dataBaseColumns) {
       this.dataBaseColumns?.map((item: any, idx: any) => {
         if (!this.orderedColumns.includes(item)) this.orderedColumns.push(item)
@@ -145,27 +147,48 @@ export class TableviewComponent implements OnInit, OnChanges {
     if (changes['initialLoaderTable']) this.clearAllFilters();
   }
 
+  getTableColumnViews(){
+    let payload = {
+      "Email":sessionStorage.getItem('userToken')
+     }
+
+     this.apiService.post(`${environment.testApiUrl}/user_views/${payload?.Email}`,payload).subscribe(
+      (data:any)=>{
+        this.currentUserViews = data;
+        let accessibleColumnsString = this.currentUserViews[0]?.edit_columns_order;
+        let accessibleColumns = accessibleColumnsString.substring(1, accessibleColumnsString.length-1).split(" ");
+        this.accessibleColumns = accessibleColumns;
+        let shownColumnsString = this.currentUserViews[0]?.location_table_column_order;
+        let shownColumns = shownColumnsString.substring(1, shownColumnsString.length-1).split(" ");
+        this.shownColumns = shownColumns;
+        this.shownColumns.unshift('select')
+      },
+      (error)=>{
+        console.log(error);
+        this.toastr.error("Error in fetching User Previleges")
+      }
+    );
+  }
+
   toggleTableView() {
     this.tableview = !this.tableview;
   }
 
-  editColumns() {
-    // this.displayedColumns.push('Route_ID')
-  }
+  editColumns() {}
 
   editTableColumns() {
     const dialogRef = this.dialog.open(EditcolumnComponent, {
       data: {
-        selectedcolumns: this.displayedColumns,
-        columns: this.dataBaseColumns,
-        orderedColumns: this.orderedColumns
+        selectedcolumns: this.shownColumns,
+        columns: this.accessibleColumns,
+        orderedColumns: this.orderedColumns,
+        currentUserViews:this.currentUserViews
       }
     });
     dialogRef.afterClosed().subscribe((data: []) => {
       if (data) {
-        this.displayedColumns = data;
-        this.displayedColumns.unshift('select');
-        this.displayedColumns.push('Distance');
+        this.shownColumns = data;
+        if(!this.shownColumns.includes('select')) this.shownColumns.unshift('select');
       }
     });
   }

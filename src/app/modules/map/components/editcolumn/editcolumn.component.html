@@ -1,19 +1,30 @@
-<div  class="mat-parent flex-column ">
-    <p class="f-s-20 p-l-10 f-w-500">Location: columns</p>
+<div  class="mat-parent flex-column " >
+  <ng-container >
+    <p class="f-s-20 p-l-10 f-w-500 m-b-2">Location: columns</p>
+    <mat-spinner style="z-index:1000!important;position: absolute!important;top:50%;left:49%" diameter="45" *ngIf="loader">
+    </mat-spinner>
+    <div class=" p-5 p-b-0 c-gr-light f-s-12 d-flex t-a-left">
+      <mat-icon matTooltip="View or hide columns in the table view"
+          class="f-s-13  p-0 m-0 m-l-5 m-r-5">info</mat-icon> <span >View or hide columns in the table view</span> 
+  </div>
     <div class="column-list f-s-13">
         <mat-selection-list #list [(ngModel)]="selectedOptions" (ngModelChange)="onNgModelChange($event)"  [disableRipple]="true">
-            <mat-list-option *ngFor="let column of columns" [value]="column" class="f-s-14" [disableRipple]="true"
+            <mat-list-option *ngFor="let column of columns" [value]="column" class="f-s-13" [disableRipple]="true"
             >
               {{column | removeunderscore | titlecase }}
             </mat-list-option>
           </mat-selection-list>
 
     </div>
-   
-
       <div class="btn-parent text-center d-flex align-center j-end w-100 t-a-right">
-        <button mat-button class="btn primary-color btn-cancel f-s-15 p-5 m-r-5"  [disableRipple]="true" (click)="cancelClick()">CANCEL</button>
-        <button mat-button class=" primary-color  f-s-15 btn-ok p-5"  [disableRipple]="true"  (click)="okClick()">SAVE</button>
+        <button mat-button class="btn primary-color btn-cancel f-s-14 p-4 m-r-5" [disabled]="loader"  [disableRipple]="true" (click)="cancelClick()">CANCEL</button>
+        <button mat-button class=" primary-color  f-s-14 btn-ok p-4"  [disabled]="loader"  [disableRipple]="true"  (click)="okClick()">SAVE</button>
     </div>
 
+  </ng-container>
+   
+  
+
 </div>
+
+

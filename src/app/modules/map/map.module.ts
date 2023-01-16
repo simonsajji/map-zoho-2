@@ -21,10 +21,14 @@ import { HttpClientModule } from '@angular/common/http';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { AuthGuardService as AuthGuard } from 'src/app/services/auth-guard.service';
 import { MaphomeComponent } from './components/maphome/maphome.component';
+import { LoginComponent } from '../authentication/components/login/login.component';
+import { ForgotPasswordComponent } from '../authentication/components/forgot-password/forgot-password.component';
+import { NewPasswordComponent } from '../authentication/components/new-password/new-password.component';
 
 const routes: Routes = [
+ 
   {
-    path: '', component: MaphomeComponent,  data: { role: ['admin'] },
+    path: '', component: MaphomeComponent,  data: { role: ['admin']},
     children: [
       { path: '', component: StoreMapComponent,  data: { role: ['admin'] } },
       { path: '', component: TableviewComponent,  data: { role: ['admin'] } },

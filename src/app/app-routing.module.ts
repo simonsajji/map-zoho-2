@@ -5,12 +5,12 @@ import { MapModule } from './modules/map/map.module';
 import { AuthGuardService as AuthGuard} from './services/auth-guard.service';
 
 const routes: Routes = [
-  // {
-  //   path: 'map', loadChildren: () => MapModule,
-  //   canActivate: [AuthGuard], data: { role: ['admin', 'register'] }
-  // },
+  {
+    path: 'map', loadChildren: () => MapModule,
+    canActivate: [AuthGuard], data: { role: ['admin'] }
+  },
  
-  { path: '', loadChildren: () => MapModule },
+  { path: '', loadChildren: () => AuthenticationModule },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 

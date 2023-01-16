@@ -1,5 +1,19 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+@font-face {
+  font-family: 'Jakarta-regular';
+  src: url('../src/assets/fonts/PlusJakartaSans-Regular.ttf');
+}
+@font-face {
+  font-family: 'Jakarta-medium';
+  src: url('../src/assets/fonts/PlusJakartaSans-Medium.ttf');
+}
+@font-face {
+  font-family: 'Jakarta-semi-bold';
+  src: url('../src/assets/fonts/PlusJakartaSans-SemiBold.ttf');
+}
+
 html, body {
     height: 100%;
     margin: 0;

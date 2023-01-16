@@ -21,6 +21,7 @@ import { DrawingService } from '../../../../services/drawing.service';
 import { RouteviewComponent } from '../routeview/routeview.component';
 import { DeletezoneconfirmComponent } from '../deletezoneconfirm/deletezoneconfirm.component';
 import { Router } from '@angular/router'
+import { UserViewsService } from 'src/app/services/user-views.service';
 
 interface TableObj {
   value: string;
@@ -119,7 +120,9 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   timeOutApiRequest: any;
   tempMarker:any;
   firstChangeFromMultipleRtes:any;
-  constructor(private renderer: Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService, private router: Router) { }
+  currentUserViews:any = [];
+  user_restricted_columns:any = [];
+  constructor(private renderer: Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService, private router: Router,private userViews:UserViewsService) { }
 
   ngOnChanges() { }
 
@@ -127,6 +130,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.apiService.get(`${environment?.coreApiUrl}/api/`).subscribe(
       (dat) => {
         this.fetched_locations = dat;
+        this.assignUserPrevileges();
         this.initMap();
         this.initTable();
         this.makeClusters();
@@ -143,6 +147,25 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
        
           this.initialLoader = false;
         }
+      }
+    );
+  }
+
+  assignUserPrevileges(){
+     let payload = {
+      "Email":sessionStorage.getItem('userToken')
+     }
+
+     this.apiService.post(`${environment.testApiUrl}/user_views/${payload?.Email}`,payload).subscribe(
+      (data:any)=>{
+        this.currentUserViews = data;
+        let user_restricted_columnsString = this.currentUserViews[0]?.user_restricted_columns;
+        let user_restricted_columns = user_restricted_columnsString?.substring(1, user_restricted_columnsString?.length-1).split(" ");
+        this.user_restricted_columns = user_restricted_columns;
+      },
+      (error)=>{
+        console.log(error);
+        this.toastr.error("Error in fetching User Previleges")
       }
     );
   }
@@ -223,7 +246,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.locationService.getSelectedPoints().subscribe((item: any) => {
       this.selectedLocations = item;
     });
-
     this.drawingService.getDrawMode().subscribe((item: any) => {
       this.canvasMode = item;
     })
@@ -240,8 +262,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       });
       
     });
-
-
     this.origin = environment?.org;
     this.destination = environment?.org;
     this.currentDate = new Date();
@@ -256,18 +276,13 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   initTable() {
     this.dataSource = new MatTableDataSource<any>(this.fetched_locations?.data);
-    this.displayedColumns = ['Address_Line_1', 'Location_Name', 'Route', 'On_Route', 'Billable', 'Location_Type', 'On_Hold', 'Rental', 'Washers', 'Dryers', 'Coin_Card_Location',
-      'Address_Line_2', 'City', 'Distance'];
-    // this.displayedColumns.unshift('op','select');
-    this.displayedColumns.unshift('select');
   }
 
   initMap() {
     this.fetched_locations?.data?.map((location: any) => {
-      if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Address_Line_1, parseFloat(location?.Location_ID), location?.Route,location?.Address_Line_1,location?.Address_Line_2,location?.Dryers,location?.Washers,location?.Location_Name,location?.City,location?.Country)
+      if (location?.Location_ID !== this.origin?.Location_ID && location?.Location_ID != this.destination?.Location_ID) this.makemkrs({ lat: parseFloat(location?.Latitude), lng: parseFloat(location?.Longitude) }, location?.Address_Line_1, parseFloat(location?.Location_ID), location?.Route,location?.Address_Line_1,location?.Address_Line_2,location?.Dryers,location?.Washers,location?.Location_Name,location?.City,location?.Country,location)
     });
     // this.initialLoader = false;
-    
   }
 
   transparencyChange(ev: any) {
@@ -330,9 +345,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         strokeWeight: 3,
         fillColor: (this.newZoneForm?.color) ? this.newZoneForm?.color : '#285ec9',
         strokeColor: (this.newZoneForm?.color) ? this.newZoneForm?.color : '#285ec9',
-
       }
-
     })
     this.editCanvasMode = false;
     this.canvasMode = true;
@@ -462,9 +475,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
               }
               else this.setSelection(event);
             });
-
           }
-
         })
         google.maps.event.addListener(event, 'dragend', this.getPolygonCoords)
         google.maps.event.addListener(event.getPath(), 'insert_at', () => {
@@ -566,9 +577,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
               location_ids_array.push(this.mkrs[i].location_id);
             }
           };
-
           poly.previous_location_ids = location_ids_array;
-
           poly?.polygon.setMap(this.map)
           poly.polygon?.setEditable(true);
           google.maps.event.addListener(poly?.polygon, 'dragend', this.getPolygonCoords)
@@ -647,7 +656,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         poly?.marker.setMap(this.map);
       }
     })
-
   }
 
   showPolygon(zone: any) {
@@ -787,11 +795,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     })
   }
   hideAllZonesinCanvas() {
-    // this.listOfPolygons.map((shape: any, idx: any) => {
-    //   if (shape?.polygon) shape?.polygon?.setEditable(false);
-    //   if (shape?.polygon) shape?.polygon?.setMap(null);
-    //   if (shape?.marker) shape?.marker.setMap(null);
-    // });
     this.fetchedPolygons.map((item: any, idx: any) => {
       if (item?.polygon) item.polygon.setEditable(false);
       if (item?.polygon) item?.polygon.setMap(null);
@@ -1189,7 +1192,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
           url: 'assets/search-location5.png',
             scaledSize: new google.maps.Size(20,20)
         });
-
       }
       else {
         this.tempMarker.setIcon({
@@ -1247,7 +1249,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     // this.initialLoader = true;
     let date = event.value || event;
     this.displayDate = date;
-
     const yyyy = date.getFullYear();
     let mm: any = date.getMonth() + 1; // Months start at 0!
     let dd: any = date.getDate();
@@ -1275,7 +1276,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.dateChange(daysAgo);
   }
 
-  makemkrs(position: any, title: any, loc_id: any, route_name: any,Address_Line_1:any,Address_Line_2:any,Dryers:any,Washers:any, Location_Name:any,City:any,Country:any) {
+  makemkrs(position: any, title: any, loc_id: any, route_name: any,Address_Line_1:any,Address_Line_2:any,Dryers:any,Washers:any, Location_Name:any,City:any,Country:any,locationObj:any) {
     let label = title + "";
     let markerIcon = {
       url: 'assets/building4.png',
@@ -1296,16 +1297,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       grid-template-columns: auto auto;
       gap: 10px;
       padding: 10px;font-weight:400">
-      <div>Location Number :</div>
-      <div>${loc_id}</div>
-      <div>Address :</div>
-      <div>${(Address_Line_1) ? Address_Line_1 : ''} ${(Address_Line_2) ? Address_Line_2 : ''}, ${(City) ? City : ''}, ${Country ? Country : ''}</div>
-      <div>Route :</div>  
-      <div>${(route_name) ? route_name : 'Empty'} </div>
-      <div>Dryers :</div>
-      <div>${(Dryers) ? Dryers : 0}</div>
-      <div>Washers :</div>
-      <div>${(Washers) ? Washers : 0}</div>
+      ${this.renderInfoDetailsasHTML(locationObj)}
     </div>`);
       this.infoWin.open(this.map, marker);
     });
@@ -1321,6 +1313,26 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
       }
   });
     this.mkrs.push(marker);
+  }
+
+  renderInfoDetailsasHTML(location:any){
+    let popup_infoString = this.currentUserViews?.[0]?.location_popup_info;
+    let popup_columns = popup_infoString.substring(1, popup_infoString.length-1).split(" ");
+    return `${(function fun() {
+      let tot = '';
+      for(let i=0;i<popup_columns.length;i++){
+        for (const [key, value] of Object.entries(location)) {
+         if(popup_columns[i] == key){
+           if(key != 'Address') tot= tot + `<div>${key.replace(/_/," ")} :</div><div>${value}</div>`;
+         }
+         else if(popup_columns[i]=='Address') {
+          tot = tot + `<div>Address :</div><div>${(location?.Address_Line_1) ? location?.Address_Line_1 : ''} ${(location?.Address_Line_2) ? location?.Address_Line_2 : ''}, ${(location?.City) ? location?.City : ''}, ${location?.Country ? location?.Country : ''}</div>`;
+          break;
+         }
+        }
+      }
+      return tot;
+    })()}`;
   }
 
   secondsToDhms(seconds: any) {
@@ -1343,7 +1355,6 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
     });
     this.alignMaptoCenter();
-
   }
 
   alignMaptoCenter() {
