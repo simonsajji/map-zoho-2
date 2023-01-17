@@ -149,7 +149,6 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
   googleLocationSuggestions: any = [];
   currentUserViews:any;
   user_restricted_columns:any;
-
   @Output('clearClusters') clearClusters = new EventEmitter();
   @Output('addClusters') addClusters = new EventEmitter();
   @Output('enableInitialLoader') enableInitialLoader = new EventEmitter();
@@ -720,6 +719,7 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
 
   makemkrs(position: any, title: any, loc_id: any, route_name: any) {
     // inactive fn
+
     // let label = title + "";
     // let markerIcon = {
     //   url: 'assets/pin.png',
@@ -828,7 +828,7 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
 
   renderInfoDetailsasHTMLforEndPoints(location:any){
     let popup_infoString = this.currentUserViews?.[0]?.location_popup_info;
-    let popup_columns = popup_infoString.substring(1, popup_infoString.length-1).split(" ");
+    let popup_columns = popup_infoString?.substring(1, popup_infoString?.length-1).split(" ");
     return `${(function fun() {
       let tot = '';
       for(let i=0;i<popup_columns.length;i++){
@@ -1256,8 +1256,8 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
   assignUserPrevileges(){
     let payload = {
      "Email":sessionStorage.getItem('userToken')
-    }
-    this.apiService.post(`${environment.testApiUrl}/user_views/${payload?.Email}`,payload).subscribe(
+    };
+    this.apiService.post(`${environment.coreApiUrl}/user_views/${payload?.Email}`,payload).subscribe(
      (data:any)=>{
        this.currentUserViews = data;
        let user_restricted_columnsString = this.currentUserViews[0]?.user_restricted_columns;

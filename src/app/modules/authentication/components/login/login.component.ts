@@ -113,7 +113,7 @@ export class LoginComponent implements OnInit {
       "Email":currentEmail,
       "Password":currentPass
     }
-    this.apiService.post(`${environment.testApiUrl}/login`,payload).subscribe(
+    this.apiService.post(`${environment.coreApiUrl}/login`,payload).subscribe(
       (data:any)=>{
         if(!data?.message){
           sessionStorage.setItem('userToken', payload?.Email);
@@ -158,27 +158,44 @@ export class LoginComponent implements OnInit {
 
   passwordChange() {
     this.loader = true;
-    let payload = {
-      "Email": "admin.assist@sparklesolutions.ca",
-      "Old_Password": "admin.assist@sparklesolutions.ca",
-      "New_Password": "admin.assist@sparklesolutions.ca"
+    let uemail = this.uemail;
+    let oldpassword = this.oldpassword;
+    let newpassword = this.newpassword;
+    let confirmpassword = this.confirmpassword;
+    if(uemail?.value.toLowerCase().trim() == '' || oldpassword?.value.trim() == '' || newpassword?.value.trim() == '' || confirmpassword?.value?.trim() == ''){
+      this.clearPasswordChangeForm();
+      this.loader = false;
+      this.toastr.warning("Please enter all the required fields");
+      return;
     }
-    this.apiService.put(`${environment.testApiUrl}/change_password`,payload).subscribe(
+    let payload = {
+      "Email": uemail?.value.toLowerCase().trim(),
+      "Old_Password": oldpassword?.value.trim(),
+      "New_Password": newpassword?.value.trim()
+    }
+    this.apiService.put(`${environment.coreApiUrl}/change_password`,payload).subscribe(
       (data:any)=>{
         if(data?.message){
-          this.toastr.success(data?.message);
+          this.toastr.info(data?.message);
           this.loader = false;
+          this.clearPasswordChangeForm();
         }
         else{
           this.toastr.error("Failed to Update Password")
           this.loader = false;
+          this.clearPasswordChangeForm();
         }
       },
       (error)=>{
         this.toastr.error("Failed to Update Password")
         this.loader = false;
+        this.clearPasswordChangeForm();
       }
     )
+  }
+
+  clearPasswordChangeForm(){
+    this.passwordChangeForm.reset();
   }
 
 }

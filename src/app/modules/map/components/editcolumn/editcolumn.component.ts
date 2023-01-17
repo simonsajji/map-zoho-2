@@ -38,7 +38,7 @@ export class EditcolumnComponent implements OnInit {
   updateColumns(){
     let currentUserViews = this.currentUserViews?.[0];
     let selectedColumns = "[" + this.selectedOptions + "]";
-    selectedColumns = selectedColumns.replace(/,/g," ");
+    selectedColumns = selectedColumns?.replace(/,/g," ");
     let payload_ = {
       "User_ID": currentUserViews?.user_id,
       "CRM_User_ID": currentUserViews?.crm_user_id,
@@ -58,7 +58,7 @@ export class EditcolumnComponent implements OnInit {
       "Update_By_Admin": currentUserViews?.is_admin
     };
     this.loader = true;
-    this.apiService.put(`${environment?.testApiUrl}/update_user_view`, payload_).subscribe(
+    this.apiService.put(`${environment?.coreApiUrl}/update_user_view`, payload_).subscribe(
       (dat:any) => {
         if(dat?.message) this.toastr.success('Successfully updated the columns in Table View');
         this.loader = false;
@@ -67,13 +67,13 @@ export class EditcolumnComponent implements OnInit {
       (error: any) => {
         // console.log(error);
         if (error?.status == 200) {
-          this.toastr.success('The Columns view has been successfully updated');
+          this.toastr.success('Successfully updated the columns in Table View');
           this.loader = false;
           this.dialogRef.close(this.selectedOptions);
         }
         else {
           this.loader = false;
-          this.toastr.error("Error occured while updating ");
+          this.toastr.error("Error occured while updating the columns in Table View");
           this.dialogRef.close(this.selectedOptions);
         }
       }

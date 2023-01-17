@@ -80,7 +80,7 @@
             <div class="passInput">
               <mat-form-field class="pass-field" appearance="outline">
                 <mat-label>Old Password</mat-label>
-                <input  matInput [type]=" hideoldpass ? 'password' : 'text'" required formControlName="oldpassword" />
+                <input  matInput [type]=" hideoldpass ? 'password' : 'text'" formControlName="oldpassword" />
                 <button class="eyeIcon" (click)="hideoldpass = !hideoldpass">
                   <mat-icon class="f-s-15">
                     {{hideoldpass ? 'visibility_off' : 'visibility'}}
@@ -99,7 +99,7 @@
             <div class="passInput">
               <mat-form-field class="pass-field" appearance="outline">
                 <mat-label>New Password</mat-label>
-                <input  matInput [type]=" hidenewpass ? 'password' : 'text'" required  formControlName="newpassword"/>
+                <input  matInput [type]=" hidenewpass ? 'password' : 'text'" formControlName="newpassword"/>
                 <button class="eyeIcon" (click)="hidenewpass = !hidenewpass">
                   <mat-icon class="f-s-15">
                     {{hidenewpass ? 'visibility_off' : 'visibility'}}
@@ -117,7 +117,7 @@
             <div class="passInput">
               <mat-form-field class="pass-field" appearance="outline">
                 <mat-label>Confirm Password</mat-label>
-                <input  matInput [type]=" hideconfirmpass ? 'password' : 'text'" required  formControlName="confirmpassword"/>
+                <input  matInput [type]=" hideconfirmpass ? 'password' : 'text'" formControlName="confirmpassword"/>
                 <button class="eyeIcon" (click)="hideconfirmpass = !hideconfirmpass">
                   <mat-icon class="f-s-15">
                     {{hideconfirmpass ? 'visibility_off' : 'visibility'}}

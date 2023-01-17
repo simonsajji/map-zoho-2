@@ -127,10 +127,13 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   ngOnChanges() { }
 
   callFnApi() {
-    this.apiService.get(`${environment?.coreApiUrl}/api/`).subscribe(
+    let payload = {
+      "Email":sessionStorage.getItem('userToken')
+     }
+    this.apiService.get(`${environment?.coreApiUrl}/api/${payload?.Email}`).subscribe(
       (dat) => {
-        this.fetched_locations = dat;
         this.assignUserPrevileges();
+        this.fetched_locations = dat;
         this.initMap();
         this.initTable();
         this.makeClusters();
@@ -154,9 +157,8 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   assignUserPrevileges(){
      let payload = {
       "Email":sessionStorage.getItem('userToken')
-     }
-
-     this.apiService.post(`${environment.testApiUrl}/user_views/${payload?.Email}`,payload).subscribe(
+     };
+     this.apiService.post(`${environment.coreApiUrl}/user_views/${payload?.Email}`,payload).subscribe(
       (data:any)=>{
         this.currentUserViews = data;
         let user_restricted_columnsString = this.currentUserViews[0]?.user_restricted_columns;
@@ -164,7 +166,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
         this.user_restricted_columns = user_restricted_columns;
       },
       (error)=>{
-        console.log(error);
+        console.error(error);
         this.toastr.error("Error in fetching User Previleges")
       }
     );
@@ -1317,13 +1319,13 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   renderInfoDetailsasHTML(location:any){
     let popup_infoString = this.currentUserViews?.[0]?.location_popup_info;
-    let popup_columns = popup_infoString.substring(1, popup_infoString.length-1).split(" ");
+    let popup_columns = popup_infoString?.substring(1, popup_infoString?.length-1).split(" ");
     return `${(function fun() {
       let tot = '';
       for(let i=0;i<popup_columns.length;i++){
         for (const [key, value] of Object.entries(location)) {
          if(popup_columns[i] == key){
-           if(key != 'Address') tot= tot + `<div>${key.replace(/_/," ")} :</div><div>${value}</div>`;
+           if(key != 'Address') tot= tot + `<div>${key.replace(/_/g," ")} :</div><div>${value}</div>`;
          }
          else if(popup_columns[i]=='Address') {
           tot = tot + `<div>Address :</div><div>${(location?.Address_Line_1) ? location?.Address_Line_1 : ''} ${(location?.Address_Line_2) ? location?.Address_Line_2 : ''}, ${(location?.City) ? location?.City : ''}, ${location?.Country ? location?.Country : ''}</div>`;
