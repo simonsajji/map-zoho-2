@@ -98,8 +98,7 @@ export class TableviewComponent implements OnInit, OnChanges {
   @Input('showRoutes') showRoutes: boolean = false;
   @Input('initialLoaderTable') initialLoaderTable: boolean = false;
   @Output('firstChangeAddMultipleRouteEvent') firstChangeAddMultipleRouteEvent = new EventEmitter();
-  // new code for User Access Based Columns (ORder is important)
-  shownColumns:any = ['Address_Line_1','Location_Name'];
+  shownColumns:any = [];
   accessibleColumns:any = [];
   currentUserViews:any;
 
@@ -152,14 +151,14 @@ export class TableviewComponent implements OnInit, OnChanges {
       "Email":sessionStorage.getItem('userToken')
      }
 
-     this.apiService.post(`${environment.testApiUrl}/user_views/${payload?.Email}`,payload).subscribe(
+     this.apiService.post(`${environment.coreApiUrl}/user_views/${payload?.Email}`,payload).subscribe(
       (data:any)=>{
         this.currentUserViews = data;
         let accessibleColumnsString = this.currentUserViews[0]?.edit_columns_order;
-        let accessibleColumns = accessibleColumnsString.substring(1, accessibleColumnsString.length-1).split(" ");
+        let accessibleColumns = accessibleColumnsString?.substring(1, accessibleColumnsString?.length-1).split(" ");
         this.accessibleColumns = accessibleColumns;
         let shownColumnsString = this.currentUserViews[0]?.location_table_column_order;
-        let shownColumns = shownColumnsString.substring(1, shownColumnsString.length-1).split(" ");
+        let shownColumns = shownColumnsString?.substring(1, shownColumnsString?.length-1).split(" ");
         this.shownColumns = shownColumns;
         this.shownColumns.unshift('select')
       },
@@ -188,7 +187,7 @@ export class TableviewComponent implements OnInit, OnChanges {
     dialogRef.afterClosed().subscribe((data: []) => {
       if (data) {
         this.shownColumns = data;
-        if(!this.shownColumns.includes('select')) this.shownColumns.unshift('select');
+        if(!this.shownColumns?.includes('select')) this.shownColumns?.unshift('select');
       }
     });
   }
