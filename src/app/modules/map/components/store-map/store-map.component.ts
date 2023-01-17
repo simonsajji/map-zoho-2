@@ -1,5 +1,5 @@
 import { LocationStrategy } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef, Renderer2, ViewEncapsulation, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnChanges, OnInit,OnDestroy, ViewChild, AfterViewInit, ChangeDetectorRef, Renderer2, ViewEncapsulation, HostListener } from '@angular/core';
 import MarkerClusterer from '@googlemaps/markerclustererplus';
 import { isThisSecond } from 'date-fns';
 import { environment } from 'src/environments/environment';
@@ -41,7 +41,7 @@ interface TableMode {
     '(document:click)': '(onBodyClick($event))'
   }
 })
-export class StoreMapComponent implements OnInit, AfterViewInit {
+export class StoreMapComponent implements OnInit, AfterViewInit,OnDestroy {
 
   @ViewChild('map', { static: false }) info: ElementRef | undefined;
   labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -122,13 +122,14 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
   firstChangeFromMultipleRtes:any;
   currentUserViews:any = [];
   user_restricted_columns:any = [];
-  constructor(private renderer: Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService, private router: Router,private userViews:UserViewsService) { }
+  userToken:any;
+  constructor(private renderer: Renderer2, private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService, private router: Router,private userViewService:UserViewsService) { }
 
   ngOnChanges() { }
 
   callFnApi() {
     let payload = {
-      "Email":sessionStorage.getItem('userToken')
+      "Email":this.userToken
      }
     this.apiService.get(`${environment?.coreApiUrl}/api/${payload?.Email}`).subscribe(
       (dat) => {
@@ -156,7 +157,7 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   assignUserPrevileges(){
      let payload = {
-      "Email":sessionStorage.getItem('userToken')
+      "Email":this.userToken
      };
      this.apiService.post(`${environment.coreApiUrl}/user_views/${payload?.Email}`,payload).subscribe(
       (data:any)=>{
@@ -239,6 +240,9 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
     this.allTerritoriesLoaded = false;
     this.attemptsFetchzones = 0;
     this.maxLimitReached = false;
+    this.userViewService.getUserToken().subscribe((item: any) => {
+      this.userToken = item;
+    })
     const loader = new Loader({
       apiKey: "AIzaSyDHDZE9BzqQu0UUT_TuaS0pBzTbCoHEPJs",
       libraries: ['drawing', 'places', 'geometry', 'visualization'],
@@ -1405,6 +1409,11 @@ export class StoreMapComponent implements OnInit, AfterViewInit {
 
   getFirstChangeFromMultipleRtes(ev:any){
     this.firstChangeFromMultipleRtes = ev;
+  }
+
+  ngOnDestroy(){
+    sessionStorage.clear();
+    this.router.navigate([''])
   }
 
 }

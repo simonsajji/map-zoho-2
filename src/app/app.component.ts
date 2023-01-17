@@ -7,5 +7,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = "Zmap"
+  title = "Zmap";
+  constructor(){
+    const isCookiesEnabled = navigator?.cookieEnabled;
+    if(!isCookiesEnabled) window.alert("Kindly enable your browser cookie to proceed further");
+  }
 }

@@ -17,6 +17,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { EditcolumnComponent } from '../editcolumn/editcolumn.component'
 import { isThisSecond } from 'date-fns';
 import { DrawingService } from '../../../../services/drawing.service';
+import { UserViewsService } from 'src/app/services/user-views.service';
 
 interface TableObj {
   value: string;
@@ -101,11 +102,15 @@ export class TableviewComponent implements OnInit, OnChanges {
   shownColumns:any = [];
   accessibleColumns:any = [];
   currentUserViews:any;
+  userToken:any;
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef,private userViewService:UserViewsService ,private toastr: ToastrServices, private dialog: MatDialog, private apiService: ApiService, private locationService: LocationService, private drawingService: DrawingService) { }
 
   ngOnInit(): void {
     this.pageSizeperPage = 70;
+    this.userViewService.getUserToken().subscribe((item: any) => {
+      this.userToken = item;
+    })
     this.getTableColumnViews();
     this.locationService.getSelectedPoints().subscribe((item: any) => {
       this.selectedLocations = item;
@@ -148,7 +153,7 @@ export class TableviewComponent implements OnInit, OnChanges {
 
   getTableColumnViews(){
     let payload = {
-      "Email":sessionStorage.getItem('userToken')
+      "Email":this.userToken
      }
 
      this.apiService.post(`${environment.coreApiUrl}/user_views/${payload?.Email}`,payload).subscribe(

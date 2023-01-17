@@ -276,7 +276,7 @@ section {
   
   .login-btn{
     /* max-width: 600px; */
-    width: 28vw!important;
+    width: calc(85% - 8px)!important;
     border-radius: 6px!important;
     /* background-color: #49a1c9; */
     background-color: #2b59b5;
@@ -288,7 +288,7 @@ section {
   
   .reset-btn{
      /* max-width: 600px; */
-     width: 28vw!important;
+     width: calc(80%)!important;
      border-radius: 6px!important;
      /* background-color: #49a1c9; */
      background-color: #2b59b5;
