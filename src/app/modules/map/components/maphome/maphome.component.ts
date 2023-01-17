@@ -1,4 +1,5 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-maphome',
@@ -26,12 +27,11 @@ export class MaphomeComponent implements OnInit {
     return true;
   }
   
-  constructor() { 
+  constructor(private router:Router) { 
     document.addEventListener('contextmenu', function(e) {
       e.preventDefault();
     });
   }
 
   ngOnInit(): void { }
-
 }

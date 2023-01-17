@@ -10,7 +10,6 @@ export class AuthGuardService implements CanActivate {
     // let roles = route.data['role'];
     if (!this.auth.isAuthenticated()) {
       this.router.navigate(['']);
-      console.log("not auth")
       return false;
     } 
     else {

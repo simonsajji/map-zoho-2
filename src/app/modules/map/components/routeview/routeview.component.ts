@@ -17,6 +17,8 @@ import { NewterritoryformComponent } from '../newterritoryform/newterritoryform.
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { debounceTime } from 'rxjs';
+import { Router } from '@angular/router';
+import { UserViewsService } from 'src/app/services/user-views.service';
 
 interface ViewObj {
   value: string;
@@ -43,7 +45,7 @@ interface ViewObj {
 
   ]
 })
-export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
+export class RouteviewComponent implements OnInit, OnChanges {
   navigation: boolean = false;
   showOverlay: boolean = false;
   showRoutes: boolean = false;
@@ -149,6 +151,7 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
   googleLocationSuggestions: any = [];
   currentUserViews:any;
   user_restricted_columns:any;
+  userToken:any;
   @Output('clearClusters') clearClusters = new EventEmitter();
   @Output('addClusters') addClusters = new EventEmitter();
   @Output('enableInitialLoader') enableInitialLoader = new EventEmitter();
@@ -165,7 +168,7 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
   @Output('viewSinglePolygonWithoutBounds') viewSinglePolygonWithoutBounds = new EventEmitter();
   @Output('hideTempMarkers') hideTempMarkers = new EventEmitter();
 
-  constructor(private locationService: LocationService, private fb: FormBuilder, private cdr: ChangeDetectorRef, private drawingService: DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient) { }
+  constructor(private locationService: LocationService,private router:Router, private fb: FormBuilder, private cdr: ChangeDetectorRef, private drawingService: DrawingService, private dialog: MatDialog, private toastr: ToastrServices, private apiService: ApiService, private http: HttpClient,private userViewService:UserViewsService) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -176,6 +179,9 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
     this.end = 5;
     this.directionsService = new google.maps.DirectionsService();
     this.infoWin = new google.maps.InfoWindow();
+    this.userViewService.getUserToken().subscribe((item: any) => {
+      this.userToken = item;
+    })
     this.locationService.getSelectedPoints().subscribe((item: any) => {
       this.selectedLocations = item;
     });
@@ -1255,7 +1261,7 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
 
   assignUserPrevileges(){
     let payload = {
-     "Email":sessionStorage.getItem('userToken')
+     "Email":this.userToken
     };
     this.apiService.post(`${environment.coreApiUrl}/user_views/${payload?.Email}`,payload).subscribe(
      (data:any)=>{
@@ -1270,8 +1276,5 @@ export class RouteviewComponent implements OnInit, OnChanges, OnDestroy {
    );
  }
 
-  ngOnDestroy(): void {
-    // clearInterval(this.fetchTimeInterval);
-  }
 
 }

@@ -27,6 +27,7 @@ export class LoginComponent implements OnInit {
   currentEmail: any;
   passwordChangeForm: FormGroup;
   loader:boolean = false;
+  userToken:any;
   @ViewChild('updatedEmail') updatedEmail: ElementRef | any;
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(e: KeyboardEvent) {
@@ -48,12 +49,15 @@ export class LoginComponent implements OnInit {
     return true;
   }
 
-  constructor(private formBuilder: FormBuilder, private router: Router, public auth: AuthService,private apiService:ApiService,private toastr:ToastrServices,private userViews:UserViewsService) {
+  constructor(private formBuilder: FormBuilder, private router: Router, public auth: AuthService,private apiService:ApiService,private toastr:ToastrServices,private userViewService:UserViewsService) {
     document.addEventListener('contextmenu', function(e) {
       e.preventDefault();
     });
+    this.userViewService.getUserToken().subscribe((item: any) => {
+      this.userToken = item;
+    });
     if (this.auth.isAuthenticated()) {
-      let userToken = sessionStorage.getItem('userToken');
+      let userToken = this.userToken;
       if (userToken != null ) this.router.navigate(['/map']);
       if (userToken === null  ) this.showLoginForm = true;
     }
@@ -116,8 +120,9 @@ export class LoginComponent implements OnInit {
     this.apiService.post(`${environment.coreApiUrl}/login`,payload).subscribe(
       (data:any)=>{
         if(!data?.message){
-          sessionStorage.setItem('userToken', payload?.Email);
-          sessionStorage.setItem('userViews',data?.view);
+          // sessionStorage.setItem('userToken', payload?.Email);
+          // sessionStorage.setItem('userViews',data?.view);
+          this.userViewService?.setUserToken(payload?.Email);
           this.toastr.success("Successfully Signed In");
           this.loader = false;
           this.router.navigate(['/map'])
