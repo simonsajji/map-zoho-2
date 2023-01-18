@@ -26,11 +26,13 @@ export class MaphomeComponent implements OnInit {
     }
     return true;
   }
+  isCookieEnabled:any;
   
   constructor(private router:Router) { 
     document.addEventListener('contextmenu', function(e) {
       e.preventDefault();
     });
+    this.isCookieEnabled = navigator?.cookieEnabled;
   }
 
   ngOnInit(): void { }

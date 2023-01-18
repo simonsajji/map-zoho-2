@@ -1,8 +1,19 @@
-<div>
+<div *ngIf="!isCookieEnabled">
+  <div class="content-body" >
+    <div class="card-error">
+        <div class="">
+          <img src="assets/warning.png" alt="" srcset="" width="50px" height="50px">
+          <p class="f-s-17 c-drk zmap-header">Cookies are blocked</p>
+          <div class="cookie-block-error f-w-400 f-s-15 p-l-5">Your browser has cookies disabled. If cookies are disabled in your browser, or you are browsing in Private Mode, please make sure cookies are enabled and try again.</div>
+        </div>
+      </div>
+  </div>
+</div>
+<div *ngIf="isCookieEnabled">
   <div *ngIf="loader" style="z-index:1200!important">
     <mat-spinner style="z-index:1000!important;position: absolute!important;top:45%;left:49%" diameter="50">
     </mat-spinner>
-</div>
+  </div>
   <div *ngIf="showLoginForm">
     <div class="content-body" *ngIf="loginView">
       <mat-card>
@@ -16,9 +27,6 @@
               <mat-form-field class="full-width" appearance="outline">
                 <mat-label>User Email</mat-label>
                 <input matInput #email (keyup)="updateEmailValue(email?.value)" autocomplete="off" formControlName="email" />
-                <!-- <mat-error *ngIf="!loginForm.controls['email'].valid">
-                  Email is required
-                </mat-error> -->
               </mat-form-field>
             </div>
 
@@ -32,22 +40,8 @@
                     {{hide ? 'visibility_off' : 'visibility'}}
                   </mat-icon>
                 </button>
-                <!-- <mat-error *ngIf="!loginForm.controls['password'].valid">
-                        Password is required
-                      </mat-error> -->
-                <!-- <mat-error *ngIf="loginForm?.get('password')?.hasError('minlength')">
-                  minimum require 4 characters
-                </mat-error> -->
-
-                <!-- <mat-hint class="change-pass f-s-12 f-w-500 c-pointer" (click)="switchView()" >Change Password</mat-hint> -->
               </mat-form-field>
             </div>
-            <!-- <mat-error class="error" *ngIf="
-                    wrongUser && !accBlocked && !loginForm?.get('password')?.hasError('minlength') 
-                   ">Invalid email or password</mat-error>
-            <mat-error class="error" *ngIf="accBlocked &&
-                  !loginForm?.get('password')?.hasError('minlength')
-                 ">Your account has been blocked for one hour</mat-error> -->
             <div class="d-flex  btn-outer align-center j-end p-l-20">
               <button mat-stroked-button type="submit" class="login-btn  f-s-14 f-w-500  m-b-20">Login</button>
             </div>
@@ -66,17 +60,12 @@
             <p class="f-s-18 f-w-600 c-drk zmap-header t-a-left">Update Password</p>
           </div>
           <form (ngSubmit)="passwordChange()" name="passwordChangeForm" [formGroup]="passwordChangeForm">
-            <!-- <div class="p-55-0rem t-a-left">User Email</div> -->
             <div class="emailInput">
               <mat-form-field class="full-width" appearance="outline">
                 <mat-label>User Email</mat-label>
                 <input matInput #updatedEmail autocomplete="off" [value]="currentEmail" formControlName="uemail" />
-                <!-- <mat-error *ngIf="!loginForm.controls['email'].valid">
-                  Email is required
-                </mat-error> -->
               </mat-form-field>
             </div>
-            <!-- <div class="p-55-0rem t-a-left">Old Password</div> -->
             <div class="passInput">
               <mat-form-field class="pass-field" appearance="outline">
                 <mat-label>Old Password</mat-label>
@@ -86,16 +75,8 @@
                     {{hideoldpass ? 'visibility_off' : 'visibility'}}
                   </mat-icon>
                 </button>
-                <!-- <mat-error *ngIf="!loginForm.controls['password'].valid">
-                        Password is required
-                      </mat-error> -->
-                <!-- <mat-error *ngIf="loginForm?.get('password')?.hasError('minlength')">
-                  minimum require 4 characters
-                </mat-error> -->
-                
               </mat-form-field>
             </div>
-            <!-- <div class="p-55-0rem t-a-left">New Password</div> -->
             <div class="passInput">
               <mat-form-field class="pass-field" appearance="outline">
                 <mat-label>New Password</mat-label>
@@ -104,14 +85,7 @@
                   <mat-icon class="f-s-15">
                     {{hidenewpass ? 'visibility_off' : 'visibility'}}
                   </mat-icon>
-                </button>
-                <!-- <mat-error *ngIf="!loginForm.controls['password'].valid">
-                        Password is required
-                      </mat-error> -->
-                <!-- <mat-error *ngIf="loginForm?.get('password')?.hasError('minlength')">
-                  minimum require 4 characters
-                </mat-error> -->
-                
+                </button>                
               </mat-form-field>
             </div>
             <div class="passInput">
@@ -122,37 +96,18 @@
                   <mat-icon class="f-s-15">
                     {{hideconfirmpass ? 'visibility_off' : 'visibility'}}
                   </mat-icon>
-                </button>
-                <!-- <mat-error *ngIf="!loginForm.controls['password'].valid">
-                        Password is required
-                      </mat-error> -->
-                <!-- <mat-error *ngIf="loginForm?.get('password')?.hasError('minlength')">
-                  minimum require 4 characters
-                </mat-error> -->
-                
+                </button>                
               </mat-form-field>
             </div>
-            <!-- <mat-error class="error" *ngIf="
-                    wrongUser && !accBlocked && !loginForm?.get('password')?.hasError('minlength') 
-                   ">Invalid email or password</mat-error>
-            <mat-error class="error" *ngIf="accBlocked &&
-                  !loginForm?.get('password')?.hasError('minlength')
-                 ">Your account has been blocked for one hour</mat-error> -->
             <div class="d-flex  btn-outer align-center j-end ">
-              <!-- <button mat-stroked-button type="submit" class="cancel-btn  f-s-14 f-w-500 w-100 f-s-14 f-w-500 m-r-0 m-t-10">Cancel</button> -->
-              <button mat-stroked-button type="submit" class="reset-btn  f-s-14 f-w-500 w-100 f-s-14 f-w-500 m-r-0 m-t-10">Update my password</button>
-              
-            </div>
-            
-          </form>
-          
+              <button mat-stroked-button type="submit" class="reset-btn  f-s-14 f-w-500 w-100 f-s-14 f-w-500 m-r-0 m-t-10">Update my password</button>             
+            </div>       
+          </form>      
         </mat-card-content>
         <div class="m-t-30 m-b-5 p-20 p-t-0 p-b-10 f-s-14 change-pass f-w-500  ">
           <div class="go-back c-pointer p-55-0rem t-a-left" (click)="switchView()">Back to Login</div>
-
       </div>
       </mat-card>
     </div>
-
   </div>
 </div>

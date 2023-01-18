@@ -182,6 +182,21 @@ section {
     align-items: center;
     justify-content: center;
   }
+
+  .card-error{
+    border-radius: 2px!important;
+    width: 35vw!important;
+    display: flex;
+    flex-direction: column;
+    text-align: center!important;
+    justify-content: center;
+    align-items: center!important;
+  }
+
+  .cookie-block-error{
+    color:rgb(85, 85, 85);
+    font-family: 'Jakarta-medium'!important;
+  }
   
   .p-55-1rem{
     padding: 0.5rem 55px;
