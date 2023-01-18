@@ -1,1 +1,15 @@
-<store-map></store-map>
+<ng-container *ngIf="!isCookieEnabled">
+  <div class="content-body" >
+    <div class="card-error">
+        <div class="">
+          <img src="assets/warning.png" alt="" srcset="" width="50px" height="50px">
+          <p class="f-s-17 c-drk zmap-header">Cookies are blocked</p>
+          <div class="cookie-block-error f-w-400 f-s-15 p-l-5">Your browser has cookies disabled. If cookies are disabled in your browser, or you are browsing in Private Mode, please make sure cookies are enabled and try again.</div>
+        </div>
+      </div>
+  </div>
+</ng-container>
+<ng-container *ngIf="isCookieEnabled">
+    <store-map></store-map>
+</ng-container>
+

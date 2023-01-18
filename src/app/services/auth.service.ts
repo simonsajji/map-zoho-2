@@ -20,6 +20,7 @@ export class AuthService {
   isAuthenticated(){
     // let usertoken = sessionStorage.getItem('userToken');    
     // let passtoken = sessionStorage.getItem('passToken');  
+    
     if(this.userToken === "" ) return false;
     else return true;
   }

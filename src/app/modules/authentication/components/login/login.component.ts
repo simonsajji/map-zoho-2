@@ -28,6 +28,7 @@ export class LoginComponent implements OnInit {
   passwordChangeForm: FormGroup;
   loader:boolean = false;
   userToken:any;
+  isCookieEnabled:any;
   @ViewChild('updatedEmail') updatedEmail: ElementRef | any;
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(e: KeyboardEvent) {
@@ -53,6 +54,8 @@ export class LoginComponent implements OnInit {
     document.addEventListener('contextmenu', function(e) {
       e.preventDefault();
     });
+    this.isCookieEnabled = navigator?.cookieEnabled;
+
     this.userViewService.getUserToken().subscribe((item: any) => {
       this.userToken = item;
     });
@@ -62,6 +65,7 @@ export class LoginComponent implements OnInit {
       if (userToken === null  ) this.showLoginForm = true;
     }
     else this.showLoginForm = true;
+    
     this.loginForm = this.formBuilder.group({
       email: [null, Validators.required,],
       password: [null, [Validators.required],
